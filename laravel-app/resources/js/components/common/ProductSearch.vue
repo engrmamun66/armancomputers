@@ -1,0 +1,85 @@
+<script setup>
+import { ref, watch } from 'vue';
+import api from '@/services/api';
+
+const props = defineProps({
+    excludeIds: { type: Array, default: () => [] },
+    placeholder: { type: String, default: 'Search product by name, SKU, or barcode…' },
+});
+
+const emit = defineEmits(['select']);
+
+const query = ref('');
+const results = ref([]);
+const open = ref(false);
+const loading = ref(false);
+let timer = null;
+
+watch(query, (value) => {
+    clearTimeout(timer);
+    if (!value.trim()) {
+        results.value = [];
+        open.value = false;
+        return;
+    }
+    timer = setTimeout(() => search(value), 300);
+});
+
+async function search(value) {
+    loading.value = true;
+    try {
+        const { data } = await api.get('/products', { params: { search: value, per_page: 8 } });
+        results.value = data.data.filter((product) => !props.excludeIds.includes(product.id));
+        open.value = true;
+    } finally {
+        loading.value = false;
+    }
+}
+
+function select(product) {
+    emit('select', product);
+    query.value = '';
+    results.value = [];
+    open.value = false;
+}
+
+function closeSoon() {
+    setTimeout(() => (open.value = false), 150);
+}
+</script>
+
+<template>
+    <div class="relative">
+        <input
+            v-model="query"
+            type="text"
+            :placeholder="placeholder"
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            @focus="results.length && (open = true)"
+            @blur="closeSoon"
+        />
+        <div
+            v-if="open && results.length"
+            class="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-lg max-h-64 overflow-y-auto"
+        >
+            <button
+                v-for="product in results"
+                :key="product.id"
+                type="button"
+                class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
+                @mousedown.prevent="select(product)"
+            >
+                <span>
+                    <span class="font-medium text-slate-800">{{ product.name }}</span>
+                    <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
+                </span>
+                <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">
+                    {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}
+                </span>
+            </button>
+        </div>
+        <div v-else-if="open && loading" class="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-lg px-3 py-2 text-sm text-slate-400">
+            Searching…
+        </div>
+    </div>
+</template>

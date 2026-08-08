@@ -1,0 +1,221 @@
+<script setup>
+import { computed, ref } from 'vue';
+import { useRoute, useRouter, RouterLink } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { can } from '@/utils/permissions';
+import Icon from '@/components/common/Icon.vue';
+
+const route = useRoute();
+const router = useRouter();
+const auth = useAuthStore();
+
+const role = computed(() => auth.roleSlug);
+
+const NAV_ITEMS = [
+    { name: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { name: 'products.index', label: 'Products', icon: 'box' },
+    { name: 'brands.index', label: 'Brands', icon: 'tag', capability: 'brands.manage' },
+    { name: 'customers.index', label: 'Customers', icon: 'user-group' },
+    { name: 'stock-in.index', label: 'Stock In', icon: 'arrow-down-tray', capability: 'stock-in.manage' },
+    { name: 'stock-out.index', label: 'Stock Out', icon: 'arrow-up-tray' },
+    { name: 'invoices.index', label: 'Invoices', icon: 'document-text' },
+    { name: 'users.index', label: 'Users', icon: 'user-group', capability: 'users' },
+];
+
+const BREADCRUMBS = {
+    'dashboard': 'Dashboard',
+    'products.index': 'Products', 'products.create': 'Add Product', 'products.edit': 'Edit Product',
+    'products.show': 'Product Details', 'products.stock-history': 'Stock History',
+    'brands.index': 'Brands',
+    'customers.index': 'Customers', 'customers.show': 'Customer Details',
+    'stock-in.index': 'Stock In', 'stock-in.create': 'New Stock In', 'stock-in.edit': 'Edit Stock In', 'stock-in.show': 'Stock In Details',
+    'stock-out.index': 'Stock Out', 'stock-out.create': 'New Stock Out', 'stock-out.edit': 'Edit Stock Out', 'stock-out.show': 'Stock Out Details',
+    'invoices.index': 'Invoices', 'invoices.show': 'Invoice',
+    'users.index': 'Users',
+    'profile': 'Profile',
+    'contact': 'Contact',
+    'privacy': 'Privacy Policy',
+};
+
+const visibleNavItems = computed(() => NAV_ITEMS.filter((item) => !item.capability || can(role.value, item.capability)));
+
+const mobilePrimaryNames = computed(() => {
+    const fourth = can(role.value, 'stock-in.manage') ? 'stock-in.index' : 'invoices.index';
+    return ['dashboard', 'stock-out.index', 'products.index', fourth];
+});
+
+const mobilePrimaryItems = computed(() =>
+    mobilePrimaryNames.value.map((name) => NAV_ITEMS.find((item) => item.name === name)).filter(Boolean)
+);
+
+const mobileMoreItems = computed(() => visibleNavItems.value.filter((item) => !mobilePrimaryNames.value.includes(item.name)));
+
+const breadcrumb = computed(() => BREADCRUMBS[route.name] || '');
+
+const userMenuOpen = ref(false);
+const moreSheetOpen = ref(false);
+
+async function handleLogout() {
+    await auth.logout();
+    router.push({ name: 'login' });
+}
+</script>
+
+<template>
+    <div class="min-h-screen bg-slate-50 flex flex-col">
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+            <div class="px-4 sm:px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="h-8 w-8 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-sm">AC</div>
+                    <span class="font-semibold text-slate-900 hidden sm:inline">Arman Computers</span>
+                </div>
+
+                <div class="relative">
+                    <button
+                        type="button"
+                        class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
+                        @click="userMenuOpen = !userMenuOpen"
+                    >
+                        <span class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-sm font-semibold overflow-hidden">
+                            <img v-if="auth.user?.avatar" :src="auth.user.avatar" class="h-full w-full object-cover" alt="" />
+                            <span v-else>{{ auth.user?.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+                        </span>
+                        <span class="hidden sm:inline">{{ auth.user?.name }}</span>
+                        <Icon name="chevron-down" class="h-4 w-4" />
+                    </button>
+
+                    <div
+                        v-if="userMenuOpen"
+                        class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-slate-200 py-1 text-sm"
+                        @click="userMenuOpen = false"
+                    >
+                        <p class="px-4 py-2 text-xs text-slate-400 uppercase tracking-wide">{{ auth.user?.role?.name }}</p>
+                        <RouterLink :to="{ name: 'profile' }" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Profile</RouterLink>
+                        <RouterLink :to="{ name: 'contact' }" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Contact</RouterLink>
+                        <button type="button" class="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50" @click="handleLogout">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-1">
+            <aside class="hidden md:flex md:flex-col w-56 shrink-0 border-r border-slate-200 bg-white">
+                <nav class="flex-1 px-3 py-4 space-y-1">
+                    <RouterLink
+                        v-for="item in visibleNavItems"
+                        :key="item.name"
+                        :to="{ name: item.name }"
+                        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium"
+                        :class="route.name === item.name || route.name?.startsWith(item.name.split('.')[0] + '.')
+                            ? 'bg-blue-50 text-blue-700'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                    >
+                        <Icon :name="item.icon" class="h-5 w-5" />
+                        {{ item.label }}
+                    </RouterLink>
+                </nav>
+            </aside>
+
+            <main class="flex-1 min-w-0 pb-20 md:pb-6">
+                <div class="px-4 sm:px-6 py-4">
+                    <nav v-if="breadcrumb" class="text-sm text-slate-500 mb-4">
+                        <RouterLink :to="{ name: 'dashboard' }" class="hover:text-slate-700">Home</RouterLink>
+                        <span class="mx-1.5">/</span>
+                        <span class="text-slate-700 font-medium">{{ breadcrumb }}</span>
+                    </nav>
+                    <slot />
+                </div>
+            </main>
+        </div>
+
+        <footer class="hidden md:block border-t border-slate-200 bg-white">
+            <div class="px-6 py-4 flex items-center justify-between text-sm text-slate-500">
+                <p>&copy; {{ new Date().getFullYear() }} Arman Computers. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <RouterLink :to="{ name: 'contact' }" class="hover:text-slate-700">Contact</RouterLink>
+                    <RouterLink :to="{ name: 'privacy' }" class="hover:text-slate-700">Privacy Policy</RouterLink>
+                </div>
+            </div>
+        </footer>
+
+        <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 flex">
+            <RouterLink
+                v-for="item in mobilePrimaryItems"
+                :key="item.name"
+                :to="{ name: item.name }"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
+                :class="route.name === item.name ? 'text-blue-600' : 'text-slate-500'"
+            >
+                <Icon :name="item.icon" class="h-5 w-5" />
+                {{ item.label }}
+            </RouterLink>
+            <button
+                type="button"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
+                :class="moreSheetOpen ? 'text-blue-600' : 'text-slate-500'"
+                @click="moreSheetOpen = true"
+            >
+                <Icon name="ellipsis-horizontal" class="h-5 w-5" />
+                More
+            </button>
+        </nav>
+
+        <Teleport to="body">
+            <div v-if="moreSheetOpen" class="md:hidden fixed inset-0 z-50 flex items-end">
+                <div class="absolute inset-0 bg-slate-900/50" @click="moreSheetOpen = false" />
+                <div class="relative bg-white rounded-t-2xl w-full p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[75vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-slate-900">More</h3>
+                        <button type="button" @click="moreSheetOpen = false"><Icon name="x-mark" class="h-5 w-5 text-slate-500" /></button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <RouterLink
+                            v-for="item in mobileMoreItems"
+                            :key="item.name"
+                            :to="{ name: item.name }"
+                            class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
+                            @click="moreSheetOpen = false"
+                        >
+                            <Icon :name="item.icon" class="h-5 w-5" />
+                            {{ item.label }}
+                        </RouterLink>
+                        <RouterLink
+                            :to="{ name: 'profile' }"
+                            class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
+                            @click="moreSheetOpen = false"
+                        >
+                            <Icon name="user-circle" class="h-5 w-5" />
+                            Profile
+                        </RouterLink>
+                        <RouterLink
+                            :to="{ name: 'contact' }"
+                            class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
+                            @click="moreSheetOpen = false"
+                        >
+                            <Icon name="phone" class="h-5 w-5" />
+                            Contact
+                        </RouterLink>
+                        <RouterLink
+                            :to="{ name: 'privacy' }"
+                            class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
+                            @click="moreSheetOpen = false"
+                        >
+                            <Icon name="shield-check" class="h-5 w-5" />
+                            Privacy
+                        </RouterLink>
+                        <button
+                            type="button"
+                            class="flex flex-col items-center gap-1 p-3 rounded-lg text-rose-600 hover:bg-rose-50 text-xs"
+                            @click="handleLogout"
+                        >
+                            <Icon name="logout" class="h-5 w-5" />
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
+    </div>
+</template>

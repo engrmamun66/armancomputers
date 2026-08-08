@@ -1,0 +1,35 @@
+<script setup>
+import { useConfirm } from '@/composables/useConfirm';
+
+const { state, respond } = useConfirm();
+</script>
+
+<template>
+    <Teleport to="body">
+        <div v-if="state.visible" class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 px-4">
+            <div role="alertdialog" aria-modal="true" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+                <h3 class="text-base font-semibold text-slate-900">{{ state.title }}</h3>
+                <p class="mt-2 text-sm text-slate-600">{{ state.message }}</p>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button
+                        type="button"
+                        class="px-4 py-2 text-sm font-medium rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50"
+                        @click="respond(false)"
+                    >
+                        {{ state.cancelText }}
+                    </button>
+                    <button
+                        type="button"
+                        :class="[
+                            'px-4 py-2 text-sm font-medium rounded-md text-white',
+                            state.danger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-blue-600 hover:bg-blue-700',
+                        ]"
+                        @click="respond(true)"
+                    >
+                        {{ state.confirmText }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </Teleport>
+</template>
