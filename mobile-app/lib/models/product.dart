@@ -5,7 +5,7 @@ class ProductModel {
   final int id;
   final BrandModel? brand;
   final String name;
-  final String sku;
+  final String? sku;
   final String? barcode;
   final String? description;
   final double purchasePrice;
@@ -36,7 +36,7 @@ class ProductModel {
         id: json['id'] as int,
         brand: json['brand'] != null ? BrandModel.fromJson(json['brand'] as Map<String, dynamic>) : null,
         name: json['name'] as String,
-        sku: json['sku'] as String,
+        sku: json['sku'] as String?,
         barcode: json['barcode'] as String?,
         description: json['description'] as String?,
         purchasePrice: (json['purchase_price'] as num).toDouble(),

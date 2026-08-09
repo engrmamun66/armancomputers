@@ -107,7 +107,7 @@ onMounted(load);
                             :to="{ name: 'products.show', params: { id: product.id } }"
                             class="flex items-center justify-between py-2 text-sm hover:bg-slate-50 px-1 -mx-1 rounded"
                         >
-                            <span class="text-slate-700">{{ product.name }} <span v-if="product.sku" class="text-slate-400">· {{ product.sku }}</span></span>
+                            <span class="text-slate-700">{{ product.name }}</span>
                             <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-amber-600'" class="font-medium">
                                 {{ product.current_stock }} / {{ product.minimum_stock }}
                             </span>

@@ -200,7 +200,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
         children: [
           AppSearchField(
             initialValue: _search,
-            hint: 'Search by name, SKU, or barcode',
+            hint: 'Search by name or barcode',
             onChanged: (value) {
               _search = value;
               _onFilterChanged();
@@ -419,15 +419,13 @@ class _ProductCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4),
-              Text(
-                [
-                  'SKU: ${product.sku}',
-                  if (product.brand != null) product.brand!.name,
-                ].join('  ·  '),
-                style: theme.textTheme.bodySmall?.copyWith(color: muted),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              if (product.brand != null)
+                Text(
+                  product.brand!.name,
+                  style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               const SizedBox(height: 10),
               Row(
                 children: [

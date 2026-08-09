@@ -31,7 +31,6 @@ const imageInput = ref(null);
 const form = reactive({
     brand_id: '',
     name: '',
-    sku: '',
     barcode: '',
     description: '',
     purchase_price: '',
@@ -51,7 +50,6 @@ onMounted(async () => {
         Object.assign(form, {
             brand_id: product.brand?.id,
             name: product.name,
-            sku: product.sku,
             barcode: product.barcode,
             description: product.description,
             purchase_price: product.purchase_price,
@@ -237,17 +235,10 @@ async function submit() {
                 <p v-if="errors.name" class="mt-1 text-xs text-rose-600">{{ errors.name[0] }}</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">SKU <span class="text-slate-400 font-normal">(optional)</span></label>
-                    <input v-model="form.sku" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                    <p v-if="errors.sku" class="mt-1 text-xs text-rose-600">{{ errors.sku[0] }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
-                    <input v-model="form.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                    <p v-if="errors.barcode" class="mt-1 text-xs text-rose-600">{{ errors.barcode[0] }}</p>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
+                <input v-model="form.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                <p v-if="errors.barcode" class="mt-1 text-xs text-rose-600">{{ errors.barcode[0] }}</p>
             </div>
 
             <div>

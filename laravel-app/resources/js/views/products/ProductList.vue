@@ -29,7 +29,6 @@ const columns = [
     { key: 'index', label: '#' },
     { key: 'image', label: 'Image', sortable: false },
     { key: 'name', label: 'Product' },
-    { key: 'sku', label: 'SKU' },
     { key: 'barcode', label: 'Barcode' },
     { key: 'brand', label: 'Brand' },
     { key: 'purchase_price', label: 'Purchase Price', align: 'right' },
@@ -138,7 +137,7 @@ async function removeProduct(product) {
 
         <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
             <div class="sm:w-64">
-                <SearchInput v-model="filters.search" placeholder="Search name, SKU, or barcode…" />
+                <SearchInput v-model="filters.search" placeholder="Search name or barcode…" />
             </div>
             <select v-model="filters.brand_id" class="px-3 py-2 text-sm border border-slate-300 rounded-md">
                 <option value="">All Brands</option>
@@ -206,7 +205,7 @@ async function removeProduct(product) {
                                 <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-900 truncate">{{ row.name }}</RouterLink>
                                 <StatusBadge :status="row.status?.slug" />
                             </div>
-                            <p class="text-sm text-slate-500 mt-1"><template v-if="row.sku">{{ row.sku }} · </template>{{ row.brand?.name }}</p>
+                            <p class="text-sm text-slate-500 mt-1">{{ row.brand?.name }}</p>
                             <p class="text-sm text-slate-500">Selling: {{ formatCurrency(row.selling_price) }}</p>
                             <p class="text-sm mt-1" :class="row.stock_state !== 'in-stock' ? 'font-semibold text-amber-600' : 'text-slate-500'">
                                 Stock: {{ row.current_stock }} <span v-if="row.stock_state !== 'in-stock'">({{ row.stock_state }})</span>

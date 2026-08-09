@@ -160,7 +160,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _infoRow(context, 'Brand', product.brand?.name ?? '—'),
-                _infoRow(context, 'SKU', product.sku),
                 if ((product.barcode ?? '').isNotEmpty) _infoRow(context, 'Barcode', product.barcode!),
                 if ((product.description ?? '').isNotEmpty) ...[
                   const SizedBox(height: 8),

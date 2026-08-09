@@ -80,7 +80,6 @@ function print() {
                             <tr class="text-left text-slate-500 border-b border-slate-200">
                                 <th class="py-2 pr-2">#</th>
                                 <th class="py-2 pr-2">Product</th>
-                                <th class="py-2 pr-2">SKU</th>
                                 <th class="py-2 pr-2 text-right">Qty</th>
                                 <th class="py-2 pr-2 text-right">Unit Price</th>
                                 <th class="py-2 text-right">Total</th>
@@ -90,7 +89,6 @@ function print() {
                             <tr v-for="(item, index) in invoice.items" :key="item.id" class="border-b border-slate-100">
                                 <td class="py-2 pr-2 text-slate-500">{{ index + 1 }}</td>
                                 <td class="py-2 pr-2 font-medium text-slate-800">{{ item.product_name }}</td>
-                                <td class="py-2 pr-2 text-slate-500">{{ item.sku }}</td>
                                 <td class="py-2 pr-2 text-right">{{ item.quantity }}</td>
                                 <td class="py-2 pr-2 text-right">{{ formatCurrency(item.unit_price) }}</td>
                                 <td class="py-2 text-right">{{ formatCurrency(item.total_price) }}</td>

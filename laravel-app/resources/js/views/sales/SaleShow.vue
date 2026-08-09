@@ -19,7 +19,6 @@ const loading = ref(true);
 
 const columns = [
     { key: 'product_name', label: 'Product' },
-    { key: 'sku', label: 'SKU' },
     { key: 'quantity', label: 'Qty', align: 'right' },
     { key: 'unit_price', label: 'Unit Price', align: 'right' },
     { key: 'warranty', label: 'Warranty', sortable: false },

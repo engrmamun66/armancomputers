@@ -42,7 +42,6 @@ class _LowStockRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final isOut = product.currentStock <= 0;
     final tint = isOut ? AppColors.danger(context) : AppColors.warning(context);
     final tintBg = isOut ? AppColors.dangerBg(context) : AppColors.warningBg(context);
@@ -68,12 +67,6 @@ class _LowStockRow extends StatelessWidget {
                   Text(
                     product.name,
                     style: Theme.of(context).textTheme.bodyMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    'SKU: ${product.sku}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

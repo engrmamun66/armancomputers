@@ -118,7 +118,6 @@ const showProductModal = ref(false);
 const productForm = reactive({
     brand_id: '',
     name: '',
-    sku: '',
     barcode: '',
     description: '',
     purchase_price: '',
@@ -133,7 +132,6 @@ function openProductModal(prefillName) {
     Object.assign(productForm, {
         brand_id: '',
         name: prefillName || '',
-        sku: '',
         barcode: '',
         description: '',
         purchase_price: '',
@@ -301,28 +299,26 @@ async function submit() {
                         <thead>
                             <tr class="text-left text-slate-500 border-b border-slate-200">
                                 <th class="py-2 pr-3">Product</th>
-                                <th class="py-2 pr-3">SKU</th>
                                 <th class="py-2 pr-3 text-center">Current Stock</th>
                                 <th class="py-2 pr-3 text-center w-28">Qty</th>
-                                <th class="py-2 pr-3 text-right w-32">Unit Price</th>
+                                <th class="py-2 pr-3 text-left w-32">Unit Price</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
                                 <th class="py-2"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="!items.length">
-                                <td colspan="7" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
+                                <td colspan="6" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
                             </tr>
                             <tr v-for="(item, index) in items" :key="item.product_id" class="border-b border-slate-100">
                                 <td class="py-2 pr-3 font-medium text-slate-800">{{ item.name }}</td>
-                                <td class="py-2 pr-3 text-slate-500">{{ item.sku }}</td>
                                 <td class="py-2 pr-3 text-center text-slate-500">{{ item.current_stock ?? '—' }}</td>
                                 <td class="py-2 pr-3">
                                     <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-center border border-slate-300 rounded-md" />
                                 </td>
                                 <td class="py-2 pr-3">
                                     <div class="flex items-center gap-1">
-                                        <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
+                                        <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full min-w-[120px] px-2 py-1 text-left border border-slate-300 rounded-md" />
                                         <button
                                             type="button"
                                             title="Save as this product's purchase price"
@@ -397,17 +393,10 @@ async function submit() {
                     <input v-model="productForm.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="productErrors.name" class="mt-1 text-xs text-rose-600">{{ productErrors.name[0] }}</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">SKU <span class="text-slate-400 font-normal">(optional)</span></label>
-                        <input v-model="productForm.sku" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                        <p v-if="productErrors.sku" class="mt-1 text-xs text-rose-600">{{ productErrors.sku[0] }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
-                        <input v-model="productForm.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                        <p v-if="productErrors.barcode" class="mt-1 text-xs text-rose-600">{{ productErrors.barcode[0] }}</p>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
+                    <input v-model="productForm.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                    <p v-if="productErrors.barcode" class="mt-1 text-xs text-rose-600">{{ productErrors.barcode[0] }}</p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>

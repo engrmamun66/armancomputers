@@ -71,14 +71,12 @@ class TopProduct {
 class LowStockProduct {
   final int id;
   final String name;
-  final String sku;
   final int currentStock;
   final int minimumStock;
 
   LowStockProduct({
     required this.id,
     required this.name,
-    required this.sku,
     required this.currentStock,
     required this.minimumStock,
   });
@@ -86,7 +84,6 @@ class LowStockProduct {
   factory LowStockProduct.fromJson(Map<String, dynamic> json) => LowStockProduct(
         id: json['id'] as int,
         name: json['name'] as String,
-        sku: json['sku'] as String,
         currentStock: (json['current_stock'] as num).toInt(),
         minimumStock: (json['minimum_stock'] as num).toInt(),
       );

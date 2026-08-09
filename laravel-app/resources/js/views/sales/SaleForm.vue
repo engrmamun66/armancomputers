@@ -304,10 +304,9 @@ async function submit() {
                         <thead>
                             <tr class="text-left text-slate-500 border-b border-slate-200">
                                 <th class="py-2 pr-3">Product</th>
-                                <th class="py-2 pr-3">SKU</th>
                                 <th class="py-2 pr-3 text-center">Available Stock</th>
                                 <th class="py-2 pr-3 text-center w-28">Qty</th>
-                                <th class="py-2 pr-3 text-right w-32">Unit Price</th>
+                                <th class="py-2 pr-3 text-left w-32">Unit Price</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
                                 <th class="py-2 pr-3">Warranty</th>
                                 <th class="py-2"></th>
@@ -315,12 +314,11 @@ async function submit() {
                         </thead>
                         <tbody>
                             <tr v-if="!items.length">
-                                <td colspan="8" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
+                                <td colspan="7" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
                             </tr>
                             <template v-for="(item, index) in items" :key="item.product_id">
                                 <tr class="border-b border-slate-100">
                                     <td class="py-2 pr-3 font-medium text-slate-800">{{ item.name }}</td>
-                                    <td class="py-2 pr-3 text-slate-500">{{ item.sku }}</td>
                                     <td class="py-2 pr-3 text-center" :class="item.available_stock <= 0 ? 'text-rose-600 font-medium' : 'text-slate-500'">
                                         {{ item.available_stock ?? '—' }}
                                     </td>
@@ -329,7 +327,7 @@ async function submit() {
                                     </td>
                                     <td class="py-2 pr-3">
                                         <div class="flex items-center gap-1">
-                                            <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
+                                            <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full min-w-[120px] px-2 py-1 text-left border border-slate-300 rounded-md" />
                                             <button
                                                 type="button"
                                                 title="Save as this product's selling price"
@@ -349,7 +347,7 @@ async function submit() {
                                     </td>
                                 </tr>
                                 <tr v-if="itemError(item)">
-                                    <td colspan="8" class="pb-2 text-xs text-rose-600">{{ itemError(item) }}</td>
+                                    <td colspan="7" class="pb-2 text-xs text-rose-600">{{ itemError(item) }}</td>
                                 </tr>
                             </template>
                         </tbody>

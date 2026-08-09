@@ -38,7 +38,6 @@ onMounted(async () => {
         <template v-else-if="product">
             <div class="bg-white border border-slate-200 rounded-lg p-4 mb-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
                 <div><span class="text-slate-400">Product:</span> <span class="font-medium text-slate-800">{{ product.name }}</span></div>
-                <div><span class="text-slate-400">SKU:</span> <span class="font-medium text-slate-800">{{ product.sku }}</span></div>
                 <div><span class="text-slate-400">Current Stock:</span> <span class="font-medium text-slate-800">{{ product.current_stock }}</span></div>
                 <div><span class="text-slate-400">Minimum Stock:</span> <span class="font-medium text-slate-800">{{ product.minimum_stock }}</span></div>
             </div>

@@ -29,7 +29,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
-  final _skuController = TextEditingController();
   final _barcodeController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _purchasePriceController = TextEditingController();
@@ -60,7 +59,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _skuController.dispose();
     _barcodeController.dispose();
     _descriptionController.dispose();
     _purchasePriceController.dispose();
@@ -85,7 +83,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       if (widget.id != null) {
         final product = await ref.read(productsServiceProvider).get(widget.id!);
         _nameController.text = product.name;
-        _skuController.text = product.sku;
         _barcodeController.text = product.barcode ?? '';
         _descriptionController.text = product.description ?? '';
         _purchasePriceController.text = product.purchasePrice.toStringAsFixed(2);
@@ -148,7 +145,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     final payload = <String, dynamic>{
       'brand_id': _brandId,
       'name': _nameController.text.trim(),
-      'sku': _skuController.text.trim(),
       'purchase_price': double.parse(_purchasePriceController.text.trim()),
       'selling_price': double.parse(_sellingPriceController.text.trim()),
       'minimum_stock': int.parse(_minimumStockController.text.trim()),
@@ -267,16 +263,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             validator: (v) {
               if ((v ?? '').trim().isEmpty) return 'Product name is required';
               return _serverErrors['name'];
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _skuController,
-            decoration: const InputDecoration(labelText: 'SKU'),
-            textInputAction: TextInputAction.next,
-            validator: (v) {
-              if ((v ?? '').trim().isEmpty) return 'SKU is required';
-              return _serverErrors['sku'];
             },
           ),
           const SizedBox(height: 16),
