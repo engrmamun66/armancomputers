@@ -7,8 +7,8 @@ const Map<String, List<String>> kCapabilities = {
     'products.manage',
     'brands.manage',
     'customers.manage',
-    'stock-in.manage',
-    'stock-out.manage',
+    'purchases.manage',
+    'sales.manage',
     'invoices.view',
     'dashboard',
   ],
@@ -16,12 +16,12 @@ const Map<String, List<String>> kCapabilities = {
     'products.manage',
     'brands.manage',
     'customers.manage',
-    'stock-in.manage',
-    'stock-out.manage',
+    'purchases.manage',
+    'sales.manage',
     'invoices.view',
     'dashboard',
   ],
-  'staff': ['products.view', 'customers.view', 'stock-out.manage', 'invoices.view', 'dashboard'],
+  'staff': ['products.view', 'customers.view', 'sales.manage', 'invoices.view', 'dashboard'],
 };
 
 bool can(String roleSlug, String capability) => (kCapabilities[roleSlug] ?? const []).contains(capability);

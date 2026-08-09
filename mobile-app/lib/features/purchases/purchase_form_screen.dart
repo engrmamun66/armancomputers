@@ -8,7 +8,7 @@ import '../../core/format.dart';
 import '../../models/line_item.dart';
 import '../../models/product.dart';
 import '../../services/products_service.dart';
-import '../../services/stock_ins_service.dart';
+import '../../services/purchases_service.dart';
 import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/loading.dart';
@@ -55,15 +55,15 @@ class _LineItemDraft {
   }
 }
 
-class StockInFormScreen extends ConsumerStatefulWidget {
+class PurchaseFormScreen extends ConsumerStatefulWidget {
   final int? id;
-  const StockInFormScreen({super.key, this.id});
+  const PurchaseFormScreen({super.key, this.id});
 
   @override
-  ConsumerState<StockInFormScreen> createState() => _StockInFormScreenState();
+  ConsumerState<PurchaseFormScreen> createState() => _PurchaseFormScreenState();
 }
 
-class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
+class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
   final _supplierNameController = TextEditingController();
   final _supplierPhoneController = TextEditingController();
   final _notesController = TextEditingController();
@@ -108,20 +108,20 @@ class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
       _fetchError = null;
     });
     try {
-      final stockIn = await ref.read(stockInsServiceProvider).get(widget.id!);
+      final purchase = await ref.read(purchasesServiceProvider).get(widget.id!);
       if (!mounted) return;
-      _supplierNameController.text = stockIn.supplierName ?? '';
-      _supplierPhoneController.text = stockIn.supplierPhone ?? '';
-      _notesController.text = stockIn.notes ?? '';
-      _discountController.text = stockIn.discount == 0 ? '' : stockIn.discount.toStringAsFixed(2);
-      _additionalCostController.text = stockIn.additionalCost == 0 ? '' : stockIn.additionalCost.toStringAsFixed(2);
-      _purchaseDate = DateTime.tryParse(stockIn.purchaseDate) ?? DateTime.now();
+      _supplierNameController.text = purchase.supplierName ?? '';
+      _supplierPhoneController.text = purchase.supplierPhone ?? '';
+      _notesController.text = purchase.notes ?? '';
+      _discountController.text = purchase.discount == 0 ? '' : purchase.discount.toStringAsFixed(2);
+      _additionalCostController.text = purchase.additionalCost == 0 ? '' : purchase.additionalCost.toStringAsFixed(2);
+      _purchaseDate = DateTime.tryParse(purchase.purchaseDate) ?? DateTime.now();
       for (final item in _items) {
         item.dispose();
       }
       _items
         ..clear()
-        ..addAll(stockIn.items.map((li) => _LineItemDraft(
+        ..addAll(purchase.items.map((li) => _LineItemDraft(
               id: li.id,
               productId: li.productId,
               productName: li.productName,
@@ -139,7 +139,7 @@ class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _fetchError = 'Failed to load stock in record.';
+        _fetchError = 'Failed to load purchase record.';
         _loading = false;
       });
     }
@@ -201,12 +201,12 @@ class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
 
     try {
       if (_isEdit) {
-        await ref.read(stockInsServiceProvider).update(widget.id!, payload);
+        await ref.read(purchasesServiceProvider).update(widget.id!, payload);
       } else {
-        await ref.read(stockInsServiceProvider).create(payload);
+        await ref.read(purchasesServiceProvider).create(payload);
       }
       if (!mounted) return;
-      AppSnackbar.success(context, _isEdit ? 'Stock in updated successfully.' : 'Stock in recorded successfully.');
+      AppSnackbar.success(context, _isEdit ? 'Purchase updated successfully.' : 'Purchase recorded successfully.');
       context.pop();
     } on ApiException catch (e) {
       if (mounted) AppSnackbar.error(context, e.message);
@@ -220,7 +220,7 @@ class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEdit ? 'Edit Stock In' : 'Add Stock In')),
+      appBar: AppBar(title: Text(_isEdit ? 'Edit Purchase' : 'Add Purchase')),
       body: _loading
           ? const AppLoading()
           : _fetchError != null
@@ -358,7 +358,7 @@ class _StockInFormScreenState extends ConsumerState<StockInFormScreen> {
             FilledButton(
               onPressed: _submitting ? null : _submit,
               style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-              child: _submitting ? const ButtonSpinner() : Text(_isEdit ? 'Update Stock In' : 'Save Stock In'),
+              child: _submitting ? const ButtonSpinner() : Text(_isEdit ? 'Update Purchase' : 'Save Purchase'),
             ),
             const SizedBox(height: 24),
           ],

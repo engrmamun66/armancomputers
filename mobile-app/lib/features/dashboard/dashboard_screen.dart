@@ -25,7 +25,7 @@ final _intFmt = NumberFormat('#,##0');
 /// The Dashboard tab: range-filterable KPI cards, two charts, and four
 /// activity lists. Mirrors the web app's Dashboard.vue 1:1 (see its
 /// RANGE_OPTIONS / cards / stock_movement / sales_overview / top-products /
-/// low-stock / recent-stock-in / recent-stock-out sections), adapted to a
+/// low-stock / recent-purchases / recent-sales sections), adapted to a
 /// single scrolling column for a phone-width shell tab.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -155,7 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             _StatsGrid(cards: data.cards),
             const SizedBox(height: 20),
             SectionCard(
-              title: 'Stock In vs Stock Out',
+              title: 'Purchase vs Sales',
               child: StockMovementChart(points: data.stockMovement),
             ),
             const SizedBox(height: 16),
@@ -175,13 +175,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
             const SizedBox(height: 16),
             SectionCard(
-              title: 'Recent Stock In',
-              child: RecentStockInList(items: data.recentStockIns),
+              title: 'Recent Purchase',
+              child: RecentPurchaseList(items: data.recentPurchases),
             ),
             const SizedBox(height: 16),
             SectionCard(
-              title: 'Recent Stock Out',
-              child: RecentStockOutList(items: data.recentStockOuts),
+              title: 'Recent Sales',
+              child: RecentSaleList(items: data.recentSales),
             ),
           ],
         ),
@@ -202,8 +202,8 @@ class _StatsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final warning = AppColors.warning(context);
     final danger = AppColors.danger(context);
-    final stockInTint = DashboardChartColors.slot1(context);
-    final stockOutTint = DashboardChartColors.slot2(context);
+    final purchaseTint = DashboardChartColors.slot1(context);
+    final saleTint = DashboardChartColors.slot2(context);
 
     final items = <StatCardData>[
       StatCardData(
@@ -217,28 +217,28 @@ class _StatsGrid extends StatelessWidget {
         icon: Icons.layers_outlined,
       ),
       StatCardData(
-        label: 'Stock In (period)',
-        value: _intFmt.format(cards.totalStockIn),
+        label: 'Purchase (period)',
+        value: _intFmt.format(cards.totalPurchases),
         icon: Icons.arrow_circle_down_outlined,
-        tint: stockInTint,
+        tint: purchaseTint,
       ),
       StatCardData(
-        label: 'Stock Out (period)',
-        value: _intFmt.format(cards.totalStockOut),
+        label: 'Sales (period)',
+        value: _intFmt.format(cards.totalSales),
         icon: Icons.arrow_circle_up_outlined,
-        tint: stockOutTint,
+        tint: saleTint,
       ),
       StatCardData(
         label: "Today's Sales",
         value: formatCurrency(cards.todaysSales),
         icon: Icons.payments_outlined,
-        tint: stockInTint,
+        tint: purchaseTint,
       ),
       StatCardData(
-        label: "Today's Stock In",
-        value: formatCurrency(cards.todaysStockIn),
+        label: "Today's Purchase",
+        value: formatCurrency(cards.todaysPurchases),
         icon: Icons.local_shipping_outlined,
-        tint: stockInTint,
+        tint: purchaseTint,
       ),
       StatCardData(
         label: 'Total Customers',

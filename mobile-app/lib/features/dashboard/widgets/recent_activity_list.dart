@@ -5,17 +5,17 @@ import '../../../core/format.dart';
 import '../../../models/dashboard.dart';
 import '../../../shared/widgets/empty_state.dart';
 
-/// "Recent Stock In" — 5 most recent stock-in records, each tappable to
-/// push the existing stock-in detail route.
-class RecentStockInList extends StatelessWidget {
-  final List<RecentStockIn> items;
+/// "Recent Purchase" — 5 most recent purchase records, each tappable to
+/// push the existing purchase detail route.
+class RecentPurchaseList extends StatelessWidget {
+  final List<RecentPurchase> items;
 
-  const RecentStockInList({super.key, required this.items});
+  const RecentPurchaseList({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const AppEmptyState(title: 'No Stock In records yet.', icon: Icons.move_to_inbox_outlined);
+      return const AppEmptyState(title: 'No Purchase records yet.', icon: Icons.move_to_inbox_outlined);
     }
 
     return Column(
@@ -27,7 +27,7 @@ class RecentStockInList extends StatelessWidget {
             date: items[i].purchaseDate,
             subLabel: items[i].supplierName ?? '—',
             amount: items[i].grandTotal,
-            onTap: () => context.push('/stock-in/${items[i].id}'),
+            onTap: () => context.push('/purchases/${items[i].id}'),
           ),
         ],
       ],
@@ -35,17 +35,17 @@ class RecentStockInList extends StatelessWidget {
   }
 }
 
-/// "Recent Stock Out" — 5 most recent stock-out records, each tappable to
-/// push the existing stock-out detail route.
-class RecentStockOutList extends StatelessWidget {
-  final List<RecentStockOut> items;
+/// "Recent Sales" — 5 most recent sale records, each tappable to
+/// push the existing sale detail route.
+class RecentSaleList extends StatelessWidget {
+  final List<RecentSale> items;
 
-  const RecentStockOutList({super.key, required this.items});
+  const RecentSaleList({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const AppEmptyState(title: 'No Stock Out records yet.', icon: Icons.outbox_outlined);
+      return const AppEmptyState(title: 'No Sales records yet.', icon: Icons.outbox_outlined);
     }
 
     return Column(
@@ -57,7 +57,7 @@ class RecentStockOutList extends StatelessWidget {
             date: items[i].saleDate,
             subLabel: items[i].customerName ?? '—',
             amount: items[i].grandTotal,
-            onTap: () => context.push('/stock-out/${items[i].id}'),
+            onTap: () => context.push('/sales/${items[i].id}'),
           ),
         ],
       ],

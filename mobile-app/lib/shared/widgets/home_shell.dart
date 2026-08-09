@@ -15,7 +15,7 @@ class HomeShell extends ConsumerWidget {
 
   int get _index {
     if (location.startsWith('/products')) return 1;
-    if (location.startsWith('/stock-out')) return 2;
+    if (location.startsWith('/sales')) return 2;
     return 0;
   }
 
@@ -34,7 +34,7 @@ class HomeShell extends ConsumerWidget {
               context.go('/products');
               break;
             case 2:
-              context.go('/stock-out');
+              context.go('/sales');
               break;
             case 3:
               showMoreSheet(context, ref);
@@ -44,7 +44,7 @@ class HomeShell extends ConsumerWidget {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Dashboard'),
           NavigationDestination(icon: Icon(Icons.inventory_2_outlined), selectedIcon: Icon(Icons.inventory_2), label: 'Products'),
-          NavigationDestination(icon: Icon(Icons.upload_outlined), selectedIcon: Icon(Icons.upload), label: 'Stock Out'),
+          NavigationDestination(icon: Icon(Icons.upload_outlined), selectedIcon: Icon(Icons.upload), label: 'Sales'),
           NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
         ],
       ),

@@ -17,7 +17,7 @@ void showMoreSheet(BuildContext context, WidgetRef ref) {
   final role = ref.read(authProvider).roleSlug;
 
   final items = <_MoreItem>[
-    if (can(role, 'stock-in.manage')) const _MoreItem(Icons.sell_outlined, 'Stock In', '/stock-in'),
+    if (can(role, 'purchases.manage')) const _MoreItem(Icons.sell_outlined, 'Purchase', '/purchases'),
     if (can(role, 'brands.manage')) const _MoreItem(Icons.local_offer_outlined, 'Brands', '/brands'),
     const _MoreItem(Icons.people_outline, 'Customers', '/customers'),
     const _MoreItem(Icons.receipt_long_outlined, 'Invoices', '/invoices'),

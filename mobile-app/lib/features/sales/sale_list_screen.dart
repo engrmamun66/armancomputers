@@ -7,9 +7,9 @@ import '../../core/format.dart';
 import '../../core/theme.dart';
 import '../../models/lookup.dart';
 import '../../models/paginated.dart';
-import '../../models/stock_out.dart';
+import '../../models/sale.dart';
 import '../../services/lookups_service.dart';
-import '../../services/stock_outs_service.dart';
+import '../../services/sales_service.dart';
 import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
@@ -20,15 +20,15 @@ import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
 
 /// Bottom-nav shell tab — the single most business-critical screen in the
-/// app, since every Stock Out here auto-creates a linked Invoice server-side.
-class StockOutListScreen extends ConsumerStatefulWidget {
-  const StockOutListScreen({super.key});
+/// app, since every Sale here auto-creates a linked Invoice server-side.
+class SaleListScreen extends ConsumerStatefulWidget {
+  const SaleListScreen({super.key});
 
   @override
-  ConsumerState<StockOutListScreen> createState() => _StockOutListScreenState();
+  ConsumerState<SaleListScreen> createState() => _SaleListScreenState();
 }
 
-class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
+class _SaleListScreenState extends ConsumerState<SaleListScreen> {
   String _search = '';
   DateTime? _from;
   DateTime? _to;
@@ -38,7 +38,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
 
   List<StatusModel> _statuses = [];
 
-  PaginatedResponse<StockOutModel>? _response;
+  PaginatedResponse<SaleModel>? _response;
   bool _loading = true;
   String? _error;
 
@@ -51,7 +51,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
 
   Future<void> _loadStatuses() async {
     try {
-      final statuses = await ref.read(lookupsServiceProvider).statuses('stock_out');
+      final statuses = await ref.read(lookupsServiceProvider).statuses('sale');
       if (!mounted) return;
       setState(() => _statuses = statuses);
     } catch (_) {
@@ -79,7 +79,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
       if (_statusId != null) params['status_id'] = _statusId;
       if (_paymentStatus.isNotEmpty) params['payment_status'] = _paymentStatus;
 
-      final response = await ref.read(stockOutsServiceProvider).list(params);
+      final response = await ref.read(salesServiceProvider).list(params);
       if (!mounted) return;
       setState(() {
         _response = response;
@@ -88,7 +88,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e is ApiException ? e.message : 'Failed to load stock outs.';
+        _error = e is ApiException ? e.message : 'Failed to load sales.';
         _loading = false;
       });
     }
@@ -107,12 +107,12 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
   }
 
   Future<void> _openDetail(int id) async {
-    final result = await context.push('/stock-out/$id');
+    final result = await context.push('/sales/$id');
     if (result == true) _fetch();
   }
 
   Future<void> _openCreate() async {
-    final result = await context.push('/stock-out/create');
+    final result = await context.push('/sales/create');
     if (result == true) _fetch();
   }
 
@@ -120,11 +120,11 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stock Out'),
+        title: const Text('Sales'),
         actions: [
-          // All roles (including staff) may create a Stock Out, so this is
+          // All roles (including staff) may create a Sale — this is
           // never permission-gated.
-          IconButton(icon: const Icon(Icons.add), tooltip: 'Add Stock Out', onPressed: _openCreate),
+          IconButton(icon: const Icon(Icons.add), tooltip: 'Add Sale', onPressed: _openCreate),
         ],
       ),
       body: RefreshIndicator(
@@ -246,7 +246,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: AppEmptyState(
           icon: Icons.error_outline,
-          title: 'Could not load stock outs',
+          title: 'Could not load sales',
           message: _error,
           clearLabel: 'Retry',
           onClear: _fetch,
@@ -258,7 +258,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: AppEmptyState(
-          title: 'No stock outs found',
+          title: 'No sales found',
           message: _hasFilters ? 'Try adjusting your filters.' : 'Record your first sale to get started.',
           clearLabel: _hasFilters ? 'Reset filters' : null,
           onClear: _hasFilters ? _resetFilters : null,
@@ -271,7 +271,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
       children: [
         if (response.totals != null) _buildTotals(context, response.totals!),
         const SizedBox(height: 12),
-        for (final so in response.data) _buildItem(context, so),
+        for (final sale in response.data) _buildItem(context, sale),
         PaginationControls(
           meta: response.meta,
           onPageChange: (p) {
@@ -312,13 +312,13 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
     );
   }
 
-  Widget _buildItem(BuildContext context, StockOutModel so) {
+  Widget _buildItem(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => _openDetail(so.id),
+        onTap: () => _openDetail(sale.id),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -329,20 +329,20 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      so.referenceNo,
+                      sale.referenceNo,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    formatCurrency(so.grandTotal),
+                    formatCurrency(sale.grandTotal),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
-              Text(formatDate(so.saleDate), style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
+              Text(formatDate(sale.saleDate), style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -350,7 +350,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      so.customer?.name ?? 'Walk-in customer',
+                      sale.customer?.name ?? 'Walk-in customer',
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -358,7 +358,7 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                '${so.itemsCount ?? so.items.length} item(s) · Qty ${so.totalQty ?? 0}',
+                '${sale.itemsCount ?? sale.items.length} item(s) · Qty ${sale.totalQty ?? 0}',
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12),
               ),
               const SizedBox(height: 10),
@@ -367,11 +367,11 @@ class _StockOutListScreenState extends ConsumerState<StockOutListScreen> {
                 runSpacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  if (so.status != null) StatusBadge(status: so.status!.slug),
-                  if (so.paymentStatus != null) StatusBadge(status: so.paymentStatus!),
-                  if (so.dueAmount > 0)
+                  if (sale.status != null) StatusBadge(status: sale.status!.slug),
+                  if (sale.paymentStatus != null) StatusBadge(status: sale.paymentStatus!),
+                  if (sale.dueAmount > 0)
                     Text(
-                      'Due: ${formatCurrency(so.dueAmount)}',
+                      'Due: ${formatCurrency(sale.dueAmount)}',
                       style: TextStyle(color: AppColors.danger(context), fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                 ],

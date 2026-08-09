@@ -15,12 +15,12 @@ import '../features/products/product_list_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/static/contact_screen.dart';
 import '../features/static/privacy_screen.dart';
-import '../features/stock_in/stock_in_detail_screen.dart';
-import '../features/stock_in/stock_in_form_screen.dart';
-import '../features/stock_in/stock_in_list_screen.dart';
-import '../features/stock_out/stock_out_detail_screen.dart';
-import '../features/stock_out/stock_out_form_screen.dart';
-import '../features/stock_out/stock_out_list_screen.dart';
+import '../features/purchases/purchase_detail_screen.dart';
+import '../features/purchases/purchase_form_screen.dart';
+import '../features/purchases/purchase_list_screen.dart';
+import '../features/sales/sale_detail_screen.dart';
+import '../features/sales/sale_form_screen.dart';
+import '../features/sales/sale_list_screen.dart';
 import '../features/users/user_list_screen.dart';
 import '../shared/widgets/home_shell.dart';
 import '../providers/auth_provider.dart';
@@ -60,7 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
           GoRoute(path: '/products', builder: (context, state) => const ProductListScreen()),
-          GoRoute(path: '/stock-out', builder: (context, state) => const StockOutListScreen()),
+          GoRoute(path: '/sales', builder: (context, state) => const SaleListScreen()),
         ],
       ),
 
@@ -82,27 +82,27 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => CustomerDetailScreen(id: _intParam(state, 'id')),
       ),
 
-      // Stock In
-      GoRoute(path: '/stock-in', builder: (context, state) => const StockInListScreen()),
-      GoRoute(path: '/stock-in/create', builder: (context, state) => const StockInFormScreen()),
+      // Purchase
+      GoRoute(path: '/purchases', builder: (context, state) => const PurchaseListScreen()),
+      GoRoute(path: '/purchases/create', builder: (context, state) => const PurchaseFormScreen()),
       GoRoute(
-        path: '/stock-in/:id',
-        builder: (context, state) => StockInDetailScreen(id: _intParam(state, 'id')),
+        path: '/purchases/:id',
+        builder: (context, state) => PurchaseDetailScreen(id: _intParam(state, 'id')),
       ),
       GoRoute(
-        path: '/stock-in/:id/edit',
-        builder: (context, state) => StockInFormScreen(id: _intParam(state, 'id')),
+        path: '/purchases/:id/edit',
+        builder: (context, state) => PurchaseFormScreen(id: _intParam(state, 'id')),
       ),
 
-      // Stock Out — detail/form pushed full-screen (list itself is a shell tab).
-      GoRoute(path: '/stock-out/create', builder: (context, state) => const StockOutFormScreen()),
+      // Sales — detail/form pushed full-screen (list itself is a shell tab).
+      GoRoute(path: '/sales/create', builder: (context, state) => const SaleFormScreen()),
       GoRoute(
-        path: '/stock-out/:id',
-        builder: (context, state) => StockOutDetailScreen(id: _intParam(state, 'id')),
+        path: '/sales/:id',
+        builder: (context, state) => SaleDetailScreen(id: _intParam(state, 'id')),
       ),
       GoRoute(
-        path: '/stock-out/:id/edit',
-        builder: (context, state) => StockOutFormScreen(id: _intParam(state, 'id')),
+        path: '/sales/:id/edit',
+        builder: (context, state) => SaleFormScreen(id: _intParam(state, 'id')),
       ),
 
       // Invoices

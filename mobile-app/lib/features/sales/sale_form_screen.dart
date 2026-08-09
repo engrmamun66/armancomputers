@@ -8,11 +8,11 @@ import '../../core/theme.dart';
 import '../../models/customer.dart';
 import '../../models/line_item.dart';
 import '../../models/product.dart';
-import '../../models/stock_out.dart';
+import '../../models/sale.dart';
 import '../../services/customers_service.dart';
 import '../../services/lookups_service.dart';
 import '../../services/products_service.dart';
-import '../../services/stock_outs_service.dart';
+import '../../services/sales_service.dart';
 import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -24,7 +24,7 @@ import '../../shared/widgets/section_card.dart';
 /// Mutable in-memory cart row while the form is being edited. `currentStock`
 /// is the stock level captured at the moment the product was picked (for the
 /// client-side, non-blocking "insufficient stock" hint). For line items
-/// seeded from an existing Stock Out (edit mode) it is left null — we don't
+/// seeded from an existing Sale (edit mode) it is left null — we don't
 /// know the "available for this row" figure without extra round-trips, and
 /// the backend's row-locked check is authoritative regardless.
 class _CartItem {
@@ -57,15 +57,15 @@ class _CartItem {
   }
 }
 
-class StockOutFormScreen extends ConsumerStatefulWidget {
+class SaleFormScreen extends ConsumerStatefulWidget {
   final int? id;
-  const StockOutFormScreen({super.key, this.id});
+  const SaleFormScreen({super.key, this.id});
 
   @override
-  ConsumerState<StockOutFormScreen> createState() => _StockOutFormScreenState();
+  ConsumerState<SaleFormScreen> createState() => _SaleFormScreenState();
 }
 
-class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
+class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
   bool _loading = false;
   String? _loadError;
   bool _submitting = false;
@@ -117,20 +117,20 @@ class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
       _loadError = null;
     });
     try {
-      final so = await ref.read(stockOutsServiceProvider).get(widget.id!);
+      final sale = await ref.read(salesServiceProvider).get(widget.id!);
       if (!mounted) return;
       setState(() {
-        _customer = so.customer;
-        _saleDate = DateTime.tryParse(so.saleDate) ?? DateTime.now();
-        _notesController.text = so.notes ?? '';
-        _discount = so.discount;
-        _discountController.text = so.discount.toStringAsFixed(2);
-        _additionalCost = so.additionalCost;
-        _additionalCostController.text = so.additionalCost.toStringAsFixed(2);
-        _paymentMethod = so.paymentMethod;
-        _paidAmount = so.paidAmount;
-        _paidAmountController.text = so.paidAmount.toStringAsFixed(2);
-        _items.addAll(so.items.map((li) => _CartItem(
+        _customer = sale.customer;
+        _saleDate = DateTime.tryParse(sale.saleDate) ?? DateTime.now();
+        _notesController.text = sale.notes ?? '';
+        _discount = sale.discount;
+        _discountController.text = sale.discount.toStringAsFixed(2);
+        _additionalCost = sale.additionalCost;
+        _additionalCostController.text = sale.additionalCost.toStringAsFixed(2);
+        _paymentMethod = sale.paymentMethod;
+        _paidAmount = sale.paidAmount;
+        _paidAmountController.text = sale.paidAmount.toStringAsFixed(2);
+        _items.addAll(sale.items.map((li) => _CartItem(
               productId: li.productId,
               productName: li.productName ?? 'Product #${li.productId}',
               sku: li.sku,
@@ -143,7 +143,7 @@ class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _loadError = e is ApiException ? e.message : 'Failed to load stock out.';
+        _loadError = e is ApiException ? e.message : 'Failed to load sale.';
         _loading = false;
       });
     }
@@ -297,12 +297,12 @@ class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
     };
     try {
       if (_isEdit) {
-        await ref.read(stockOutsServiceProvider).update(widget.id!, payload);
+        await ref.read(salesServiceProvider).update(widget.id!, payload);
       } else {
-        await ref.read(stockOutsServiceProvider).create(payload);
+        await ref.read(salesServiceProvider).create(payload);
       }
       if (!mounted) return;
-      AppSnackbar.success(context, _isEdit ? 'Stock out updated successfully.' : 'Stock out recorded successfully.');
+      AppSnackbar.success(context, _isEdit ? 'Sale updated successfully.' : 'Sale recorded successfully.');
       context.pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -320,13 +320,13 @@ class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEdit ? 'Edit Stock Out' : 'Add Stock Out')),
+      appBar: AppBar(title: Text(_isEdit ? 'Edit Sale' : 'Add Sale')),
       body: _loading
           ? const AppLoading()
           : _loadError != null
               ? AppEmptyState(
                   icon: Icons.error_outline,
-                  title: 'Could not load stock out',
+                  title: 'Could not load sale',
                   message: _loadError,
                   clearLabel: 'Retry',
                   onClear: _loadExisting,
@@ -354,7 +354,7 @@ class _StockOutFormScreenState extends ConsumerState<StockOutFormScreen> {
                   onPressed: _submitting ? null : _submit,
                   child: _submitting
                       ? ButtonSpinner(color: Theme.of(context).colorScheme.onPrimary)
-                      : Text(_isEdit ? 'Save Changes' : 'Create Stock Out'),
+                      : Text(_isEdit ? 'Save Changes' : 'Create Sale'),
                 ),
               ),
             ),

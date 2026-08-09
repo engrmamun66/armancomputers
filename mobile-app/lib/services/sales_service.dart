@@ -2,33 +2,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/api_client.dart';
 import '../models/paginated.dart';
-import '../models/stock_out.dart';
+import '../models/sale.dart';
 
-class StockOutsService {
+class SalesService {
   final Ref ref;
-  StockOutsService(this.ref);
+  SalesService(this.ref);
 
-  Future<PaginatedResponse<StockOutModel>> list(Map<String, dynamic> params) async {
-    final res = await ref.read(dioProvider).get('/stock-outs', queryParameters: params);
-    return PaginatedResponse.fromJson(res.data as Map<String, dynamic>, StockOutModel.fromJson);
+  Future<PaginatedResponse<SaleModel>> list(Map<String, dynamic> params) async {
+    final res = await ref.read(dioProvider).get('/sales', queryParameters: params);
+    return PaginatedResponse.fromJson(res.data as Map<String, dynamic>, SaleModel.fromJson);
   }
 
-  Future<StockOutModel> get(int id) async {
-    final res = await ref.read(dioProvider).get('/stock-outs/$id');
-    return StockOutModel.fromJson(res.data['data'] as Map<String, dynamic>);
+  Future<SaleModel> get(int id) async {
+    final res = await ref.read(dioProvider).get('/sales/$id');
+    return SaleModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
-  Future<StockOutModel> create(Map<String, dynamic> payload) async {
-    final res = await ref.read(dioProvider).post('/stock-outs', data: payload);
-    return StockOutModel.fromJson(res.data['data'] as Map<String, dynamic>);
+  Future<SaleModel> create(Map<String, dynamic> payload) async {
+    final res = await ref.read(dioProvider).post('/sales', data: payload);
+    return SaleModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
-  Future<StockOutModel> update(int id, Map<String, dynamic> payload) async {
-    final res = await ref.read(dioProvider).put('/stock-outs/$id', data: payload);
-    return StockOutModel.fromJson(res.data['data'] as Map<String, dynamic>);
+  Future<SaleModel> update(int id, Map<String, dynamic> payload) async {
+    final res = await ref.read(dioProvider).put('/sales/$id', data: payload);
+    return SaleModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
-  Future<void> remove(int id) => ref.read(dioProvider).delete('/stock-outs/$id');
+  Future<void> remove(int id) => ref.read(dioProvider).delete('/sales/$id');
 }
 
-final stockOutsServiceProvider = Provider((ref) => StockOutsService(ref));
+final salesServiceProvider = Provider((ref) => SalesService(ref));

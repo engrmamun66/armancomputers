@@ -275,7 +275,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       return const AppEmptyState(
         icon: Icons.history,
         title: 'No stock movements yet',
-        message: 'Stock-in and stock-out activity for this product will appear here.',
+        message: 'Purchase and sale activity for this product will appear here.',
       );
     }
     return Column(

@@ -7,7 +7,7 @@ import 'chart_axis.dart';
 import 'chart_legend.dart';
 import 'dashboard_chart_colors.dart';
 
-/// Grouped bar chart: Stock In qty vs Stock Out qty per day.
+/// Grouped bar chart: Purchase qty vs Sale qty per day.
 ///
 /// Sized with a [LayoutBuilder] so bar width / group spacing shrink as the
 /// number of days grows (e.g. "This Year" can return ~366 daily points) —
@@ -29,13 +29,13 @@ class StockMovementChart extends StatelessWidget {
     }
 
     final scheme = Theme.of(context).colorScheme;
-    final stockInColor = DashboardChartColors.slot1(context);
-    final stockOutColor = DashboardChartColors.slot2(context);
+    final purchaseColor = DashboardChartColors.slot1(context);
+    final saleColor = DashboardChartColors.slot2(context);
     final labelInterval = chartLabelInterval(points.length);
 
     double maxQty = 0;
     for (final p in points) {
-      maxQty = [maxQty, p.stockInQty.toDouble(), p.stockOutQty.toDouble()].reduce((a, b) => a > b ? a : b);
+      maxQty = [maxQty, p.purchaseQty.toDouble(), p.saleQty.toDouble()].reduce((a, b) => a > b ? a : b);
     }
     final maxY = maxQty <= 0 ? 4.0 : maxQty * 1.2;
 
@@ -43,8 +43,8 @@ class StockMovementChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ChartLegend(items: [
-          ChartLegendItem(color: stockInColor, label: 'Stock In'),
-          ChartLegendItem(color: stockOutColor, label: 'Stock Out'),
+          ChartLegendItem(color: purchaseColor, label: 'Purchase'),
+          ChartLegendItem(color: saleColor, label: 'Sale'),
         ]),
         const SizedBox(height: 12),
         SizedBox(
@@ -103,7 +103,7 @@ class StockMovementChart extends StatelessWidget {
                       getTooltipColor: (_) => scheme.inverseSurface,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final point = points[group.x.toInt()];
-                        final label = rodIndex == 0 ? 'Stock In' : 'Stock Out';
+                        final label = rodIndex == 0 ? 'Purchase' : 'Sale';
                         return BarTooltipItem(
                           '${chartShortDate(point.date)}\n$label: ${rod.toY.toInt()}',
                           TextStyle(color: scheme.onInverseSurface, fontSize: 12, fontWeight: FontWeight.w600),
@@ -118,14 +118,14 @@ class StockMovementChart extends StatelessWidget {
                         barsSpace: barWidth * 0.4,
                         barRods: [
                           BarChartRodData(
-                            toY: points[i].stockInQty.toDouble(),
-                            color: stockInColor,
+                            toY: points[i].purchaseQty.toDouble(),
+                            color: purchaseColor,
                             width: barWidth,
                             borderRadius: BorderRadius.vertical(top: Radius.circular(barWidth < 3 ? 0 : 2)),
                           ),
                           BarChartRodData(
-                            toY: points[i].stockOutQty.toDouble(),
-                            color: stockOutColor,
+                            toY: points[i].saleQty.toDouble(),
+                            color: saleColor,
                             width: barWidth,
                             borderRadius: BorderRadius.vertical(top: Radius.circular(barWidth < 3 ? 0 : 2)),
                           ),

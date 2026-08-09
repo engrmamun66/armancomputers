@@ -6,9 +6,9 @@ import '../../core/api_exception.dart';
 import '../../core/format.dart';
 import '../../models/lookup.dart';
 import '../../models/paginated.dart';
-import '../../models/stock_in.dart';
+import '../../models/purchase.dart';
 import '../../services/lookups_service.dart';
-import '../../services/stock_ins_service.dart';
+import '../../services/purchases_service.dart';
 import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
@@ -24,14 +24,14 @@ import '../../shared/widgets/status_badge.dart';
 /// cannot distinguish "picked null" from "dismissed without picking".
 const int _kAllStatuses = -1;
 
-class StockInListScreen extends ConsumerStatefulWidget {
-  const StockInListScreen({super.key});
+class PurchaseListScreen extends ConsumerStatefulWidget {
+  const PurchaseListScreen({super.key});
 
   @override
-  ConsumerState<StockInListScreen> createState() => _StockInListScreenState();
+  ConsumerState<PurchaseListScreen> createState() => _PurchaseListScreenState();
 }
 
-class _StockInListScreenState extends ConsumerState<StockInListScreen> {
+class _PurchaseListScreenState extends ConsumerState<PurchaseListScreen> {
   String _search = '';
   DateTime? _dateFrom;
   DateTime? _dateTo;
@@ -42,7 +42,7 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
 
   bool _loading = true;
   String? _error;
-  List<StockInModel> _items = [];
+  List<PurchaseModel> _items = [];
   PageMeta? _meta;
   Map<String, dynamic>? _totals;
 
@@ -57,7 +57,7 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
 
   Future<void> _loadStatuses() async {
     try {
-      final statuses = await ref.read(lookupsServiceProvider).statuses('stock_in');
+      final statuses = await ref.read(lookupsServiceProvider).statuses('purchase');
       if (!mounted) return;
       setState(() => _statuses = statuses);
     } catch (_) {
@@ -81,7 +81,7 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
     if (_statusId != null) params['status_id'] = _statusId;
 
     try {
-      final res = await ref.read(stockInsServiceProvider).list(params);
+      final res = await ref.read(purchasesServiceProvider).list(params);
       if (!mounted) return;
       setState(() {
         _items = res.data;
@@ -132,12 +132,12 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stock In'),
+        title: const Text('Purchase'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'Add Stock In',
-            onPressed: () => context.push('/stock-in/create').then((_) => _load()),
+            tooltip: 'Add Purchase',
+            onPressed: () => context.push('/purchases/create').then((_) => _load()),
           ),
         ],
       ),
@@ -158,7 +158,7 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
               _buildError(context)
             else if (_items.isEmpty)
               AppEmptyState(
-                title: 'No stock in records found',
+                title: 'No purchase records found',
                 message: _hasFilters ? 'Try adjusting your filters.' : 'Recorded purchases will appear here.',
                 clearLabel: _hasFilters ? 'Reset filters' : null,
                 onClear: _hasFilters ? _resetFilters : null,
@@ -167,9 +167,9 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
               ..._items.map(
                 (item) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: _StockInCard(
+                  child: _PurchaseCard(
                     item: item,
-                    onTap: () => context.push('/stock-in/${item.id}').then((_) => _load()),
+                    onTap: () => context.push('/purchases/${item.id}').then((_) => _load()),
                   ),
                 ),
               ),
@@ -300,11 +300,11 @@ class _StockInListScreenState extends ConsumerState<StockInListScreen> {
   }
 }
 
-class _StockInCard extends StatelessWidget {
-  final StockInModel item;
+class _PurchaseCard extends StatelessWidget {
+  final PurchaseModel item;
   final VoidCallback onTap;
 
-  const _StockInCard({required this.item, required this.onTap});
+  const _PurchaseCard({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

@@ -5,27 +5,27 @@ import 'package:go_router/go_router.dart';
 import '../../core/api_exception.dart';
 import '../../core/format.dart';
 import '../../models/line_item.dart';
-import '../../models/stock_in.dart';
-import '../../services/stock_ins_service.dart';
+import '../../models/purchase.dart';
+import '../../services/purchases_service.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/loading.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
 
-class StockInDetailScreen extends ConsumerStatefulWidget {
+class PurchaseDetailScreen extends ConsumerStatefulWidget {
   final int id;
-  const StockInDetailScreen({super.key, required this.id});
+  const PurchaseDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<StockInDetailScreen> createState() => _StockInDetailScreenState();
+  ConsumerState<PurchaseDetailScreen> createState() => _PurchaseDetailScreenState();
 }
 
-class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
+class _PurchaseDetailScreenState extends ConsumerState<PurchaseDetailScreen> {
   bool _loading = true;
   bool _deleting = false;
   String? _error;
-  StockInModel? _stockIn;
+  PurchaseModel? _purchase;
 
   @override
   void initState() {
@@ -39,10 +39,10 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
       _error = null;
     });
     try {
-      final stockIn = await ref.read(stockInsServiceProvider).get(widget.id);
+      final purchase = await ref.read(purchasesServiceProvider).get(widget.id);
       if (!mounted) return;
       setState(() {
-        _stockIn = stockIn;
+        _purchase = purchase;
         _loading = false;
       });
     } on ApiException catch (e) {
@@ -54,29 +54,29 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _error = 'Failed to load stock in record.';
+        _error = 'Failed to load purchase record.';
         _loading = false;
       });
     }
   }
 
   Future<void> _delete() async {
-    final stockIn = _stockIn;
-    if (stockIn == null) return;
+    final purchase = _purchase;
+    if (purchase == null) return;
     final confirmed = await showAppConfirmDialog(
       context,
-      title: 'Cancel Stock In',
-      message: '${stockIn.referenceNo} will be cancelled and its stock effect reversed. This cannot be undone.',
-      confirmText: 'Cancel Stock In',
+      title: 'Cancel Purchase',
+      message: '${purchase.referenceNo} will be cancelled and its stock effect reversed. This cannot be undone.',
+      confirmText: 'Cancel Purchase',
       danger: true,
     );
     if (!confirmed) return;
 
     setState(() => _deleting = true);
     try {
-      await ref.read(stockInsServiceProvider).remove(stockIn.id);
+      await ref.read(purchasesServiceProvider).remove(purchase.id);
       if (!mounted) return;
-      AppSnackbar.success(context, '${stockIn.referenceNo} was cancelled.');
+      AppSnackbar.success(context, '${purchase.referenceNo} was cancelled.');
       context.pop();
     } on ApiException catch (e) {
       if (mounted) AppSnackbar.error(context, e.message);
@@ -89,17 +89,17 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final stockIn = _stockIn;
+    final purchase = _purchase;
     return Scaffold(
       appBar: AppBar(
-        title: Text(stockIn?.referenceNo ?? 'Stock In'),
-        actions: stockIn == null
+        title: Text(purchase?.referenceNo ?? 'Purchase'),
+        actions: purchase == null
             ? null
             : [
                 IconButton(
                   icon: const Icon(Icons.edit),
                   tooltip: 'Edit',
-                  onPressed: () => context.push('/stock-in/${widget.id}/edit').then((_) => _load()),
+                  onPressed: () => context.push('/purchases/${widget.id}/edit').then((_) => _load()),
                 ),
                 IconButton(
                   icon: _deleting
@@ -118,9 +118,9 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
           ? const AppLoading()
           : _error != null
               ? _buildError(context)
-              : stockIn == null
+              : purchase == null
                   ? const SizedBox.shrink()
-                  : _buildBody(context, stockIn),
+                  : _buildBody(context, purchase),
     );
   }
 
@@ -142,9 +142,9 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, StockInModel stockIn) {
+  Widget _buildBody(BuildContext context, PurchaseModel purchase) {
     final scheme = Theme.of(context).colorScheme;
-    final hasNotes = stockIn.notes != null && stockIn.notes!.trim().isNotEmpty;
+    final hasNotes = purchase.notes != null && purchase.notes!.trim().isNotEmpty;
     return RefreshIndicator(
       onRefresh: _load,
       child: SingleChildScrollView(
@@ -155,46 +155,46 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
           children: [
             SectionCard(
               title: 'Purchase Info',
-              trailing: StatusBadge(status: stockIn.status?.slug ?? 'unknown'),
+              trailing: StatusBadge(status: purchase.status?.slug ?? 'unknown'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _infoRow(context, 'Reference No.', stockIn.referenceNo, mono: true),
-                  _infoRow(context, 'Purchase Date', formatDate(stockIn.purchaseDate)),
+                  _infoRow(context, 'Reference No.', purchase.referenceNo, mono: true),
+                  _infoRow(context, 'Purchase Date', formatDate(purchase.purchaseDate)),
                   _infoRow(
                     context,
                     'Supplier',
-                    (stockIn.supplierName?.isNotEmpty ?? false) ? stockIn.supplierName! : '—',
+                    (purchase.supplierName?.isNotEmpty ?? false) ? purchase.supplierName! : '—',
                   ),
                   _infoRow(
                     context,
                     'Supplier Phone',
-                    (stockIn.supplierPhone?.isNotEmpty ?? false) ? stockIn.supplierPhone! : '—',
+                    (purchase.supplierPhone?.isNotEmpty ?? false) ? purchase.supplierPhone! : '—',
                   ),
                   _infoRow(
                     context,
                     'Created By',
-                    (stockIn.createdBy?.isNotEmpty ?? false) ? stockIn.createdBy! : '—',
+                    (purchase.createdBy?.isNotEmpty ?? false) ? purchase.createdBy! : '—',
                   ),
-                  if (stockIn.createdAt != null) _infoRow(context, 'Recorded On', formatDateTime(stockIn.createdAt)),
+                  if (purchase.createdAt != null) _infoRow(context, 'Recorded On', formatDateTime(purchase.createdAt)),
                 ],
               ),
             ),
             if (hasNotes) ...[
               const SizedBox(height: 16),
-              SectionCard(title: 'Notes', child: Text(stockIn.notes!.trim())),
+              SectionCard(title: 'Notes', child: Text(purchase.notes!.trim())),
             ],
             const SizedBox(height: 16),
             SectionCard(
-              title: 'Items (${stockIn.items.length})',
-              child: stockIn.items.isEmpty
+              title: 'Items (${purchase.items.length})',
+              child: purchase.items.isEmpty
                   ? Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Text('No line items recorded.', style: TextStyle(color: scheme.onSurfaceVariant)),
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: stockIn.items
+                      children: purchase.items
                           .map((item) => Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: _buildItemRow(context, item),
@@ -208,15 +208,15 @@ class _StockInDetailScreenState extends ConsumerState<StockInDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _totalsRow(context, 'Subtotal', formatCurrency(stockIn.subtotal)),
+                  _totalsRow(context, 'Subtotal', formatCurrency(purchase.subtotal)),
                   const SizedBox(height: 8),
-                  _totalsRow(context, 'Discount', '- ${formatCurrency(stockIn.discount)}'),
+                  _totalsRow(context, 'Discount', '- ${formatCurrency(purchase.discount)}'),
                   const SizedBox(height: 8),
-                  _totalsRow(context, 'Additional Cost', '+ ${formatCurrency(stockIn.additionalCost)}'),
+                  _totalsRow(context, 'Additional Cost', '+ ${formatCurrency(purchase.additionalCost)}'),
                   const SizedBox(height: 12),
                   const Divider(),
                   const SizedBox(height: 6),
-                  _totalsRow(context, 'Grand Total', formatCurrency(stockIn.grandTotal), emphasize: true),
+                  _totalsRow(context, 'Grand Total', formatCurrency(purchase.grandTotal), emphasize: true),
                 ],
               ),
             ),

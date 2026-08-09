@@ -1,4 +1,4 @@
-/// Shared shape for StockInItem / StockOutItem / InvoiceItem — all three
+/// Shared shape for PurchaseItem / SaleItem / InvoiceItem — all three
 /// resources on the backend serialize identically.
 class LineItem {
   final int? id;

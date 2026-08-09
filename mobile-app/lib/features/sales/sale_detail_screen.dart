@@ -7,9 +7,9 @@ import '../../core/format.dart';
 import '../../core/permissions.dart';
 import '../../core/theme.dart';
 import '../../models/line_item.dart';
-import '../../models/stock_out.dart';
+import '../../models/sale.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/stock_outs_service.dart';
+import '../../services/sales_service.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -17,20 +17,20 @@ import '../../shared/widgets/loading.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
 
-/// All roles (including staff) can create a Stock Out, but only admin/manager
+/// All roles (including staff) can create a Sale, but only admin/manager
 /// may edit or delete an existing one — staff is explicitly excluded even
-/// though `can('staff', 'stock-out.manage')` is true, per the app's business
+/// though `can('staff', 'sales.manage')` is true, per the app's business
 /// rule that staff can record sales but not alter/void them afterwards.
-class StockOutDetailScreen extends ConsumerStatefulWidget {
+class SaleDetailScreen extends ConsumerStatefulWidget {
   final int id;
-  const StockOutDetailScreen({super.key, required this.id});
+  const SaleDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<StockOutDetailScreen> createState() => _StockOutDetailScreenState();
+  ConsumerState<SaleDetailScreen> createState() => _SaleDetailScreenState();
 }
 
-class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
-  StockOutModel? _stockOut;
+class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
+  SaleModel? _sale;
   bool _loading = true;
   String? _error;
   bool _deleting = false;
@@ -47,42 +47,42 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
       _error = null;
     });
     try {
-      final so = await ref.read(stockOutsServiceProvider).get(widget.id);
+      final sale = await ref.read(salesServiceProvider).get(widget.id);
       if (!mounted) return;
       setState(() {
-        _stockOut = so;
+        _sale = sale;
         _loading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e is ApiException ? e.message : 'Failed to load stock out.';
+        _error = e is ApiException ? e.message : 'Failed to load sale.';
         _loading = false;
       });
     }
   }
 
   Future<void> _handleEdit() async {
-    final result = await context.push('/stock-out/${widget.id}/edit');
+    final result = await context.push('/sales/${widget.id}/edit');
     if (result == true) _fetch();
   }
 
   Future<void> _handleDelete() async {
-    final so = _stockOut;
-    if (so == null) return;
+    final sale = _sale;
+    if (sale == null) return;
     final confirmed = await showAppConfirmDialog(
       context,
-      title: 'Delete Stock Out',
-      message: '${so.referenceNo} will be cancelled, its stock returned, and its invoice voided. This cannot be undone.',
+      title: 'Delete Sale',
+      message: '${sale.referenceNo} will be cancelled, its stock returned, and its invoice voided. This cannot be undone.',
       confirmText: 'Delete',
       danger: true,
     );
     if (!confirmed) return;
     setState(() => _deleting = true);
     try {
-      await ref.read(stockOutsServiceProvider).remove(widget.id);
+      await ref.read(salesServiceProvider).remove(widget.id);
       if (!mounted) return;
-      AppSnackbar.success(context, 'Stock out deleted successfully.');
+      AppSnackbar.success(context, 'Sale deleted successfully.');
       context.pop(true);
     } on ApiException catch (e) {
       if (!mounted) return;
@@ -90,7 +90,7 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
       setState(() => _deleting = false);
     } catch (_) {
       if (!mounted) return;
-      AppSnackbar.error(context, 'Failed to delete stock out.');
+      AppSnackbar.error(context, 'Failed to delete sale.');
       setState(() => _deleting = false);
     }
   }
@@ -98,17 +98,17 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    // Staff CAN create (see StockOutListScreen's always-visible "+"), but
-    // must NOT see edit/delete here even though stock-out.manage is granted
+    // Staff CAN create (see SaleListScreen's always-visible "+"), but
+    // must NOT see edit/delete here even though sales.manage is granted
     // to their role — hence the explicit role != 'staff' exclusion.
-    final canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug != 'staff';
-    final so = _stockOut;
+    final canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug != 'staff';
+    final sale = _sale;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(so?.referenceNo ?? 'Stock Out'),
+        title: Text(sale?.referenceNo ?? 'Sale'),
         actions: [
-          if (canManage && so != null) ...[
+          if (canManage && sale != null) ...[
             IconButton(icon: const Icon(Icons.edit), tooltip: 'Edit', onPressed: _handleEdit),
             IconButton(
               icon: _deleting
@@ -120,52 +120,52 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
           ],
         ],
       ),
-      body: _buildBody(context, so),
+      body: _buildBody(context, sale),
     );
   }
 
-  Widget _buildBody(BuildContext context, StockOutModel? so) {
+  Widget _buildBody(BuildContext context, SaleModel? sale) {
     if (_loading) return const AppLoading();
     if (_error != null) {
       return AppEmptyState(
         icon: Icons.error_outline,
-        title: 'Could not load stock out',
+        title: 'Could not load sale',
         message: _error,
         clearLabel: 'Retry',
         onClear: _fetch,
       );
     }
-    if (so == null) {
-      return const AppEmptyState(title: 'Stock out not found');
+    if (sale == null) {
+      return const AppEmptyState(title: 'Sale not found');
     }
     return RefreshIndicator(
       onRefresh: _fetch,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildHeaderCard(context, so),
+          _buildHeaderCard(context, sale),
           const SizedBox(height: 16),
-          _buildCustomerCard(context, so),
-          if (so.notes != null && so.notes!.isNotEmpty) ...[
+          _buildCustomerCard(context, sale),
+          if (sale.notes != null && sale.notes!.isNotEmpty) ...[
             const SizedBox(height: 16),
-            SectionCard(title: 'Notes', child: Text(so.notes!)),
+            SectionCard(title: 'Notes', child: Text(sale.notes!)),
           ],
           const SizedBox(height: 16),
-          _buildItemsCard(context, so),
+          _buildItemsCard(context, sale),
           const SizedBox(height: 16),
-          _buildTotalsCard(context, so),
-          if (so.invoiceId != null) ...[
+          _buildTotalsCard(context, sale),
+          if (sale.invoiceId != null) ...[
             const SizedBox(height: 16),
-            _buildInvoiceLink(context, so),
+            _buildInvoiceLink(context, sale),
           ],
           const SizedBox(height: 16),
-          _buildMetaFooter(context, so),
+          _buildMetaFooter(context, sale),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context, StockOutModel so) {
+  Widget _buildHeaderCard(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
     return SectionCard(
       child: Column(
@@ -176,12 +176,12 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
             children: [
               Expanded(
                 child: Text(
-                  so.referenceNo,
+                  sale.referenceNo,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
               Text(
-                formatCurrency(so.grandTotal),
+                formatCurrency(sale.grandTotal),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
@@ -191,7 +191,7 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
             children: [
               Icon(Icons.event, size: 16, color: scheme.onSurfaceVariant),
               const SizedBox(width: 6),
-              Text(formatDate(so.saleDate), style: TextStyle(color: scheme.onSurfaceVariant)),
+              Text(formatDate(sale.saleDate), style: TextStyle(color: scheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(height: 12),
@@ -199,8 +199,8 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              if (so.status != null) StatusBadge(status: so.status!.slug),
-              if (so.paymentStatus != null) StatusBadge(status: so.paymentStatus!),
+              if (sale.status != null) StatusBadge(status: sale.status!.slug),
+              if (sale.paymentStatus != null) StatusBadge(status: sale.paymentStatus!),
             ],
           ),
         ],
@@ -208,9 +208,9 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
     );
   }
 
-  Widget _buildCustomerCard(BuildContext context, StockOutModel so) {
+  Widget _buildCustomerCard(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
-    final c = so.customer;
+    final c = sale.customer;
     return SectionCard(
       title: 'Customer',
       child: c == null
@@ -245,20 +245,20 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
     );
   }
 
-  Widget _buildItemsCard(BuildContext context, StockOutModel so) {
+  Widget _buildItemsCard(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
     return SectionCard(
-      title: 'Items (${so.itemsCount ?? so.items.length})',
-      child: so.items.isEmpty
+      title: 'Items (${sale.itemsCount ?? sale.items.length})',
+      child: sale.items.isEmpty
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text('No line items.', style: TextStyle(color: scheme.onSurfaceVariant)),
             )
           : Column(
               children: [
-                for (int i = 0; i < so.items.length; i++) ...[
+                for (int i = 0; i < sale.items.length; i++) ...[
                   if (i > 0) const Divider(height: 20),
-                  _buildItemRow(context, so.items[i]),
+                  _buildItemRow(context, sale.items[i]),
                 ],
               ],
             ),
@@ -289,31 +289,31 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
     );
   }
 
-  Widget _buildTotalsCard(BuildContext context, StockOutModel so) {
+  Widget _buildTotalsCard(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
     return SectionCard(
       title: 'Payment Summary',
       child: Column(
         children: [
-          _row(context, 'Subtotal', formatCurrency(so.subtotal)),
-          _row(context, 'Discount', '- ${formatCurrency(so.discount)}'),
-          _row(context, 'Additional Cost', '+ ${formatCurrency(so.additionalCost)}'),
+          _row(context, 'Subtotal', formatCurrency(sale.subtotal)),
+          _row(context, 'Discount', '- ${formatCurrency(sale.discount)}'),
+          _row(context, 'Additional Cost', '+ ${formatCurrency(sale.additionalCost)}'),
           const Divider(height: 20),
-          _row(context, 'Grand Total', formatCurrency(so.grandTotal), bold: true),
+          _row(context, 'Grand Total', formatCurrency(sale.grandTotal), bold: true),
           const SizedBox(height: 8),
-          _row(context, 'Paid', formatCurrency(so.paidAmount)),
+          _row(context, 'Paid', formatCurrency(sale.paidAmount)),
           _row(
             context,
             'Due',
-            formatCurrency(so.dueAmount),
+            formatCurrency(sale.dueAmount),
             bold: true,
-            color: so.dueAmount > 0 ? AppColors.danger(context) : AppColors.success(context),
+            color: sale.dueAmount > 0 ? AppColors.danger(context) : AppColors.success(context),
           ),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Payment Method: ${_labelForPaymentMethod(so.paymentMethod)}',
+              'Payment Method: ${_labelForPaymentMethod(sale.paymentMethod)}',
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
             ),
           ),
@@ -340,30 +340,30 @@ class _StockOutDetailScreenState extends ConsumerState<StockOutDetailScreen> {
     return match.isEmpty ? value : match.first['label']!;
   }
 
-  Widget _buildInvoiceLink(BuildContext context, StockOutModel so) {
+  Widget _buildInvoiceLink(BuildContext context, SaleModel sale) {
     return Card(
       child: ListTile(
         leading: Icon(Icons.receipt_long, color: Theme.of(context).colorScheme.primary),
         title: const Text('View Invoice'),
         subtitle: const Text('Open the linked invoice for this sale'),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.push('/invoices/${so.invoiceId}'),
+        onTap: () => context.push('/invoices/${sale.invoiceId}'),
       ),
     );
   }
 
-  Widget _buildMetaFooter(BuildContext context, StockOutModel so) {
+  Widget _buildMetaFooter(BuildContext context, SaleModel sale) {
     final scheme = Theme.of(context).colorScheme;
-    if (so.createdBy == null && so.createdAt == null) return const SizedBox.shrink();
+    if (sale.createdBy == null && sale.createdAt == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (so.createdBy != null)
-            Text('Created by ${so.createdBy}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-          if (so.createdAt != null)
-            Text('Created ${formatDate(so.createdAt)}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          if (sale.createdBy != null)
+            Text('Created by ${sale.createdBy}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          if (sale.createdAt != null)
+            Text('Created ${formatDate(sale.createdAt)}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
         ],
       ),
     );

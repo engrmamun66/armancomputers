@@ -338,8 +338,8 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
     } else if (invoice.createdAt != null) {
       lines.add('Created on ${formatDateTime(invoice.createdAt)}');
     }
-    if (invoice.stockOutId != null) {
-      lines.add('Generated from Stock Out #${invoice.stockOutId}');
+    if (invoice.saleId != null) {
+      lines.add('Generated from Sale #${invoice.saleId}');
     }
     if (lines.isEmpty) return const SizedBox.shrink();
     return Padding(
