@@ -229,7 +229,11 @@ async function submit() {
     <AppLayout>
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-lg font-semibold text-slate-900">{{ isEdit ? 'Edit Purchase' : 'New Purchase' }}</h1>
-            <RouterLink :to="{ name: 'purchases.index' }" class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50">
+            <RouterLink
+                :to="{ name: 'purchases.index' }"
+                class="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover"
+            >
+                <Icon name="arrow-left" class="h-4 w-4" />
                 Back
             </RouterLink>
         </div>
