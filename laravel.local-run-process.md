@@ -52,6 +52,15 @@ php artisan storage:link   # required once, for profile avatar uploads
 
 Seed creates: 3 roles, general/stock_in/stock_out/invoice statuses, 4 demo users, 8 brands, 24 products, 10 customers, sample Stock In/Out transactions with auto-generated invoices.
 
+## ====================================
+## ====================================
+## ====================================
+## ====================================
+## ====================================
+## ====================================
+## ====================================
+## ====================================
+## ====================================
 ## Running the app
 
 Two processes, both from `laravel-app/`:
