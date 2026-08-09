@@ -153,7 +153,7 @@ async function removeProduct(product) {
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-name="{ row }">
-                    <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-primary-600">
+                    <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-link">
                         {{ row.name }}
                     </RouterLink>
                 </template>

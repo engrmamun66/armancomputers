@@ -233,7 +233,7 @@ async function submit() {
                         <label class="block text-sm font-medium text-slate-700 mb-1">Customer</label>
                         <div v-if="selectedCustomer" class="flex items-center justify-between px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
                             <span class="text-sm font-medium text-slate-800">{{ selectedCustomer.name }} <span class="text-slate-400 font-normal">· {{ selectedCustomer.phone || 'no phone' }}</span></span>
-                            <button type="button" class="text-sm text-primary-600" @click="selectedCustomer = null; form.customer_id = null">Change</button>
+                            <button type="button" class="text-sm text-link" @click="selectedCustomer = null; form.customer_id = null">Change</button>
                         </div>
                         <CustomerSearch v-else @select="selectCustomer" @create-new="openCustomerModal" />
                     </div>

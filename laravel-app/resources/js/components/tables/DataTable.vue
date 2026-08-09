@@ -51,6 +51,9 @@ defineProps({
                     </td>
                 </tr>
             </tbody>
+            <tfoot v-if="$slots.footer">
+                <slot name="footer" />
+            </tfoot>
         </table>
     </div>
 </template>

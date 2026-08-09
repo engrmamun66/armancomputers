@@ -41,6 +41,7 @@ const columns = [
 
 const rows = ref([]);
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
+const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0 });
 const loading = ref(false);
 const statuses = ref([]);
 const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', page: 1 });
@@ -63,6 +64,7 @@ async function loadStockOuts() {
         });
         rows.value = data.data;
         meta.value = data.meta;
+        totals.value = data.totals;
     } catch {
         toast.error('Failed to load Stock Out records.');
     } finally {
@@ -133,7 +135,7 @@ async function removeStockOut(stockOut) {
                 <option value="partial">Partial</option>
                 <option value="due">Due</option>
             </select>
-            <button v-if="hasActiveFilters()" type="button" class="text-sm text-primary-600 hover:text-primary-700" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="text-sm text-link hover:text-link-hover" @click="clearFilters">
                 Reset Filters
             </button>
         </div>
@@ -149,8 +151,17 @@ async function removeStockOut(stockOut) {
         <template v-else>
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
+                <template #footer>
+                    <tr v-if="rows.length" class="bg-slate-50 font-semibold text-slate-700 border-t border-slate-200">
+                        <td class="px-4 py-3" colspan="4">Totals</td>
+                        <td class="px-4 py-3 text-center">{{ totals.items_count }}</td>
+                        <td class="px-4 py-3 text-right">{{ totals.total_qty }}</td>
+                        <td class="px-4 py-3 text-right">{{ formatCurrency(totals.total_amount) }}</td>
+                        <td class="px-4 py-3" colspan="5"></td>
+                    </tr>
+                </template>
                 <template #cell-reference_no="{ row }">
-                    <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-primary-600 hover:text-primary-700">
+                    <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">
                         {{ row.reference_no }}
                     </RouterLink>
                 </template>

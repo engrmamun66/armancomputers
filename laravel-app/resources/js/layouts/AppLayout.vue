@@ -151,7 +151,7 @@ async function handleLogout() {
                 :key="item.name"
                 :to="{ name: item.name }"
                 class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
-                :class="route.name === item.name ? 'text-primary-600' : 'text-slate-500'"
+                :class="route.name === item.name ? 'text-link' : 'text-slate-500'"
             >
                 <Icon :name="item.icon" class="h-5 w-5" />
                 {{ item.label }}
@@ -159,7 +159,7 @@ async function handleLogout() {
             <button
                 type="button"
                 class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
-                :class="moreSheetOpen ? 'text-primary-600' : 'text-slate-500'"
+                :class="moreSheetOpen ? 'text-link' : 'text-slate-500'"
                 @click="moreSheetOpen = true"
             >
                 <Icon name="ellipsis-horizontal" class="h-5 w-5" />

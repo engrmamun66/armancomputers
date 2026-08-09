@@ -46,6 +46,13 @@
     --color-accent-solid-hover: light-dark(#171717, #e5e5e5);
     --color-on-accent-solid: light-dark(#fff, #262626);
 
+    /* Plain inline link text (reference numbers, "View History", breadcrumbs)
+       sitting directly on a card/table surface. Unlike bg-primary-50 soft
+       chips (which stay static), this needs to lighten in dark mode or it
+       reads as near-invisible dark-on-dark text. */
+    --color-link: light-dark(#262626, #a3a3a3);
+    --color-link-hover: light-dark(#000, #d4d4d4);
+
     /* Neutral surface ramp. Native CSS light-dark() re-resolves these against
        the page's color-scheme (set by the theme store), so every existing
        bg-white, text-slate, and border-slate class project-wide becomes

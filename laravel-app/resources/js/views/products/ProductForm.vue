@@ -103,7 +103,7 @@ async function submit() {
         <form v-else class="bg-white border border-slate-200 rounded-lg p-6 max-w-2xl space-y-4" @submit.prevent="submit">
             <div v-if="isEdit" class="rounded-md bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600 flex items-center justify-between">
                 <span>Current stock: <strong>{{ currentStock }}</strong> (managed via Stock In / Stock Out, not editable here)</span>
-                <RouterLink :to="{ name: 'products.stock-history', params: { id } }" class="text-primary-600 hover:text-primary-700 font-medium">View History</RouterLink>
+                <RouterLink :to="{ name: 'products.stock-history', params: { id } }" class="text-link hover:text-link-hover font-medium">View History</RouterLink>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
