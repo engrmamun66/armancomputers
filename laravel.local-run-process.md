@@ -66,11 +66,11 @@ Seed creates: 3 roles, general/stock_in/stock_out/invoice statuses, 4 demo users
 Two processes, both from `laravel-app/`:
 
 ```bash
-php artisan serve --port=8000   # backend + serves the SPA shell
+php artisan serve --port=7878   # backend + serves the SPA shell
 npm run dev                      # Vite dev server (HMR)
 ```
 
-Visit **http://127.0.0.1:8000** — Vite is only used for asset compilation/HMR, not for serving pages, so there's a single origin and no CORS setup needed.
+Visit **http://127.0.0.1:7878** — Vite is only used for asset compilation/HMR, not for serving pages, so there's a single origin and no CORS setup needed.
 
 ## Demo logins
 

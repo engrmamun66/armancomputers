@@ -4,6 +4,7 @@ import { RouterLink, useRouter } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ProductSearch from '@/components/common/ProductSearch.vue';
+import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
 import stockInsApi from '@/services/stockIns';
 import { useToast } from '@/composables/useToast';
 import { formatCurrency } from '@/utils/format';
@@ -154,7 +155,11 @@ async function submit() {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Date</label>
-                        <input v-model="form.purchase_date" type="date" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <EmDateTimePicker
+                            v-model="form.purchase_date"
+                            model-value-type="date"
+                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
+                        />
                         <p v-if="errors.purchase_date" class="mt-1 text-xs text-rose-600">{{ errors.purchase_date[0] }}</p>
                     </div>
                     <div>

@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ProductSearch from '@/components/common/ProductSearch.vue';
 import CustomerSearch from '@/components/common/CustomerSearch.vue';
+import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
 import Modal from '@/components/common/Modal.vue';
 import stockOutsApi from '@/services/stockOuts';
 import customersApi from '@/services/customers';
@@ -241,7 +242,11 @@ async function submit() {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Sale Date</label>
-                        <input v-model="form.sale_date" type="date" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <EmDateTimePicker
+                            v-model="form.sale_date"
+                            model-value-type="date"
+                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
+                        />
                         <p v-if="errors.sale_date" class="mt-1 text-xs text-rose-600">{{ errors.sale_date[0] }}</p>
                     </div>
                 </div>
