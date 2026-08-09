@@ -69,6 +69,18 @@ onMounted(load);
 
         <LoadingSpinner v-if="loading" />
         <template v-else-if="data">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <StatCard label="Total Purchase Cost (period)" :value="formatCurrency(data.cards.total_purchase_cost)" icon="arrow-down-tray" emphasize />
+                <StatCard label="Total Sales (period)" :value="formatCurrency(data.cards.total_sales_amount)" icon="arrow-up-tray" emphasize />
+                <StatCard
+                    label="Total Profit (period)"
+                    :value="formatCurrency(data.cards.total_profit)"
+                    icon="shield-check"
+                    :tone="data.cards.total_profit >= 0 ? 'success' : 'danger'"
+                    emphasize
+                />
+            </div>
+
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Total Products" :value="data.cards.total_products" icon="box" />
                 <StatCard label="Total Stock Quantity" :value="data.cards.total_stock_quantity" icon="box" />

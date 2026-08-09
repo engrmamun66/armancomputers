@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/tables/DataTable.vue';
 import Icon from '@/components/common/Icon.vue';
+import StatCard from '@/components/dashboard/StatCard.vue';
 import Pagination from '@/components/common/Pagination.vue';
 import SearchInput from '@/components/common/SearchInput.vue';
 import DateRangePicker from '@/components/common/DateRangePicker.vue';
@@ -40,7 +41,7 @@ const columns = [
 
 const rows = ref([]);
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
-const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0 });
+const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0, total_cost: 0, total_profit: 0 });
 const loading = ref(false);
 const statuses = ref([]);
 const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', sort_by: 'sale_date', sort_dir: 'desc', page: 1 });
@@ -150,6 +151,18 @@ async function removeSale(sale) {
             <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="clearFilters">
                 Reset Filters
             </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <StatCard label="Total Sale" :value="formatCurrency(totals.total_amount)" icon="arrow-up-tray" emphasize />
+            <StatCard label="Total Purchase Cost" :value="formatCurrency(totals.total_cost)" icon="arrow-down-tray" emphasize />
+            <StatCard
+                label="Total Profit"
+                :value="formatCurrency(totals.total_profit)"
+                icon="shield-check"
+                :tone="totals.total_profit >= 0 ? 'success' : 'danger'"
+                emphasize
+            />
         </div>
 
         <LoadingSpinner v-if="loading" />

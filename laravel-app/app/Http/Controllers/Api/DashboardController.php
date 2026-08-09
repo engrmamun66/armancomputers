@@ -23,6 +23,13 @@ class DashboardController extends Controller
 
         $today = now()->toDateString();
 
+        $periodSalesAmount = (float) Sale::whereBetween('sale_date', [$from, $to])->sum('grand_total');
+        $periodSalesCost = (float) DB::table('sale_items')
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->join('products', 'products.id', '=', 'sale_items.product_id')
+            ->whereBetween('sales.sale_date', [$from, $to])
+            ->sum(DB::raw('sale_items.quantity * products.purchase_price'));
+
         $cards = [
             'total_products' => Product::count(),
             'total_stock_quantity' => (int) Product::sum('current_stock'),
@@ -33,6 +40,9 @@ class DashboardController extends Controller
             'total_customers' => Customer::count(),
             'low_stock_products' => Product::whereColumn('current_stock', '<=', 'minimum_stock')->where('current_stock', '>', 0)->count(),
             'out_of_stock_products' => Product::where('current_stock', '<=', 0)->count(),
+            'total_sales_amount' => $periodSalesAmount,
+            'total_purchase_cost' => $periodSalesCost,
+            'total_profit' => $periodSalesAmount - $periodSalesCost,
         ];
 
         $purchaseByDate = DB::table('purchase_items')

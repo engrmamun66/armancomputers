@@ -50,10 +50,16 @@ class SaleController extends Controller
             });
 
         $ids = (clone $filtered)->pluck('id');
+        $totalAmount = (float) (clone $filtered)->sum('grand_total');
+        $totalCost = (float) SaleItem::whereIn('sale_id', $ids)
+            ->join('products', 'products.id', '=', 'sale_items.product_id')
+            ->sum(DB::raw('sale_items.quantity * products.purchase_price'));
         $totals = [
             'items_count' => (int) SaleItem::whereIn('sale_id', $ids)->count(),
             'total_qty' => (int) SaleItem::whereIn('sale_id', $ids)->sum('quantity'),
-            'total_amount' => (float) (clone $filtered)->sum('grand_total'),
+            'total_amount' => $totalAmount,
+            'total_cost' => $totalCost,
+            'total_profit' => $totalAmount - $totalCost,
         ];
 
         $filtered
