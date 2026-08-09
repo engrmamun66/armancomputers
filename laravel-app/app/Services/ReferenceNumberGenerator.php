@@ -23,8 +23,8 @@ class ReferenceNumberGenerator
             ->orderByDesc($column)
             ->value($column);
 
-        $next = $last ? ((int) substr($last, -6)) + 1 : 1;
+        $next = $last ? ((int) substr($last, -4)) + 1 : 1;
 
-        return sprintf('%s-%d-%06d', $prefix, $year, $next);
+        return sprintf('%s-%d-%04d', $prefix, $year, $next);
     }
 }
