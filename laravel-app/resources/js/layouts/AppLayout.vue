@@ -67,10 +67,10 @@ async function handleLogout() {
     <div class="min-h-screen bg-slate-50 flex flex-col">
         <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40">
             <div class="px-4 sm:px-6 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-2">
+                <RouterLink :to="{ name: 'dashboard' }" class="flex items-center gap-2">
                     <img :src="logoSquare" alt="Arman Computers" class="h-10 w-10 object-contain" />
                     <span class="font-semibold text-slate-900 hidden sm:inline">Arman Computers</span>
-                </div>
+                </RouterLink>
 
                 <div class="flex items-center gap-2">
                 <ThemeToggle />
