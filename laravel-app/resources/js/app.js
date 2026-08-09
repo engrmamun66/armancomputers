@@ -1,6 +1,5 @@
 import './bootstrap';
 import '../css/app.css';
-import './vendor/em-datetimepicker/em-datetimepicker.css';
 import './vendor/em-datetimepicker/em-datetimepicker-widget.min.js';
 
 import { createApp } from 'vue';

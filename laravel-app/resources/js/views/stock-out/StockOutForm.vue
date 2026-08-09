@@ -7,6 +7,7 @@ import ProductSearch from '@/components/common/ProductSearch.vue';
 import CustomerSearch from '@/components/common/CustomerSearch.vue';
 import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
 import Modal from '@/components/common/Modal.vue';
+import SelectSearch from '@/components/common/SelectSearch.vue';
 import stockOutsApi from '@/services/stockOuts';
 import customersApi from '@/services/customers';
 import lookups from '@/services/lookups';
@@ -319,9 +320,9 @@ async function submit() {
                 </div>
                 <div class="flex justify-between items-center text-sm border-t border-slate-200 pt-3">
                     <span class="text-slate-500">Payment Method</span>
-                    <select v-model="form.payment_method" class="px-2 py-1 border border-slate-300 rounded-md">
-                        <option v-for="method in PAYMENT_METHODS" :key="method.value" :value="method.value">{{ method.label }}</option>
-                    </select>
+                    <div class="w-40">
+                        <SelectSearch v-model="form.payment_method" :options="PAYMENT_METHODS" placeholder="Select method" />
+                    </div>
                 </div>
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-slate-500">Paid Amount</span>

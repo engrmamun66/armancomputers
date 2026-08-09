@@ -22,6 +22,8 @@ const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 's
 const toast = useToast();
 const { confirm } = useConfirm();
 
+const DATE_RANGE_PRESETS = ['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year', 'Last Year'];
+
 const columns = [
     { key: 'index', label: '#' },
     { key: 'reference_no', label: 'Reference No' },
@@ -120,7 +122,7 @@ async function removeStockOut(stockOut) {
             <div class="sm:w-64">
                 <SearchInput v-model="filters.search" placeholder="Search reference, customer, or product…" />
             </div>
-            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" />
+            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="DATE_RANGE_PRESETS" />
             <select v-model="filters.status_id" class="px-3 py-2 text-sm border border-slate-300 rounded-md">
                 <option value="">All Statuses</option>
                 <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>

@@ -7,6 +7,7 @@ import productsApi from '@/services/products';
 import brandsApi from '@/services/brands';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
+import SelectSearch from '@/components/common/SelectSearch.vue';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
 const router = useRouter();
@@ -59,6 +60,17 @@ onMounted(async () => {
     loading.value = false;
 });
 
+const brandOptions = computed(() => brands.value.map((brand) => ({ value: brand.id, label: brand.name })));
+const statusOptions = computed(() => statuses.value.map((status) => ({ value: status.id, label: status.name })));
+
+async function createBrand(name) {
+    const activeStatusId = statuses.value.find((status) => status.slug === 'active')?.id;
+    const { data } = await brandsApi.create({ name, status_id: activeStatusId });
+    brands.value.push(data.data);
+    toast.success(`Brand "${data.data.name}" added.`);
+    return { value: data.data.id, label: data.data.name };
+}
+
 async function submit() {
     saving.value = true;
     errors.value = {};
@@ -97,17 +109,19 @@ async function submit() {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Brand</label>
-                    <select v-model="form.brand_id" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md">
-                        <option value="" disabled>Select a brand</option>
-                        <option v-for="brand in brands" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
-                    </select>
+                    <SelectSearch
+                        v-model="form.brand_id"
+                        :options="brandOptions"
+                        placeholder="Select a brand"
+                        allow-create
+                        :create-fn="createBrand"
+                        create-label="Add brand"
+                    />
                     <p v-if="errors.brand_id" class="mt-1 text-xs text-rose-600">{{ errors.brand_id[0] }}</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                    <select v-model="form.status_id" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md">
-                        <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
-                    </select>
+                    <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
                 </div>
             </div>
 

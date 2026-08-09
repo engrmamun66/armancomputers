@@ -75,29 +75,6 @@ watch(() => props.modelValue, (value) => {
 const attrs = useAttrs();
 const pickerAttrs = computed(() => {
   const out = { ...attrs, is_disabled: props.isDisabled };
-  const aliasMap = {
-    "range-picker": "rangePicker",
-    "time-picker": "timePicker",
-    "min-date": "minDate",
-    "start-date": "startDate",
-    "display-format": "displayFormat",
-    "auto-open": "autoOpen",
-    "time-picker-buttons": "timePickerButtons",
-    "time-picker-ui": "timePickerUi",
-    "use24-format-time-for-events": "use24FormatTimeForEvents",
-    "adjust-x": "adjustX",
-    "adjust-y": "adjustY",
-    "use24-format": "use24Format",
-    "display-in": "displayIn",
-    "is-disabled": "isDisabled",
-    "keep-empty-the-calendar-first": "keepEmptyTheCalendarFirst",
-  };
-
-  Object.keys(aliasMap).forEach((key) => {
-    if (key in out && !(aliasMap[key] in out)) {
-      out[aliasMap[key]] = out[key];
-    }
-  });
   return out;
 });
 

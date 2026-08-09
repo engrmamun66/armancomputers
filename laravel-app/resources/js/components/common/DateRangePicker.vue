@@ -1,16 +1,36 @@
 <script setup>
+import { computed } from 'vue';
 import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
 
-defineProps({
+const props = defineProps({
     from: { type: String, default: '' },
     to: { type: String, default: '' },
+    unified: { type: Boolean, default: false },
+    presets: { type: Array, default: null },
 });
 
-defineEmits(['update:from', 'update:to']);
+const emit = defineEmits(['update:from', 'update:to']);
+
+const combinedLabel = computed(() => (props.from || props.to ? `${props.from || '…'} - ${props.to || '…'}` : ''));
+
+function onRangeChange(data) {
+    emit('update:from', data.startDateTime);
+    emit('update:to', data.endDateTime);
+}
 </script>
 
 <template>
-    <div class="flex items-center gap-2">
+    <EmDateTimePicker
+        v-if="unified"
+        :model-value="combinedLabel"
+        model-value-type="string"
+        classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-56"
+        :range-picker="true"
+        :use-custom-range="presets || undefined"
+        placeholder="Select date range"
+        @change="onRangeChange"
+    />
+    <div v-else class="flex items-center gap-2">
         <EmDateTimePicker
             :model-value="from"
             model-value-type="date"
