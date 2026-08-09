@@ -19,9 +19,9 @@ class Customer extends Model
         return $this->belongsTo(Status::class);
     }
 
-    public function stockOuts(): HasMany
+    public function sales(): HasMany
     {
-        return $this->hasMany(StockOut::class);
+        return $this->hasMany(Sale::class);
     }
 
     public function invoices(): HasMany

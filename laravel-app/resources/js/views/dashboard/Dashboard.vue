@@ -72,17 +72,17 @@ onMounted(load);
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Total Products" :value="data.cards.total_products" icon="box" />
                 <StatCard label="Total Stock Quantity" :value="data.cards.total_stock_quantity" icon="box" />
-                <StatCard label="Stock In (period)" :value="data.cards.total_stock_in" icon="arrow-down-tray" />
-                <StatCard label="Stock Out (period)" :value="data.cards.total_stock_out" icon="arrow-up-tray" />
+                <StatCard label="Purchase (period)" :value="data.cards.total_purchases" icon="arrow-down-tray" />
+                <StatCard label="Sales (period)" :value="data.cards.total_sales" icon="arrow-up-tray" />
                 <StatCard label="Today's Sales" :value="formatCurrency(data.cards.todays_sales)" icon="document-text" />
-                <StatCard label="Today's Stock In" :value="formatCurrency(data.cards.todays_stock_in)" icon="arrow-down-tray" />
+                <StatCard label="Today's Purchase" :value="formatCurrency(data.cards.todays_purchases)" icon="arrow-down-tray" />
                 <StatCard label="Total Customers" :value="data.cards.total_customers" icon="user-group" />
                 <StatCard label="Low Stock Products" :value="data.cards.low_stock_products" icon="tag" tone="warning" />
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 <div class="bg-white border border-slate-200 rounded-lg p-4">
-                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Stock In vs Stock Out</h2>
+                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Purchase vs Sales</h2>
                     <StockMovementChart :points="data.stock_movement" />
                 </div>
                 <div class="bg-white border border-slate-200 rounded-lg p-4">
@@ -118,13 +118,13 @@ onMounted(load);
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200 rounded-lg p-4">
-                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Recent Stock In</h2>
-                    <EmptyState v-if="!data.recent_stock_ins.length" title="No Stock In records yet." />
+                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Recent Purchase</h2>
+                    <EmptyState v-if="!data.recent_purchases.length" title="No Purchase records yet." />
                     <div v-else class="divide-y divide-slate-100">
                         <RouterLink
-                            v-for="item in data.recent_stock_ins"
+                            v-for="item in data.recent_purchases"
                             :key="item.id"
-                            :to="{ name: 'stock-in.show', params: { id: item.id } }"
+                            :to="{ name: 'purchases.show', params: { id: item.id } }"
                             class="flex items-center justify-between py-2 text-sm hover:bg-slate-50 px-1 -mx-1 rounded"
                         >
                             <span class="text-slate-700">{{ item.reference_no }} <span class="text-slate-400">· {{ item.supplier_name || '—' }}</span></span>
@@ -133,13 +133,13 @@ onMounted(load);
                     </div>
                 </div>
                 <div class="bg-white border border-slate-200 rounded-lg p-4">
-                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Recent Stock Out</h2>
-                    <EmptyState v-if="!data.recent_stock_outs.length" title="No Stock Out records yet." />
+                    <h2 class="text-sm font-semibold text-slate-700 mb-3">Recent Sales</h2>
+                    <EmptyState v-if="!data.recent_sales.length" title="No Sales records yet." />
                     <div v-else class="divide-y divide-slate-100">
                         <RouterLink
-                            v-for="item in data.recent_stock_outs"
+                            v-for="item in data.recent_sales"
                             :key="item.id"
-                            :to="{ name: 'stock-out.show', params: { id: item.id } }"
+                            :to="{ name: 'sales.show', params: { id: item.id } }"
                             class="flex items-center justify-between py-2 text-sm hover:bg-slate-50 px-1 -mx-1 rounded"
                         >
                             <span class="text-slate-700">{{ item.reference_no }} <span class="text-slate-400">· {{ item.customer_name }}</span></span>

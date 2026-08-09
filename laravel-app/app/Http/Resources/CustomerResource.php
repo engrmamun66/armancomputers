@@ -17,7 +17,7 @@ class CustomerResource extends JsonResource
             'email' => $this->email,
             'address' => $this->address,
             'status' => $this->status ? new StatusResource($this->status) : null,
-            'total_purchases' => $this->when(isset($this->stock_outs_count), fn () => (int) $this->stock_outs_count),
+            'total_purchases' => $this->when(isset($this->sales_count), fn () => (int) $this->sales_count),
             'total_paid' => $this->when(isset($this->total_paid_amount), fn () => (float) ($this->total_paid_amount ?? 0)),
             'total_due' => $this->when(isset($this->total_due_amount), fn () => (float) ($this->total_due_amount ?? 0)),
             'created_at' => $this->created_at,

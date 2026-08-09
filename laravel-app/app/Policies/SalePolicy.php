@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 
-class StockOutPolicy
+class SalePolicy
 {
     public function viewAny(User $user): bool
     {

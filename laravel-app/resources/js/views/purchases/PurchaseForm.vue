@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ProductSearch from '@/components/common/ProductSearch.vue';
 import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
-import stockInsApi from '@/services/stockIns';
+import purchasesApi from '@/services/purchases';
 import { useToast } from '@/composables/useToast';
 import { formatCurrency } from '@/utils/format';
 
@@ -33,18 +33,18 @@ const items = ref([]);
 
 onMounted(async () => {
     if (isEdit.value) {
-        const { data } = await stockInsApi.get(props.id);
-        const stockIn = data.data;
-        referenceNo.value = stockIn.reference_no;
+        const { data } = await purchasesApi.get(props.id);
+        const purchase = data.data;
+        referenceNo.value = purchase.reference_no;
         Object.assign(form, {
-            supplier_name: stockIn.supplier_name || '',
-            supplier_phone: stockIn.supplier_phone || '',
-            purchase_date: stockIn.purchase_date?.slice(0, 10),
-            notes: stockIn.notes || '',
-            discount: stockIn.discount,
-            additional_cost: stockIn.additional_cost,
+            supplier_name: purchase.supplier_name || '',
+            supplier_phone: purchase.supplier_phone || '',
+            purchase_date: purchase.purchase_date?.slice(0, 10),
+            notes: purchase.notes || '',
+            discount: purchase.discount,
+            additional_cost: purchase.additional_cost,
         });
-        items.value = stockIn.items.map((item) => ({
+        items.value = purchase.items.map((item) => ({
             product_id: item.product_id,
             name: item.product_name,
             sku: item.sku,
@@ -111,13 +111,13 @@ async function submit() {
         };
 
         if (isEdit.value) {
-            await stockInsApi.update(props.id, payload);
-            toast.success('Stock In updated successfully.');
+            await purchasesApi.update(props.id, payload);
+            toast.success('Purchase updated successfully.');
         } else {
-            await stockInsApi.create(payload);
-            toast.success('Stock In created successfully.');
+            await purchasesApi.create(payload);
+            toast.success('Purchase created successfully.');
         }
-        router.push({ name: 'stock-in.index' });
+        router.push({ name: 'purchases.index' });
     } catch (error) {
         if (error.response?.status === 422) {
             errors.value = error.response.data.errors || {};
@@ -133,7 +133,7 @@ async function submit() {
 
 <template>
     <AppLayout>
-        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Stock In' : 'New Stock In' }}</h1>
+        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Purchase' : 'New Purchase' }}</h1>
 
         <LoadingSpinner v-if="loading" />
         <form v-else class="space-y-6" @submit.prevent="submit">
@@ -238,9 +238,9 @@ async function submit() {
             </div>
 
             <div class="flex justify-end gap-3">
-                <RouterLink :to="{ name: 'stock-in.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
+                <RouterLink :to="{ name: 'purchases.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
                 <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
-                    {{ saving ? 'Saving…' : 'Save Stock In' }}
+                    {{ saving ? 'Saving…' : 'Save Purchase' }}
                 </button>
             </div>
         </form>

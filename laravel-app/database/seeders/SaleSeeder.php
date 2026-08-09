@@ -6,30 +6,30 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Status;
-use App\Models\StockOut;
-use App\Models\StockOutItem;
 use App\Models\User;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class StockOutSeeder extends Seeder
+class SaleSeeder extends Seeder
 {
     public function run(): void
     {
-        if (StockOut::query()->count() > 0) {
+        if (Sale::query()->count() > 0) {
             return;
         }
 
-        $stockOutStatusId = Status::id(Status::TYPE_STOCK_OUT, 'completed');
+        $saleStatusId = Status::id(Status::TYPE_SALE, 'completed');
         $invoiceStatusId = Status::id(Status::TYPE_INVOICE, 'issued');
         $creators = User::query()->pluck('id');
         $customers = Customer::query()->pluck('id');
         $paymentMethods = ['cash', 'bank', 'card', 'mobile_banking'];
 
         for ($batch = 0; $batch < 15; $batch++) {
-            DB::transaction(function () use ($stockOutStatusId, $invoiceStatusId, $creators, $customers, $paymentMethods) {
+            DB::transaction(function () use ($saleStatusId, $invoiceStatusId, $creators, $customers, $paymentMethods) {
                 $products = Product::query()->where('current_stock', '>', 0)->inRandomOrder()->limit(random_int(1, 3))->get();
 
                 if ($products->isEmpty()) {
@@ -77,8 +77,8 @@ class StockOutSeeder extends Seeder
                 $createdBy = $creators->random();
                 $customerId = $customers->random();
 
-                $stockOut = StockOut::query()->create([
-                    'reference_no' => ReferenceNumberGenerator::generate('SO', 'stock_outs'),
+                $sale = Sale::query()->create([
+                    'reference_no' => ReferenceNumberGenerator::generate('SAL', 'sales'),
                     'customer_id' => $customerId,
                     'sale_date' => $saleDate,
                     'subtotal' => $subtotal,
@@ -89,18 +89,18 @@ class StockOutSeeder extends Seeder
                     'due_amount' => $dueAmount,
                     'payment_method' => $paymentMethods[array_rand($paymentMethods)],
                     'notes' => null,
-                    'status_id' => $stockOutStatusId,
+                    'status_id' => $saleStatusId,
                     'created_by' => $createdBy,
                 ]);
 
                 foreach ($itemRows as $row) {
-                    StockOutItem::query()->create($row + ['stock_out_id' => $stockOut->id]);
+                    SaleItem::query()->create($row + ['sale_id' => $sale->id]);
                     Product::query()->whereKey($row['product_id'])->decrement('current_stock', $row['quantity']);
                 }
 
                 $invoice = Invoice::query()->create([
                     'invoice_number' => ReferenceNumberGenerator::generate('INV', 'invoices', 'invoice_number'),
-                    'stock_out_id' => $stockOut->id,
+                    'sale_id' => $sale->id,
                     'customer_id' => $customerId,
                     'invoice_date' => $saleDate,
                     'subtotal' => $subtotal,

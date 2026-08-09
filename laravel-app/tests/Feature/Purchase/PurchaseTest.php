@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Feature\StockIn;
+namespace Tests\Feature\Purchase;
 
+use App\Models\Purchase;
 use App\Models\Role;
-use App\Models\StockIn;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\SeedsCore;
 use Tests\TestCase;
 
-class StockInTest extends TestCase
+class PurchaseTest extends TestCase
 {
     use RefreshDatabase, SeedsCore;
 
@@ -18,13 +18,13 @@ class StockInTest extends TestCase
         $this->seedLookups();
     }
 
-    public function test_can_create_stock_in_with_multiple_products_and_stock_increases(): void
+    public function test_can_create_purchase_with_multiple_products_and_stock_increases(): void
     {
         $user = $this->makeUser(Role::ADMIN);
         $productA = $this->makeProduct(['current_stock' => 10]);
         $productB = $this->makeProduct(['current_stock' => 0]);
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'supplier_name' => 'Acme Supplies',
             'discount' => 10,
@@ -44,15 +44,15 @@ class StockInTest extends TestCase
         $response->assertJsonPath('data.subtotal', 1100)
             ->assertJsonPath('data.grand_total', 1110);
 
-        $this->assertDatabaseCount('stock_in_items', 2);
+        $this->assertDatabaseCount('purchase_items', 2);
         $this->assertNotEmpty($response->json('data.reference_no'));
     }
 
-    public function test_stock_in_requires_at_least_one_item(): void
+    public function test_purchase_requires_at_least_one_item(): void
     {
         $user = $this->makeUser(Role::ADMIN);
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [],
         ]);
@@ -60,12 +60,12 @@ class StockInTest extends TestCase
         $response->assertStatus(422)->assertJsonValidationErrors(['items']);
     }
 
-    public function test_stock_in_rejects_invalid_quantity(): void
+    public function test_purchase_rejects_invalid_quantity(): void
     {
         $user = $this->makeUser(Role::ADMIN);
         $product = $this->makeProduct();
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [['product_id' => $product->id, 'quantity' => 0, 'unit_price' => 100]],
         ]);
@@ -74,12 +74,12 @@ class StockInTest extends TestCase
         $this->assertEquals(0, $product->fresh()->current_stock);
     }
 
-    public function test_stock_in_rejects_negative_unit_price(): void
+    public function test_purchase_rejects_negative_unit_price(): void
     {
         $user = $this->makeUser(Role::ADMIN);
         $product = $this->makeProduct();
 
-        $response = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $response = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [['product_id' => $product->id, 'quantity' => 5, 'unit_price' => -10]],
         ]);
@@ -87,56 +87,56 @@ class StockInTest extends TestCase
         $response->assertStatus(422)->assertJsonValidationErrors(['items.0.unit_price']);
     }
 
-    public function test_deleting_stock_in_reverses_stock_effect(): void
+    public function test_deleting_purchase_reverses_stock_effect(): void
     {
         $user = $this->makeUser(Role::ADMIN);
         $product = $this->makeProduct(['current_stock' => 0]);
 
-        $create = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $create = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [['product_id' => $product->id, 'quantity' => 20, 'unit_price' => 50]],
         ]);
-        $stockInId = $create->json('data.id');
+        $purchaseId = $create->json('data.id');
         $this->assertEquals(20, $product->fresh()->current_stock);
 
-        $this->actingAs($user, 'api')->deleteJson("/api/stock-ins/{$stockInId}")->assertOk();
+        $this->actingAs($user, 'api')->deleteJson("/api/purchases/{$purchaseId}")->assertOk();
 
         $this->assertEquals(0, $product->fresh()->current_stock);
-        $this->assertSoftDeleted('stock_ins', ['id' => $stockInId]);
+        $this->assertSoftDeleted('purchases', ['id' => $purchaseId]);
     }
 
-    public function test_deleting_stock_in_is_rejected_if_it_would_cause_negative_stock(): void
+    public function test_deleting_purchase_is_rejected_if_it_would_cause_negative_stock(): void
     {
         $user = $this->makeUser(Role::ADMIN);
         $product = $this->makeProduct(['current_stock' => 0]);
 
-        $create = $this->actingAs($user, 'api')->postJson('/api/stock-ins', [
+        $create = $this->actingAs($user, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [['product_id' => $product->id, 'quantity' => 20, 'unit_price' => 50]],
         ]);
-        $stockInId = $create->json('data.id');
+        $purchaseId = $create->json('data.id');
 
-        // Simulate downstream consumption (e.g. via Stock Out) eating into the stock this Stock In provided.
+        // Simulate downstream consumption (e.g. via a Sale) eating into the stock this Purchase provided.
         $product->fresh()->update(['current_stock' => 5]);
 
-        $response = $this->actingAs($user, 'api')->deleteJson("/api/stock-ins/{$stockInId}");
+        $response = $this->actingAs($user, 'api')->deleteJson("/api/purchases/{$purchaseId}");
 
         $response->assertStatus(422);
         $this->assertEquals(5, $product->fresh()->current_stock);
-        $this->assertDatabaseHas('stock_ins', ['id' => $stockInId, 'deleted_at' => null]);
+        $this->assertDatabaseHas('purchases', ['id' => $purchaseId, 'deleted_at' => null]);
     }
 
-    public function test_staff_cannot_create_stock_in(): void
+    public function test_staff_cannot_create_purchase(): void
     {
         $staff = $this->makeUser(Role::STAFF);
         $product = $this->makeProduct();
 
-        $response = $this->actingAs($staff, 'api')->postJson('/api/stock-ins', [
+        $response = $this->actingAs($staff, 'api')->postJson('/api/purchases', [
             'purchase_date' => now()->toDateString(),
             'items' => [['product_id' => $product->id, 'quantity' => 5, 'unit_price' => 10]],
         ]);
 
         $response->assertStatus(403);
-        $this->assertEquals(0, StockIn::count());
+        $this->assertEquals(0, Purchase::count());
     }
 }

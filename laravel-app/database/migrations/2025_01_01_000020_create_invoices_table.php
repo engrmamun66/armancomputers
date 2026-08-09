@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_number')->unique();
-            $table->foreignId('stock_out_id')->constrained('stock_outs');
+            $table->foreignId('sale_id')->constrained('sales');
             $table->foreignId('customer_id')->constrained('customers');
             $table->date('invoice_date');
             $table->decimal('subtotal', 14, 2)->default(0);

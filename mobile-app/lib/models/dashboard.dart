@@ -1,10 +1,10 @@
 class DashboardCards {
   final int totalProducts;
   final int totalStockQuantity;
-  final int totalStockIn;
-  final int totalStockOut;
+  final int totalPurchases;
+  final int totalSales;
   final double todaysSales;
-  final double todaysStockIn;
+  final double todaysPurchases;
   final int totalCustomers;
   final int lowStockProducts;
   final int outOfStockProducts;
@@ -12,10 +12,10 @@ class DashboardCards {
   DashboardCards({
     required this.totalProducts,
     required this.totalStockQuantity,
-    required this.totalStockIn,
-    required this.totalStockOut,
+    required this.totalPurchases,
+    required this.totalSales,
     required this.todaysSales,
-    required this.todaysStockIn,
+    required this.todaysPurchases,
     required this.totalCustomers,
     required this.lowStockProducts,
     required this.outOfStockProducts,
@@ -24,10 +24,10 @@ class DashboardCards {
   factory DashboardCards.fromJson(Map<String, dynamic> json) => DashboardCards(
         totalProducts: (json['total_products'] as num).toInt(),
         totalStockQuantity: (json['total_stock_quantity'] as num).toInt(),
-        totalStockIn: (json['total_stock_in'] as num).toInt(),
-        totalStockOut: (json['total_stock_out'] as num).toInt(),
+        totalPurchases: (json['total_purchases'] as num).toInt(),
+        totalSales: (json['total_sales'] as num).toInt(),
         todaysSales: (json['todays_sales'] as num).toDouble(),
-        todaysStockIn: (json['todays_stock_in'] as num).toDouble(),
+        todaysPurchases: (json['todays_purchases'] as num).toDouble(),
         totalCustomers: (json['total_customers'] as num).toInt(),
         lowStockProducts: (json['low_stock_products'] as num).toInt(),
         outOfStockProducts: (json['out_of_stock_products'] as num).toInt(),
@@ -36,15 +36,15 @@ class DashboardCards {
 
 class StockMovementPoint {
   final String date;
-  final int stockInQty;
-  final int stockOutQty;
+  final int purchaseQty;
+  final int saleQty;
 
-  StockMovementPoint({required this.date, required this.stockInQty, required this.stockOutQty});
+  StockMovementPoint({required this.date, required this.purchaseQty, required this.saleQty});
 
   factory StockMovementPoint.fromJson(Map<String, dynamic> json) => StockMovementPoint(
         date: json['date'] as String,
-        stockInQty: (json['stock_in_qty'] as num).toInt(),
-        stockOutQty: (json['stock_out_qty'] as num).toInt(),
+        purchaseQty: (json['purchase_qty'] as num).toInt(),
+        saleQty: (json['sale_qty'] as num).toInt(),
       );
 }
 
@@ -92,7 +92,7 @@ class LowStockProduct {
       );
 }
 
-class RecentStockIn {
+class RecentPurchase {
   final int id;
   final String referenceNo;
   final String purchaseDate;
@@ -100,7 +100,7 @@ class RecentStockIn {
   final double grandTotal;
   final String? createdBy;
 
-  RecentStockIn({
+  RecentPurchase({
     required this.id,
     required this.referenceNo,
     required this.purchaseDate,
@@ -109,7 +109,7 @@ class RecentStockIn {
     this.createdBy,
   });
 
-  factory RecentStockIn.fromJson(Map<String, dynamic> json) => RecentStockIn(
+  factory RecentPurchase.fromJson(Map<String, dynamic> json) => RecentPurchase(
         id: json['id'] as int,
         referenceNo: json['reference_no'] as String,
         purchaseDate: json['purchase_date'] as String,
@@ -119,14 +119,14 @@ class RecentStockIn {
       );
 }
 
-class RecentStockOut {
+class RecentSale {
   final int id;
   final String referenceNo;
   final String saleDate;
   final String? customerName;
   final double grandTotal;
 
-  RecentStockOut({
+  RecentSale({
     required this.id,
     required this.referenceNo,
     required this.saleDate,
@@ -134,7 +134,7 @@ class RecentStockOut {
     required this.grandTotal,
   });
 
-  factory RecentStockOut.fromJson(Map<String, dynamic> json) => RecentStockOut(
+  factory RecentSale.fromJson(Map<String, dynamic> json) => RecentSale(
         id: json['id'] as int,
         referenceNo: json['reference_no'] as String,
         saleDate: json['sale_date'] as String,
@@ -149,8 +149,8 @@ class DashboardData {
   final List<SalesPoint> salesOverview;
   final List<TopProduct> topSellingProducts;
   final List<LowStockProduct> lowStockProducts;
-  final List<RecentStockIn> recentStockIns;
-  final List<RecentStockOut> recentStockOuts;
+  final List<RecentPurchase> recentPurchases;
+  final List<RecentSale> recentSales;
 
   DashboardData({
     required this.cards,
@@ -158,8 +158,8 @@ class DashboardData {
     required this.salesOverview,
     required this.topSellingProducts,
     required this.lowStockProducts,
-    required this.recentStockIns,
-    required this.recentStockOuts,
+    required this.recentPurchases,
+    required this.recentSales,
   });
 
   factory DashboardData.fromJson(Map<String, dynamic> json) => DashboardData(
@@ -176,11 +176,11 @@ class DashboardData {
         lowStockProducts: (json['low_stock_products'] as List<dynamic>)
             .map((e) => LowStockProduct.fromJson(e as Map<String, dynamic>))
             .toList(),
-        recentStockIns: (json['recent_stock_ins'] as List<dynamic>)
-            .map((e) => RecentStockIn.fromJson(e as Map<String, dynamic>))
+        recentPurchases: (json['recent_purchases'] as List<dynamic>)
+            .map((e) => RecentPurchase.fromJson(e as Map<String, dynamic>))
             .toList(),
-        recentStockOuts: (json['recent_stock_outs'] as List<dynamic>)
-            .map((e) => RecentStockOut.fromJson(e as Map<String, dynamic>))
+        recentSales: (json['recent_sales'] as List<dynamic>)
+            .map((e) => RecentSale.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
 }

@@ -45,14 +45,14 @@ class Product extends Model
         return $this->belongsTo(Status::class);
     }
 
-    public function stockInItems(): HasMany
+    public function purchaseItems(): HasMany
     {
-        return $this->hasMany(StockInItem::class);
+        return $this->hasMany(PurchaseItem::class);
     }
 
-    public function stockOutItems(): HasMany
+    public function saleItems(): HasMany
     {
-        return $this->hasMany(StockOutItem::class);
+        return $this->hasMany(SaleItem::class);
     }
 
     public function isLowStock(): bool

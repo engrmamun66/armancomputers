@@ -18,8 +18,8 @@ const NAV_ITEMS = [
     { name: 'products.index', label: 'Products', icon: 'box' },
     { name: 'brands.index', label: 'Brands', icon: 'tag', capability: 'brands.manage' },
     { name: 'customers.index', label: 'Customers', icon: 'user-group' },
-    { name: 'stock-in.index', label: 'Stock In', icon: 'arrow-down-tray', capability: 'stock-in.manage' },
-    { name: 'stock-out.index', label: 'Stock Out', icon: 'arrow-up-tray' },
+    { name: 'purchases.index', label: 'Purchase', icon: 'arrow-down-tray', capability: 'purchases.manage' },
+    { name: 'sales.index', label: 'Sales', icon: 'arrow-up-tray' },
     { name: 'invoices.index', label: 'Invoices', icon: 'document-text' },
     { name: 'users.index', label: 'Users', icon: 'user-group', capability: 'users' },
 ];
@@ -30,8 +30,8 @@ const BREADCRUMBS = {
     'products.show': 'Product Details', 'products.stock-history': 'Stock History',
     'brands.index': 'Brands',
     'customers.index': 'Customers', 'customers.show': 'Customer Details',
-    'stock-in.index': 'Stock In', 'stock-in.create': 'New Stock In', 'stock-in.edit': 'Edit Stock In', 'stock-in.show': 'Stock In Details',
-    'stock-out.index': 'Stock Out', 'stock-out.create': 'New Stock Out', 'stock-out.edit': 'Edit Stock Out', 'stock-out.show': 'Stock Out Details',
+    'purchases.index': 'Purchase', 'purchases.create': 'New Purchase', 'purchases.edit': 'Edit Purchase', 'purchases.show': 'Purchase Details',
+    'sales.index': 'Sales', 'sales.create': 'New Sale', 'sales.edit': 'Edit Sale', 'sales.show': 'Sale Details',
     'invoices.index': 'Invoices', 'invoices.show': 'Invoice',
     'users.index': 'Users',
     'profile': 'Profile',
@@ -42,8 +42,8 @@ const BREADCRUMBS = {
 const visibleNavItems = computed(() => NAV_ITEMS.filter((item) => !item.capability || can(role.value, item.capability)));
 
 const mobilePrimaryNames = computed(() => {
-    const second = can(role.value, 'stock-in.manage') ? 'stock-in.index' : 'invoices.index';
-    return ['dashboard', second, 'products.index', 'stock-out.index'];
+    const second = can(role.value, 'purchases.manage') ? 'purchases.index' : 'invoices.index';
+    return ['dashboard', second, 'products.index', 'sales.index'];
 });
 
 const mobilePrimaryItems = computed(() =>

@@ -4,30 +4,30 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StockOut\StoreStockOutRequest;
-use App\Http\Requests\StockOut\UpdateStockOutRequest;
-use App\Http\Resources\StockOutResource;
+use App\Http\Requests\Sale\StoreSaleRequest;
+use App\Http\Requests\Sale\UpdateSaleRequest;
+use App\Http\Resources\SaleResource;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Status;
-use App\Models\StockOut;
-use App\Models\StockOutItem;
 use App\Models\User;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class StockOutController extends Controller
+class SaleController extends Controller
 {
     use Sortable;
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', StockOut::class);
+        $this->authorize('viewAny', Sale::class);
 
-        $filtered = StockOut::query()
+        $filtered = Sale::query()
             ->when($request->filled('search'), function ($query) use ($request) {
                 $term = "%{$request->string('search')}%";
                 $query->where(function ($q) use ($term) {
@@ -51,8 +51,8 @@ class StockOutController extends Controller
 
         $ids = (clone $filtered)->pluck('id');
         $totals = [
-            'items_count' => (int) StockOutItem::whereIn('stock_out_id', $ids)->count(),
-            'total_qty' => (int) StockOutItem::whereIn('stock_out_id', $ids)->sum('quantity'),
+            'items_count' => (int) SaleItem::whereIn('sale_id', $ids)->count(),
+            'total_qty' => (int) SaleItem::whereIn('sale_id', $ids)->sum('quantity'),
             'total_amount' => (float) (clone $filtered)->sum('grand_total'),
         ];
 
@@ -64,31 +64,31 @@ class StockOutController extends Controller
         $this->applySort($filtered, $request, [
             'reference_no' => 'reference_no',
             'sale_date' => 'sale_date',
-            'customer' => fn ($q, $dir) => $q->orderBy(Customer::select('name')->whereColumn('customers.id', 'stock_outs.customer_id'), $dir),
+            'customer' => fn ($q, $dir) => $q->orderBy(Customer::select('name')->whereColumn('customers.id', 'sales.customer_id'), $dir),
             'items_count' => 'items_count',
             'total_qty' => 'total_qty',
             'grand_total' => 'grand_total',
             'paid_amount' => 'paid_amount',
             'due_amount' => 'due_amount',
             'status' => 'status_id',
-            'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'stock_outs.created_by'), $dir),
+            'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'sales.created_by'), $dir),
         ], 'sale_date', 'desc');
         $filtered->orderByDesc('id');
 
-        $stockOuts = $filtered->paginate($request->integer('per_page', 15));
+        $sales = $filtered->paginate($request->integer('per_page', 15));
 
-        return StockOutResource::collection($stockOuts)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
+        return SaleResource::collection($sales)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
     }
 
-    public function store(StoreStockOutRequest $request)
+    public function store(StoreSaleRequest $request)
     {
-        $this->authorize('create', StockOut::class);
+        $this->authorize('create', Sale::class);
 
         $validated = $request->validated();
         $items = $validated['items'];
 
         try {
-            $stockOut = DB::transaction(function () use ($validated, $items, $request) {
+            $sale = DB::transaction(function () use ($validated, $items, $request) {
                 $products = [];
                 foreach ($items as $item) {
                     $product = Product::query()->whereKey($item['product_id'])->lockForUpdate()->first();
@@ -111,8 +111,8 @@ class StockOutController extends Controller
                 $paidAmount = min($validated['paid_amount'] ?? 0, $grandTotal);
                 $dueAmount = round($grandTotal - $paidAmount, 2);
 
-                $stockOut = StockOut::query()->create([
-                    'reference_no' => ReferenceNumberGenerator::generate('SO', 'stock_outs'),
+                $sale = Sale::query()->create([
+                    'reference_no' => ReferenceNumberGenerator::generate('SAL', 'sales'),
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
                     'subtotal' => $subtotal,
@@ -123,12 +123,12 @@ class StockOutController extends Controller
                     'due_amount' => $dueAmount,
                     'payment_method' => $validated['payment_method'],
                     'notes' => $validated['notes'] ?? null,
-                    'status_id' => Status::id(Status::TYPE_STOCK_OUT, 'completed'),
+                    'status_id' => Status::id(Status::TYPE_SALE, 'completed'),
                     'created_by' => $request->user()->id,
                 ]);
 
                 foreach ($items as $item) {
-                    $stockOut->items()->create([
+                    $sale->items()->create([
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
@@ -148,7 +148,7 @@ class StockOutController extends Controller
 
                 $invoice = Invoice::query()->create([
                     'invoice_number' => ReferenceNumberGenerator::generate('INV', 'invoices', 'invoice_number'),
-                    'stock_out_id' => $stockOut->id,
+                    'sale_id' => $sale->id,
                     'customer_id' => $validated['customer_id'],
                     'invoice_date' => $validated['sale_date'],
                     'subtotal' => $subtotal,
@@ -170,38 +170,38 @@ class StockOutController extends Controller
                     ]);
                 }
 
-                return $stockOut;
+                return $sale;
             });
         } catch (RuntimeException $e) {
             return $this->error($e->getMessage(), null, 422);
         }
 
         return $this->success(
-            new StockOutResource($stockOut->load('items.product', 'status', 'creator', 'customer', 'invoice')),
-            'Stock Out created successfully.',
+            new SaleResource($sale->load('items.product', 'status', 'creator', 'customer', 'invoice')),
+            'Sale created successfully.',
             201
         );
     }
 
-    public function show(StockOut $stockOut)
+    public function show(Sale $sale)
     {
-        $this->authorize('view', StockOut::class);
+        $this->authorize('view', Sale::class);
 
         return $this->success(
-            new StockOutResource($stockOut->load('items.product', 'status', 'creator', 'customer', 'invoice'))
+            new SaleResource($sale->load('items.product', 'status', 'creator', 'customer', 'invoice'))
         );
     }
 
-    public function update(UpdateStockOutRequest $request, StockOut $stockOut)
+    public function update(UpdateSaleRequest $request, Sale $sale)
     {
-        $this->authorize('update', StockOut::class);
+        $this->authorize('update', Sale::class);
 
         $validated = $request->validated();
         $newItems = $validated['items'];
 
         try {
-            DB::transaction(function () use ($validated, $newItems, $stockOut) {
-                $oldItems = $stockOut->items()->get();
+            DB::transaction(function () use ($validated, $newItems, $sale) {
+                $oldItems = $sale->items()->get();
 
                 foreach ($oldItems as $oldItem) {
                     Product::query()->whereKey($oldItem->product_id)->increment('current_stock', $oldItem->quantity);
@@ -222,14 +222,14 @@ class StockOutController extends Controller
                     $products[$item['product_id']] = $product;
                 }
 
-                $stockOut->items()->delete();
+                $sale->items()->delete();
 
                 $subtotal = 0;
                 foreach ($newItems as $item) {
                     $totalPrice = $item['quantity'] * $item['unit_price'];
                     $subtotal += $totalPrice;
 
-                    $stockOut->items()->create([
+                    $sale->items()->create([
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
@@ -253,7 +253,7 @@ class StockOutController extends Controller
                 $paidAmount = min($validated['paid_amount'] ?? 0, $grandTotal);
                 $dueAmount = round($grandTotal - $paidAmount, 2);
 
-                $stockOut->update([
+                $sale->update([
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
                     'subtotal' => $subtotal,
@@ -266,7 +266,7 @@ class StockOutController extends Controller
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
-                $invoice = $stockOut->invoice;
+                $invoice = $sale->invoice;
                 if ($invoice) {
                     $invoice->items()->delete();
                     foreach ($newItems as $item) {
@@ -294,31 +294,31 @@ class StockOutController extends Controller
         }
 
         return $this->success(
-            new StockOutResource($stockOut->fresh()->load('items.product', 'status', 'creator', 'customer', 'invoice')),
-            'Stock Out updated successfully.'
+            new SaleResource($sale->fresh()->load('items.product', 'status', 'creator', 'customer', 'invoice')),
+            'Sale updated successfully.'
         );
     }
 
-    public function destroy(StockOut $stockOut)
+    public function destroy(Sale $sale)
     {
-        $this->authorize('delete', StockOut::class);
+        $this->authorize('delete', Sale::class);
 
-        DB::transaction(function () use ($stockOut) {
-            $items = $stockOut->items()->get();
+        DB::transaction(function () use ($sale) {
+            $items = $sale->items()->get();
 
             foreach ($items as $item) {
                 Product::query()->whereKey($item->product_id)->increment('current_stock', $item->quantity);
             }
 
-            $stockOut->update(['status_id' => Status::id(Status::TYPE_STOCK_OUT, 'cancelled')]);
+            $sale->update(['status_id' => Status::id(Status::TYPE_SALE, 'cancelled')]);
 
-            if ($stockOut->invoice) {
-                $stockOut->invoice->update(['status_id' => Status::id(Status::TYPE_INVOICE, 'cancelled')]);
+            if ($sale->invoice) {
+                $sale->invoice->update(['status_id' => Status::id(Status::TYPE_INVOICE, 'cancelled')]);
             }
 
-            $stockOut->delete();
+            $sale->delete();
         });
 
-        return $this->success(null, 'Stock Out deleted successfully.');
+        return $this->success(null, 'Sale deleted successfully.');
     }
 }

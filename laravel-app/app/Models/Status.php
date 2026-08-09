@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Status extends Model
 {
     public const TYPE_GENERAL = 'general';
-    public const TYPE_STOCK_IN = 'stock_in';
-    public const TYPE_STOCK_OUT = 'stock_out';
+    public const TYPE_PURCHASE = 'purchase';
+    public const TYPE_SALE = 'sale';
     public const TYPE_INVOICE = 'invoice';
 
     protected $fillable = ['name', 'slug', 'type'];

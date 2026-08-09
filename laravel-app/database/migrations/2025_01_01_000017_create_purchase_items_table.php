@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('stock_in_items', function (Blueprint $table) {
+        Schema::create('purchase_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('stock_in_id')->constrained('stock_ins')->cascadeOnDelete();
+            $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnDelete();
             $table->foreignId('product_id')->constrained('products');
             $table->integer('quantity');
             $table->decimal('unit_price', 12, 2);
@@ -21,6 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('stock_in_items');
+        Schema::dropIfExists('purchase_items');
     }
 };

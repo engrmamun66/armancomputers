@@ -5,7 +5,7 @@ import 'lookup.dart';
 class InvoiceModel {
   final int id;
   final String invoiceNumber;
-  final int? stockOutId;
+  final int? saleId;
   final CustomerRef? customer;
   final String invoiceDate;
   final double subtotal;

@@ -5,8 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\StockOut */
-class StockOutResource extends JsonResource
+/** @mixin \App\Models\Sale */
+class SaleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -33,7 +33,7 @@ class StockOutResource extends JsonResource
             'invoice_id' => $this->when($this->relationLoaded('invoice'), fn () => $this->invoice?->id),
             'items_count' => $this->when(isset($this->items_count), fn () => (int) $this->items_count),
             'total_qty' => $this->when(isset($this->total_qty), fn () => (int) ($this->total_qty ?? 0)),
-            'items' => StockOutItemResource::collection($this->whenLoaded('items')),
+            'items' => SaleItemResource::collection($this->whenLoaded('items')),
             'created_at' => $this->created_at,
         ];
     }

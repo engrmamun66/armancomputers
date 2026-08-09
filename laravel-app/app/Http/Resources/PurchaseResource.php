@@ -5,8 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\StockIn */
-class StockInResource extends JsonResource
+/** @mixin \App\Models\Purchase */
+class PurchaseResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -25,7 +25,7 @@ class StockInResource extends JsonResource
             'created_by' => $this->creator?->name,
             'items_count' => $this->when(isset($this->items_count), fn () => (int) $this->items_count),
             'total_qty' => $this->when(isset($this->total_qty), fn () => (int) ($this->total_qty ?? 0)),
-            'items' => StockInItemResource::collection($this->whenLoaded('items')),
+            'items' => PurchaseItemResource::collection($this->whenLoaded('items')),
             'created_at' => $this->created_at,
         ];
     }

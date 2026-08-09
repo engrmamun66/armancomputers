@@ -8,9 +8,9 @@ use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\PurchaseController;
+use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StatusController;
-use App\Http\Controllers\Api\StockInController;
-use App\Http\Controllers\Api\StockOutController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,8 +38,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::apiResource('customers', CustomerController::class);
 
-    Route::apiResource('stock-ins', StockInController::class);
-    Route::apiResource('stock-outs', StockOutController::class);
+    Route::apiResource('purchases', PurchaseController::class);
+    Route::apiResource('sales', SaleController::class);
 
     Route::get('invoices', [InvoiceController::class, 'index']);
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);

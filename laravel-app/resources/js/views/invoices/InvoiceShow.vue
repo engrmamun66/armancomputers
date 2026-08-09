@@ -13,7 +13,7 @@ import { formatCurrency, formatDate } from '@/utils/format';
 const props = defineProps({ id: { type: [String, Number], required: true } });
 
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
 
 const invoice = ref(null);
 const loading = ref(true);
@@ -37,11 +37,11 @@ function print() {
                 <h1 class="text-lg font-semibold text-slate-900">Invoice {{ invoice.invoice_number }}</h1>
                 <div class="flex gap-3">
                     <RouterLink
-                        v-if="canManage && invoice.stock_out_id"
-                        :to="{ name: 'stock-out.edit', params: { id: invoice.stock_out_id } }"
+                        v-if="canManage && invoice.sale_id"
+                        :to="{ name: 'sales.edit', params: { id: invoice.sale_id } }"
                         class="px-4 py-2 text-sm rounded-md border border-slate-300"
                     >
-                        Edit Stock Out
+                        Edit Sale
                     </RouterLink>
                     <button type="button" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover" @click="print">Print</button>
                     <RouterLink :to="{ name: 'invoices.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Back</RouterLink>

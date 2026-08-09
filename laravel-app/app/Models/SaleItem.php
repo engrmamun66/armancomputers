@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class StockOutItem extends Model
+class SaleItem extends Model
 {
-    protected $fillable = ['stock_out_id', 'product_id', 'quantity', 'unit_price', 'total_price'];
+    protected $fillable = ['sale_id', 'product_id', 'quantity', 'unit_price', 'total_price'];
 
     protected function casts(): array
     {
@@ -18,9 +18,9 @@ class StockOutItem extends Model
         ];
     }
 
-    public function stockOut(): BelongsTo
+    public function sale(): BelongsTo
     {
-        return $this->belongsTo(StockOut::class);
+        return $this->belongsTo(Sale::class);
     }
 
     public function product(): BelongsTo

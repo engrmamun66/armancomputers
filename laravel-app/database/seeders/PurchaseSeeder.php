@@ -3,23 +3,23 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\PurchaseItem;
 use App\Models\Status;
-use App\Models\StockIn;
-use App\Models\StockInItem;
 use App\Models\User;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class StockInSeeder extends Seeder
+class PurchaseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (StockIn::query()->count() > 0) {
+        if (Purchase::query()->count() > 0) {
             return;
         }
 
-        $statusId = Status::id(Status::TYPE_STOCK_IN, 'completed');
+        $statusId = Status::id(Status::TYPE_PURCHASE, 'completed');
         $creators = User::query()->pluck('id');
         $suppliers = ['Global Tech Distributors', 'Micro Traders Ltd', 'Bright Star Imports', 'City Electronics Wholesale'];
 
@@ -47,8 +47,8 @@ class StockInSeeder extends Seeder
                 $additionalCost = random_int(0, 1) ? random_int(100, 500) : 0;
                 $grandTotal = $subtotal - $discount + $additionalCost;
 
-                $stockIn = StockIn::query()->create([
-                    'reference_no' => ReferenceNumberGenerator::generate('SI', 'stock_ins'),
+                $purchase = Purchase::query()->create([
+                    'reference_no' => ReferenceNumberGenerator::generate('PUR', 'purchases'),
                     'supplier_name' => $suppliers[array_rand($suppliers)],
                     'supplier_phone' => '01' . random_int(700000000, 999999999),
                     'purchase_date' => now()->subDays(random_int(1, 60))->toDateString(),
@@ -62,7 +62,7 @@ class StockInSeeder extends Seeder
                 ]);
 
                 foreach ($itemRows as $row) {
-                    StockInItem::query()->create($row + ['stock_in_id' => $stockIn->id]);
+                    PurchaseItem::query()->create($row + ['purchase_id' => $purchase->id]);
                     Product::query()->whereKey($row['product_id'])->increment('current_stock', $row['quantity']);
                 }
             });

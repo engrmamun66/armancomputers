@@ -9,8 +9,8 @@ const props = defineProps({ points: { type: Array, default: () => [] } });
 const chartData = computed(() => ({
     labels: props.points.map((p) => formatDate(p.date)),
     datasets: [
-        { label: 'Stock In', data: props.points.map((p) => p.stock_in_qty), backgroundColor: '#3b82f6' },
-        { label: 'Stock Out', data: props.points.map((p) => p.stock_out_qty), backgroundColor: '#f97316' },
+        { label: 'Purchase', data: props.points.map((p) => p.purchase_qty), backgroundColor: '#3b82f6' },
+        { label: 'Sales', data: props.points.map((p) => p.sale_qty), backgroundColor: '#f97316' },
     ],
 }));
 

@@ -19,9 +19,9 @@ class CustomerController extends Controller
         $this->authorize('viewAny', Customer::class);
 
         $customers = Customer::query()
-            ->withCount('stockOuts')
-            ->withSum('stockOuts as total_paid_amount', 'paid_amount')
-            ->withSum('stockOuts as total_due_amount', 'due_amount')
+            ->withCount('sales')
+            ->withSum('sales as total_paid_amount', 'paid_amount')
+            ->withSum('sales as total_due_amount', 'due_amount')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $term = "%{$request->string('search')}%";
                 $query->where(fn ($q) => $q->where('name', 'like', $term)
@@ -34,7 +34,7 @@ class CustomerController extends Controller
             'name' => 'name',
             'phone' => 'phone',
             'email' => 'email',
-            'total_purchases' => 'stock_outs_count',
+            'total_purchases' => 'sales_count',
             'total_paid' => 'total_paid_amount',
             'total_due' => 'total_due_amount',
             'status' => 'status_id',
@@ -58,23 +58,23 @@ class CustomerController extends Controller
     {
         $this->authorize('view', Customer::class);
 
-        $customer->loadCount('stockOuts')
-            ->loadSum('stockOuts as total_paid_amount', 'paid_amount')
-            ->loadSum('stockOuts as total_due_amount', 'due_amount');
+        $customer->loadCount('sales')
+            ->loadSum('sales as total_paid_amount', 'paid_amount')
+            ->loadSum('sales as total_due_amount', 'due_amount');
 
-        $purchases = $customer->stockOuts()
+        $purchases = $customer->sales()
             ->with('status')
             ->orderByDesc('sale_date')
             ->get()
-            ->map(fn ($stockOut) => [
-                'id' => $stockOut->id,
-                'reference_no' => $stockOut->reference_no,
-                'sale_date' => $stockOut->sale_date,
-                'grand_total' => (float) $stockOut->grand_total,
-                'paid_amount' => (float) $stockOut->paid_amount,
-                'due_amount' => (float) $stockOut->due_amount,
-                'payment_status' => $stockOut->payment_status,
-                'status' => $stockOut->status->slug,
+            ->map(fn ($sale) => [
+                'id' => $sale->id,
+                'reference_no' => $sale->reference_no,
+                'sale_date' => $sale->sale_date,
+                'grand_total' => (float) $sale->grand_total,
+                'paid_amount' => (float) $sale->paid_amount,
+                'due_amount' => (float) $sale->due_amount,
+                'payment_status' => $sale->payment_status,
+                'status' => $sale->status->slug,
             ]);
 
         return $this->success([

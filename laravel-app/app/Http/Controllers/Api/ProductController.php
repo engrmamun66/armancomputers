@@ -97,31 +97,31 @@ class ProductController extends Controller
     {
         $this->authorize('view', Product::class);
 
-        $inRows = DB::table('stock_in_items')
-            ->join('stock_ins', 'stock_ins.id', '=', 'stock_in_items.stock_in_id')
-            ->join('users', 'users.id', '=', 'stock_ins.created_by')
-            ->where('stock_in_items.product_id', $product->id)
+        $inRows = DB::table('purchase_items')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->join('users', 'users.id', '=', 'purchases.created_by')
+            ->where('purchase_items.product_id', $product->id)
             ->select([
-                'stock_ins.purchase_date as date',
+                'purchases.purchase_date as date',
                 DB::raw("'in' as type"),
-                'stock_ins.reference_no as reference',
-                'stock_in_items.quantity as quantity',
+                'purchases.reference_no as reference',
+                'purchase_items.quantity as quantity',
                 'users.name as user',
-                'stock_in_items.created_at as created_at',
+                'purchase_items.created_at as created_at',
             ])
             ->get();
 
-        $outRows = DB::table('stock_out_items')
-            ->join('stock_outs', 'stock_outs.id', '=', 'stock_out_items.stock_out_id')
-            ->join('users', 'users.id', '=', 'stock_outs.created_by')
-            ->where('stock_out_items.product_id', $product->id)
+        $outRows = DB::table('sale_items')
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->join('users', 'users.id', '=', 'sales.created_by')
+            ->where('sale_items.product_id', $product->id)
             ->select([
-                'stock_outs.sale_date as date',
+                'sales.sale_date as date',
                 DB::raw("'out' as type"),
-                'stock_outs.reference_no as reference',
-                'stock_out_items.quantity as quantity',
+                'sales.reference_no as reference',
+                'sale_items.quantity as quantity',
                 'users.name as user',
-                'stock_out_items.created_at as created_at',
+                'sale_items.created_at as created_at',
             ])
             ->get();
 

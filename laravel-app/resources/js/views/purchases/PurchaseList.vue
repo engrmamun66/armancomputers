@@ -9,7 +9,7 @@ import DateRangePicker from '@/components/common/DateRangePicker.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import stockInsApi from '@/services/stockIns';
+import purchasesApi from '@/services/purchases';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
@@ -42,14 +42,14 @@ const statuses = ref([]);
 const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', sort_by: 'purchase_date', sort_dir: 'desc', page: 1 });
 
 async function loadStatuses() {
-    const { data } = await lookups.statuses('stock_in');
+    const { data } = await lookups.statuses('purchase');
     statuses.value = data.data;
 }
 
-async function loadStockIns() {
+async function loadPurchases() {
     loading.value = true;
     try {
-        const { data } = await stockInsApi.list({
+        const { data } = await purchasesApi.list({
             search: filters.search || undefined,
             date_from: filters.date_from || undefined,
             date_to: filters.date_to || undefined,
@@ -62,7 +62,7 @@ async function loadStockIns() {
         meta.value = data.meta;
         totals.value = data.totals;
     } catch {
-        toast.error('Failed to load Stock In records.');
+        toast.error('Failed to load Purchase records.');
     } finally {
         loading.value = false;
     }
@@ -76,7 +76,7 @@ function onSort(key) {
         filters.sort_dir = 'asc';
     }
     filters.page = 1;
-    loadStockIns();
+    loadPurchases();
 }
 
 function hasActiveFilters() {
@@ -89,28 +89,28 @@ function clearFilters() {
 
 watch([() => filters.search, () => filters.date_from, () => filters.date_to, () => filters.status_id], () => {
     filters.page = 1;
-    loadStockIns();
+    loadPurchases();
 });
 
 onMounted(async () => {
     await loadStatuses();
-    await loadStockIns();
+    await loadPurchases();
 });
 
-async function removeStockIn(stockIn) {
+async function removePurchase(purchase) {
     const ok = await confirm({
-        title: 'Delete this Stock In?',
-        message: `${stockIn.reference_no} will be cancelled and its stock effect reversed. This cannot be undone.`,
+        title: 'Delete this Purchase?',
+        message: `${purchase.reference_no} will be cancelled and its stock effect reversed. This cannot be undone.`,
         confirmText: 'Delete',
     });
     if (!ok) return;
 
     try {
-        await stockInsApi.remove(stockIn.id);
-        toast.success('Stock In deleted successfully.');
-        await loadStockIns();
+        await purchasesApi.remove(purchase.id);
+        toast.success('Purchase deleted successfully.');
+        await loadPurchases();
     } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to delete Stock In.');
+        toast.error(error.response?.data?.message || 'Failed to delete Purchase.');
     }
 }
 </script>
@@ -118,9 +118,9 @@ async function removeStockIn(stockIn) {
 <template>
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h1 class="text-lg font-semibold text-slate-900">Stock In</h1>
-            <RouterLink :to="{ name: 'stock-in.create' }" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover">
-                + Add Stock In
+            <h1 class="text-lg font-semibold text-slate-900">Purchase</h1>
+            <RouterLink :to="{ name: 'purchases.create' }" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover">
+                + Add Purchase
             </RouterLink>
         </div>
 
@@ -141,7 +141,7 @@ async function removeStockIn(stockIn) {
         <LoadingSpinner v-if="loading" />
         <EmptyState
             v-else-if="!rows.length"
-            title="No Stock In records found."
+            title="No Purchase records found."
             :message="hasActiveFilters() ? 'No records match your current filters.' : ''"
             :show-clear="hasActiveFilters()"
             @clear="clearFilters"
@@ -159,7 +159,7 @@ async function removeStockIn(stockIn) {
                     </tr>
                 </template>
                 <template #cell-reference_no="{ row }">
-                    <RouterLink :to="{ name: 'stock-in.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">
+                    <RouterLink :to="{ name: 'purchases.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">
                         {{ row.reference_no }}
                     </RouterLink>
                 </template>
@@ -170,9 +170,9 @@ async function removeStockIn(stockIn) {
                 <template #cell-created_at="{ row }">{{ formatDateTime(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-2 text-sm">
-                        <RouterLink :to="{ name: 'stock-in.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
-                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
-                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeStockIn(row)">Delete</button>
+                        <RouterLink :to="{ name: 'purchases.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                        <RouterLink :to="{ name: 'purchases.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removePurchase(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -180,20 +180,20 @@ async function removeStockIn(stockIn) {
             <div class="md:hidden space-y-3">
                 <div v-for="row in rows" :key="row.id" class="bg-white border border-slate-200 rounded-lg p-4">
                     <div class="flex items-center justify-between">
-                        <RouterLink :to="{ name: 'stock-in.show', params: { id: row.id } }" class="font-medium text-slate-900">{{ row.reference_no }}</RouterLink>
+                        <RouterLink :to="{ name: 'purchases.show', params: { id: row.id } }" class="font-medium text-slate-900">{{ row.reference_no }}</RouterLink>
                         <StatusBadge :status="row.status?.slug" />
                     </div>
                     <p class="text-sm text-slate-500 mt-1">Supplier: {{ row.supplier_name || '—' }}</p>
                     <p class="text-sm text-slate-500">Date: {{ formatDate(row.purchase_date) }}</p>
                     <p class="text-sm text-slate-500">Items: {{ row.items_count }} · Total: {{ formatCurrency(row.grand_total) }}</p>
                     <div class="flex gap-2 mt-3 text-sm">
-                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
-                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeStockIn(row)">Delete</button>
+                        <RouterLink :to="{ name: 'purchases.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removePurchase(row)">Delete</button>
                     </div>
                 </div>
             </div>
 
-            <Pagination :meta="meta" @change="(page) => { filters.page = page; loadStockIns(); }" />
+            <Pagination :meta="meta" @change="(page) => { filters.page = page; loadPurchases(); }" />
         </template>
     </AppLayout>
 </template>

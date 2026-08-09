@@ -17,7 +17,7 @@ import { formatCurrency, formatDate } from '@/utils/format';
 
 const toast = useToast();
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
 
 const DATE_RANGE_PRESETS = ['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year', 'Last Year'];
 
@@ -126,7 +126,7 @@ onMounted(loadInvoices);
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-2 text-sm">
                         <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
-                        <RouterLink v-if="canManage && row.stock_out_id" :to="{ name: 'stock-out.edit', params: { id: row.stock_out_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit Stock Out</RouterLink>
+                        <RouterLink v-if="canManage && row.sale_id" :to="{ name: 'sales.edit', params: { id: row.sale_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit Sale</RouterLink>
                     </div>
                 </template>
             </DataTable>
@@ -139,8 +139,8 @@ onMounted(loadInvoices);
                     </div>
                     <p class="text-sm text-slate-500 mt-1">{{ row.customer?.name }} · {{ formatDate(row.invoice_date) }}</p>
                     <p class="text-sm text-slate-500">Total: {{ formatCurrency(row.grand_total) }} · Due: {{ formatCurrency(row.due_amount) }}</p>
-                    <div v-if="canManage && row.stock_out_id" class="flex gap-2 mt-3 text-sm">
-                        <RouterLink :to="{ name: 'stock-out.edit', params: { id: row.stock_out_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit Stock Out</RouterLink>
+                    <div v-if="canManage && row.sale_id" class="flex gap-2 mt-3 text-sm">
+                        <RouterLink :to="{ name: 'sales.edit', params: { id: row.sale_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit Sale</RouterLink>
                     </div>
                 </div>
             </div>

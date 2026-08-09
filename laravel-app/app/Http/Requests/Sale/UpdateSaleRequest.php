@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\StockOut;
+namespace App\Http\Requests\Sale;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateStockOutRequest extends FormRequest
+class UpdateSaleRequest extends FormRequest
 {
     public function authorize(): bool
     {

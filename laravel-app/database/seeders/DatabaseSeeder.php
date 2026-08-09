@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             ProductSeeder::class,
             CustomerSeeder::class,
-            StockInSeeder::class,
-            StockOutSeeder::class,
+            PurchaseSeeder::class,
+            SaleSeeder::class,
         ]);
     }
 }

@@ -9,7 +9,7 @@ import DateRangePicker from '@/components/common/DateRangePicker.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import stockOutsApi from '@/services/stockOuts';
+import salesApi from '@/services/sales';
 import lookups from '@/services/lookups';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
@@ -18,7 +18,7 @@ import { useConfirm } from '@/composables/useConfirm';
 import { formatCurrency, formatDate, formatDateTime } from '@/utils/format';
 
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
 const toast = useToast();
 const { confirm } = useConfirm();
 
@@ -47,14 +47,14 @@ const statuses = ref([]);
 const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', sort_by: 'sale_date', sort_dir: 'desc', page: 1 });
 
 async function loadStatuses() {
-    const { data } = await lookups.statuses('stock_out');
+    const { data } = await lookups.statuses('sale');
     statuses.value = data.data;
 }
 
-async function loadStockOuts() {
+async function loadSales() {
     loading.value = true;
     try {
-        const { data } = await stockOutsApi.list({
+        const { data } = await salesApi.list({
             search: filters.search || undefined,
             date_from: filters.date_from || undefined,
             date_to: filters.date_to || undefined,
@@ -68,7 +68,7 @@ async function loadStockOuts() {
         meta.value = data.meta;
         totals.value = data.totals;
     } catch {
-        toast.error('Failed to load Stock Out records.');
+        toast.error('Failed to load Sales records.');
     } finally {
         loading.value = false;
     }
@@ -82,7 +82,7 @@ function onSort(key) {
         filters.sort_dir = 'asc';
     }
     filters.page = 1;
-    loadStockOuts();
+    loadSales();
 }
 
 function hasActiveFilters() {
@@ -97,29 +97,29 @@ watch(
     [() => filters.search, () => filters.date_from, () => filters.date_to, () => filters.status_id, () => filters.payment_status],
     () => {
         filters.page = 1;
-        loadStockOuts();
+        loadSales();
     }
 );
 
 onMounted(async () => {
     await loadStatuses();
-    await loadStockOuts();
+    await loadSales();
 });
 
-async function removeStockOut(stockOut) {
+async function removeSale(sale) {
     const ok = await confirm({
-        title: 'Delete this Stock Out?',
-        message: `${stockOut.reference_no} will be cancelled, its stock returned, and its invoice voided. This cannot be undone.`,
+        title: 'Delete this Sale?',
+        message: `${sale.reference_no} will be cancelled, its stock returned, and its invoice voided. This cannot be undone.`,
         confirmText: 'Delete',
     });
     if (!ok) return;
 
     try {
-        await stockOutsApi.remove(stockOut.id);
-        toast.success('Stock Out deleted successfully.');
-        await loadStockOuts();
+        await salesApi.remove(sale.id);
+        toast.success('Sale deleted successfully.');
+        await loadSales();
     } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to delete Stock Out.');
+        toast.error(error.response?.data?.message || 'Failed to delete Sale.');
     }
 }
 </script>
@@ -127,9 +127,9 @@ async function removeStockOut(stockOut) {
 <template>
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h1 class="text-lg font-semibold text-slate-900">Stock Out</h1>
-            <RouterLink :to="{ name: 'stock-out.create' }" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover">
-                + Add Stock Out
+            <h1 class="text-lg font-semibold text-slate-900">Sales</h1>
+            <RouterLink :to="{ name: 'sales.create' }" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover">
+                + Add Sale
             </RouterLink>
         </div>
 
@@ -156,7 +156,7 @@ async function removeStockOut(stockOut) {
         <LoadingSpinner v-if="loading" />
         <EmptyState
             v-else-if="!rows.length"
-            title="No Stock Out records found."
+            title="No Sales records found."
             :message="hasActiveFilters() ? 'No records match your current filters.' : ''"
             :show-clear="hasActiveFilters()"
             @clear="clearFilters"
@@ -174,7 +174,7 @@ async function removeStockOut(stockOut) {
                     </tr>
                 </template>
                 <template #cell-reference_no="{ row }">
-                    <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">
+                    <RouterLink :to="{ name: 'sales.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">
                         {{ row.reference_no }}
                     </RouterLink>
                 </template>
@@ -193,10 +193,10 @@ async function removeStockOut(stockOut) {
                 </template>
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-2 text-sm">
-                        <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                        <RouterLink :to="{ name: 'sales.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
                         <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">Invoice</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
-                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeStockOut(row)">Delete</button>
+                        <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
+                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeSale(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -204,7 +204,7 @@ async function removeStockOut(stockOut) {
             <div class="md:hidden space-y-3">
                 <div v-for="row in rows" :key="row.id" class="bg-white border border-slate-200 rounded-lg p-4">
                     <div class="flex items-center justify-between">
-                        <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-slate-900">{{ row.reference_no }}</RouterLink>
+                        <RouterLink :to="{ name: 'sales.show', params: { id: row.id } }" class="font-medium text-slate-900">{{ row.reference_no }}</RouterLink>
                         <StatusBadge :status="row.payment_status" />
                     </div>
                     <p class="text-sm text-slate-500 mt-1">Customer: {{ row.customer?.name }}</p>
@@ -216,13 +216,13 @@ async function removeStockOut(stockOut) {
                     </p>
                     <div class="flex gap-2 mt-3 text-sm">
                         <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">Invoice</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
-                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeStockOut(row)">Delete</button>
+                        <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
+                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeSale(row)">Delete</button>
                     </div>
                 </div>
             </div>
 
-            <Pagination :meta="meta" @change="(page) => { filters.page = page; loadStockOuts(); }" />
+            <Pagination :meta="meta" @change="(page) => { filters.page = page; loadSales(); }" />
         </template>
     </AppLayout>
 </template>

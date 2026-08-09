@@ -13,7 +13,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'invoice_number',
-        'stock_out_id',
+        'sale_id',
         'customer_id',
         'invoice_date',
         'subtotal',
@@ -38,9 +38,9 @@ class Invoice extends Model
         ];
     }
 
-    public function stockOut(): BelongsTo
+    public function sale(): BelongsTo
     {
-        return $this->belongsTo(StockOut::class);
+        return $this->belongsTo(Sale::class);
     }
 
     public function customer(): BelongsTo

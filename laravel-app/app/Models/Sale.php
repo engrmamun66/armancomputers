@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class StockOut extends Model
+class Sale extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -57,7 +57,7 @@ class StockOut extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(StockOutItem::class);
+        return $this->hasMany(SaleItem::class);
     }
 
     public function invoice(): \Illuminate\Database\Eloquent\Relations\HasOne

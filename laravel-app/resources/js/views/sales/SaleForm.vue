@@ -8,7 +8,7 @@ import CustomerSearch from '@/components/common/CustomerSearch.vue';
 import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
 import Modal from '@/components/common/Modal.vue';
 import SelectSearch from '@/components/common/SelectSearch.vue';
-import stockOutsApi from '@/services/stockOuts';
+import salesApi from '@/services/sales';
 import customersApi from '@/services/customers';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
@@ -48,20 +48,20 @@ const items = ref([]);
 
 onMounted(async () => {
     if (isEdit.value) {
-        const { data } = await stockOutsApi.get(props.id);
-        const stockOut = data.data;
-        referenceNo.value = stockOut.reference_no;
-        selectedCustomer.value = stockOut.customer;
+        const { data } = await salesApi.get(props.id);
+        const sale = data.data;
+        referenceNo.value = sale.reference_no;
+        selectedCustomer.value = sale.customer;
         Object.assign(form, {
-            customer_id: stockOut.customer?.id,
-            sale_date: stockOut.sale_date?.slice(0, 10),
-            notes: stockOut.notes || '',
-            discount: stockOut.discount,
-            additional_cost: stockOut.additional_cost,
-            paid_amount: stockOut.paid_amount,
-            payment_method: stockOut.payment_method,
+            customer_id: sale.customer?.id,
+            sale_date: sale.sale_date?.slice(0, 10),
+            notes: sale.notes || '',
+            discount: sale.discount,
+            additional_cost: sale.additional_cost,
+            paid_amount: sale.paid_amount,
+            payment_method: sale.payment_method,
         });
-        items.value = stockOut.items.map((item) => ({
+        items.value = sale.items.map((item) => ({
             product_id: item.product_id,
             name: item.product_name,
             sku: item.sku,
@@ -196,13 +196,13 @@ async function submit() {
         };
 
         if (isEdit.value) {
-            await stockOutsApi.update(props.id, payload);
-            toast.success('Stock Out updated successfully.');
+            await salesApi.update(props.id, payload);
+            toast.success('Sale updated successfully.');
         } else {
-            await stockOutsApi.create(payload);
-            toast.success('Stock Out created successfully.');
+            await salesApi.create(payload);
+            toast.success('Sale created successfully.');
         }
-        router.push({ name: 'stock-out.index' });
+        router.push({ name: 'sales.index' });
     } catch (error) {
         if (error.response?.status === 422) {
             errors.value = error.response.data.errors || {};
@@ -218,7 +218,7 @@ async function submit() {
 
 <template>
     <AppLayout>
-        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Stock Out' : 'New Stock Out' }}</h1>
+        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Sale' : 'New Sale' }}</h1>
 
         <LoadingSpinner v-if="loading" />
         <form v-else class="space-y-6" @submit.prevent="submit">
@@ -335,9 +335,9 @@ async function submit() {
             </div>
 
             <div class="flex justify-end gap-3">
-                <RouterLink :to="{ name: 'stock-out.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
+                <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
                 <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
-                    {{ saving ? 'Saving…' : 'Save Stock Out' }}
+                    {{ saving ? 'Saving…' : 'Save Sale' }}
                 </button>
             </div>
         </form>

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('stock_outs', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('reference_no')->unique();
             $table->foreignId('customer_id')->constrained('customers');
@@ -32,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('stock_outs');
+        Schema::dropIfExists('sales');
     }
 };
