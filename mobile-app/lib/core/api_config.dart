@@ -1,7 +1,7 @@
 class ApiConfig {
-  /// Overridable via env.json + `--dart-define-from-file=env.json`.
+  /// Overridable via .env + `--dart-define-from-file=.env`.
   /// Default (10.0.2.2) is the Android emulator's alias for the host
-  /// machine's localhost. Point env.json at a real host/IP for a physical
+  /// machine's localhost. Point .env at a real host/IP for a physical
   /// device or Chrome.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',

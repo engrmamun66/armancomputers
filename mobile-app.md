@@ -16,10 +16,11 @@ flutter run -d emulator-5554
 
 `api_config.dart`'s default (`10.0.2.2`) already matches the emulator — no edit needed.
 
-### Run on a real Android device
+### Run on a real Android Real device
 ```bash
 flutter devices
 flutter run -d <device_id>
+flutter run -d 0G02A20X4000157C
 ```
 
 ### Build APK
