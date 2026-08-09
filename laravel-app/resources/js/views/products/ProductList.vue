@@ -115,7 +115,7 @@ async function removeProduct(product) {
             <RouterLink
                 v-if="canManage"
                 :to="{ name: 'products.create' }"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
+                class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700"
             >
                 + Add Product
             </RouterLink>

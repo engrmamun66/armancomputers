@@ -8,7 +8,7 @@ const props = defineProps({
     unified: { type: Boolean, default: false },
     presets: { type: Array, default: null },
 });
-
+ 
 const emit = defineEmits(['update:from', 'update:to']);
 
 const combinedLabel = computed(() => (props.from || props.to ? `${props.from || '…'} - ${props.to || '…'}` : ''));
@@ -27,6 +27,7 @@ function onRangeChange(data) {
         classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-56"
         :range-picker="true"
         :use-custom-range="presets || undefined"
+        display-in="bottom_center"
         placeholder="Select date range"
         @change="onRangeChange"
     />

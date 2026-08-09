@@ -30,7 +30,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
 
 <template>
     <Teleport to="body">
-        <div v-if="modelValue" class="fixed inset-0 z-[90] flex items-start sm:items-center justify-center bg-slate-900/50 p-4 overflow-y-auto">
+        <div v-if="modelValue" class="fixed inset-0 z-[90] flex items-start sm:items-center justify-center bg-overlay-solid/50 p-4 overflow-y-auto">
             <div class="absolute inset-0" @click="close" />
             <div role="dialog" aria-modal="true" :class="['relative bg-white rounded-lg shadow-xl w-full my-8 sm:my-0', sizes[size]]">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">

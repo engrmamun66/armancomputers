@@ -10,20 +10,74 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-    /* Brand color scale. Change these to re-theme the whole app. */
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
+    /* Brand color scale. Change these to re-theme the whole app. Kept static
+       (not theme-inverted) so bg-primary-600 always stays dark enough for
+       the fixed-white onbrand button/badge text below, in both themes. */
+    --color-primary-50: #fafafa;
+    --color-primary-100: #f5f5f5;
+    --color-primary-200: #e5e5e5;
+    --color-primary-300: #d4d4d4;
+    --color-primary-400: #a3a3a3;
+    --color-primary-500: #737373;
+    --color-primary-600: #262626;
+    --color-primary-700: #171717;
+    --color-primary-800: #0a0a0a;
+    --color-primary-900: #000000;
+
+    /* Always-white text/icon color for labels sitting on solid brand/status
+       backgrounds (buttons, toasts, pagination). Deliberately NOT the same
+       token as bg-white above, which inverts with the theme for surfaces. */
+    --color-onbrand: #fff;
+
+    /* Solid-fill danger/success colors — always saturated, never inverted by
+       theme (used for white-text buttons and toasts, unlike the rose/emerald
+       text/badge shades below which lighten in dark mode). */
+    --color-danger-solid: oklch(58.6% 0.253 17.585);
+    --color-danger-solid-hover: oklch(51.4% 0.222 16.935);
+    --color-success-solid: oklch(59.6% 0.145 163.225);
+    --color-ink-solid: oklch(27.9% 0.041 260.031);
+    --color-overlay-solid: oklch(20.8% 0.042 265.755);
+
+    /* Neutral surface ramp. Native CSS light-dark() re-resolves these against
+       the page's color-scheme (set by the theme store), so every existing
+       bg-white, text-slate, and border-slate class project-wide becomes
+       theme-aware automatically, no per-component dark classes needed. */
+    --color-white: light-dark(#fff, oklch(27.9% 0.041 260.031));
+    --color-slate-50: light-dark(oklch(98.4% 0.003 247.858), oklch(20.8% 0.042 265.755));
+    --color-slate-100: light-dark(oklch(96.8% 0.007 247.896), oklch(27.9% 0.041 260.031));
+    --color-slate-200: light-dark(oklch(92.9% 0.013 255.508), oklch(37.2% 0.044 257.287));
+    --color-slate-300: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
+    --color-slate-400: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
+    --color-slate-500: light-dark(oklch(55.4% 0.046 257.417), oklch(70.4% 0.04 256.788));
+    --color-slate-600: light-dark(oklch(44.6% 0.043 257.281), oklch(86.9% 0.022 252.894));
+    --color-slate-700: light-dark(oklch(37.2% 0.044 257.287), oklch(92.9% 0.013 255.508));
+    --color-slate-800: light-dark(oklch(27.9% 0.041 260.031), oklch(96.8% 0.007 247.896));
+    --color-slate-900: light-dark(oklch(20.8% 0.042 265.755), oklch(98.4% 0.003 247.858));
+
+    /* Soft badge / inline-text accent shades (status chips, form errors).
+       Same inversion pattern — pale bg becomes a dark tint, saturated text
+       becomes a light tint, so contrast direction still works in dark mode. */
+    --color-rose-50: light-dark(oklch(96.9% 0.015 12.422), oklch(41% 0.159 10.272));
+    --color-rose-100: light-dark(oklch(94.1% 0.03 12.58), oklch(45.5% 0.188 13.697));
+    --color-rose-200: light-dark(oklch(89.2% 0.058 10.001), oklch(51.4% 0.222 16.935));
+    --color-rose-400: light-dark(oklch(71.2% 0.194 13.428), oklch(64.5% 0.246 16.439));
+    --color-rose-600: light-dark(oklch(58.6% 0.253 17.585), oklch(81% 0.117 11.638));
+    --color-rose-700: light-dark(oklch(51.4% 0.222 16.935), oklch(89.2% 0.058 10.001));
+
+    --color-amber-50: light-dark(oklch(98.7% 0.022 95.277), oklch(41.4% 0.112 45.904));
+    --color-amber-100: light-dark(oklch(96.2% 0.059 95.617), oklch(47.3% 0.137 46.201));
+    --color-amber-600: light-dark(oklch(66.6% 0.179 58.318), oklch(87.9% 0.169 91.605));
+    --color-amber-700: light-dark(oklch(55.5% 0.163 48.998), oklch(92.4% 0.12 95.746));
+
+    --color-emerald-100: light-dark(oklch(95% 0.052 163.051), oklch(43.2% 0.095 166.913));
+    --color-emerald-600: light-dark(oklch(59.6% 0.145 163.225), oklch(84.5% 0.143 164.978));
+    --color-emerald-700: light-dark(oklch(50.8% 0.118 165.612), oklch(90.5% 0.093 164.15));
 }
 
 @media print {
+    :root {
+        color-scheme: light !important;
+    }
     .no-print {
         display: none !important;
     }

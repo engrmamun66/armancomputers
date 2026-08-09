@@ -4,9 +4,9 @@ import { useToast } from '@/composables/useToast';
 const { toasts, remove } = useToast();
 
 const styles = {
-    success: 'bg-emerald-600',
-    error: 'bg-rose-600',
-    info: 'bg-slate-800',
+    success: 'bg-success-solid',
+    error: 'bg-danger-solid',
+    info: 'bg-ink-solid',
 };
 </script>
 
@@ -16,12 +16,12 @@ const styles = {
             <div
                 v-for="toast in toasts"
                 :key="toast.id"
-                :class="[styles[toast.type] || styles.info, 'text-white rounded-lg shadow-lg px-4 py-3 flex items-start gap-3']"
+                :class="[styles[toast.type] || styles.info, 'text-onbrand rounded-lg shadow-lg px-4 py-3 flex items-start gap-3']"
             >
                 <span class="flex-1 text-sm">{{ toast.message }}</span>
                 <button
                     type="button"
-                    class="text-white/80 hover:text-white leading-none"
+                    class="text-onbrand/80 hover:text-onbrand leading-none"
                     @click="remove(toast.id)"
                 >
                     &times;

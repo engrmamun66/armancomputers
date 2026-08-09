@@ -53,7 +53,7 @@ function go(page) {
                 type="button"
                 :class="[
                     'min-w-[2.25rem] px-2 py-1.5 text-sm rounded-md',
-                    page === meta.current_page ? 'bg-primary-600 text-white' : 'border border-slate-300 hover:bg-slate-50',
+                    page === meta.current_page ? 'bg-primary-600 text-onbrand' : 'border border-slate-300 hover:bg-slate-50',
                     page === '…' ? 'cursor-default border-none' : '',
                 ]"
                 @click="go(page)"

@@ -7,10 +7,12 @@ import { createPinia } from 'pinia';
 import moment from 'moment';
 import App from './App.vue';
 import router from './router';
+import { useThemeStore } from './stores/theme';
 
 const app = createApp(App);
 
 app.provide('moment', moment);
 app.use(createPinia());
 app.use(router);
+useThemeStore().init();
 app.mount('#app');

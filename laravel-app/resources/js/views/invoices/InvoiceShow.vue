@@ -31,7 +31,7 @@ function print() {
             <div class="no-print flex items-center justify-between mb-4">
                 <h1 class="text-lg font-semibold text-slate-900">Invoice {{ invoice.invoice_number }}</h1>
                 <div class="flex gap-3">
-                    <button type="button" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700" @click="print">Print</button>
+                    <button type="button" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700" @click="print">Print</button>
                     <RouterLink :to="{ name: 'invoices.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Back</RouterLink>
                 </div>
             </div>
@@ -104,7 +104,7 @@ function print() {
             </div>
 
             <div class="no-print flex justify-center gap-3 mt-4">
-                <button type="button" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700" @click="print">Print</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700" @click="print">Print</button>
                 <RouterLink :to="{ name: 'invoices.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Back</RouterLink>
             </div>
         </template>

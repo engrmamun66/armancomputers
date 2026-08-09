@@ -6,7 +6,7 @@ const { state, respond } = useConfirm();
 
 <template>
     <Teleport to="body">
-        <div v-if="state.visible" class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 px-4">
+        <div v-if="state.visible" class="fixed inset-0 z-[110] flex items-center justify-center bg-overlay-solid/50 px-4">
             <div role="alertdialog" aria-modal="true" class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
                 <h3 class="text-base font-semibold text-slate-900">{{ state.title }}</h3>
                 <p class="mt-2 text-sm text-slate-600">{{ state.message }}</p>
@@ -21,8 +21,8 @@ const { state, respond } = useConfirm();
                     <button
                         type="button"
                         :class="[
-                            'px-4 py-2 text-sm font-medium rounded-md text-white',
-                            state.danger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700',
+                            'px-4 py-2 text-sm font-medium rounded-md text-onbrand',
+                            state.danger ? 'bg-danger-solid hover:bg-danger-solid-hover' : 'bg-primary-600 hover:bg-primary-700',
                         ]"
                         @click="respond(true)"
                     >

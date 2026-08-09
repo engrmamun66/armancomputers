@@ -113,7 +113,7 @@ async function removeStockOut(stockOut) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Stock Out</h1>
-            <RouterLink :to="{ name: 'stock-out.create' }" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
+            <RouterLink :to="{ name: 'stock-out.create' }" class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700">
                 + Add Stock Out
             </RouterLink>
         </div>

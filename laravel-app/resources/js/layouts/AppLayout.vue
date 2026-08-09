@@ -4,6 +4,7 @@ import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
 import Icon from '@/components/common/Icon.vue';
+import ThemeToggle from '@/components/common/ThemeToggle.vue';
 import logoSquare from '@/../images/logo-square.png';
 
 const route = useRoute();
@@ -71,6 +72,8 @@ async function handleLogout() {
                     <span class="font-semibold text-slate-900 hidden sm:inline">Arman Computers</span>
                 </div>
 
+                <div class="flex items-center gap-2">
+                <ThemeToggle />
                 <div class="relative">
                     <button
                         type="button"
@@ -97,6 +100,7 @@ async function handleLogout() {
                             Logout
                         </button>
                     </div>
+                </div>
                 </div>
             </div>
         </header>
@@ -165,7 +169,7 @@ async function handleLogout() {
 
         <Teleport to="body">
             <div v-if="moreSheetOpen" class="md:hidden fixed inset-0 z-50 flex items-end">
-                <div class="absolute inset-0 bg-slate-900/50" @click="moreSheetOpen = false" />
+                <div class="absolute inset-0 bg-overlay-solid/50" @click="moreSheetOpen = false" />
                 <div class="relative bg-white rounded-t-2xl w-full p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] max-h-[75vh] overflow-y-auto">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-semibold text-slate-900">More</h3>
