@@ -19,7 +19,6 @@ class UserSeeder extends Seeder
             ['name' => 'Arman Admin', 'email' => 'admin@armancomputers.com', 'role' => Role::ADMIN],
             ['name' => 'Manager User', 'email' => 'manager@armancomputers.com', 'role' => Role::MANAGER],
             ['name' => 'Staff One', 'email' => 'staff1@armancomputers.com', 'role' => Role::STAFF],
-            ['name' => 'Staff Two', 'email' => 'staff2@armancomputers.com', 'role' => Role::STAFF],
         ];
 
         foreach ($users as $user) {
