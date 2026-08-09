@@ -1,25 +1,5 @@
 
-## Mobile app (Flutter, Android)
-
-Lives in `mobile-app/` — Android-only (no iOS), consumes the same Laravel API. The API base URL is hardcoded per-environment in `lib/core/api_config.dart`, so which host to point at depends on how you run it (see below).
-
-Backend must be serving on **port 8000** (the mobile app's hardcoded default) — not 7878 used above for the web SPA:
-
-```bash
-cd laravel-app
-php artisan serve --host=0.0.0.0 --port=8000
-```
-
-First-time setup:
-
-```bash
-cd mobile-app
-flutter pub get
-```
-
-### Run in Chrome (fast UI iteration only)
-
-Chrome can't resolve `10.0.2.2` (that's an Android-emulator-only NAT alias), so point the app at `127.0.0.1` first — edit `baseUrl`/`origin` in `lib/core/api_config.dart` to `http://127.0.0.1:8000`, then:
+### Run in Chrome (fast UI iteration only) 
 
 ```bash
 flutter run -d chrome
