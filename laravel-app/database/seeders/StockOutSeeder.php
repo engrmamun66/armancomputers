@@ -73,7 +73,7 @@ class StockOutSeeder extends Seeder
                 };
                 $dueAmount = round($grandTotal - $paidAmount, 2);
 
-                $saleDate = now()->subDays(random_int(0, 30));
+                $saleDate = now()->subDays(random_int(0, 30))->toDateString();
                 $createdBy = $creators->random();
                 $customerId = $customers->random();
 

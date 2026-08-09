@@ -3,9 +3,14 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StatusController;
+use App\Http\Controllers\Api\StockInController;
+use App\Http\Controllers\Api\StockOutController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,4 +37,16 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('products', ProductController::class);
 
     Route::apiResource('customers', CustomerController::class);
+
+    Route::apiResource('stock-ins', StockInController::class);
+    Route::apiResource('stock-outs', StockOutController::class);
+
+    Route::get('invoices', [InvoiceController::class, 'index']);
+    Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
+
+    Route::put('profile', [ProfileController::class, 'update']);
+    Route::post('profile/avatar', [ProfileController::class, 'updateAvatar']);
+    Route::put('profile/password', [ProfileController::class, 'updatePassword']);
 });

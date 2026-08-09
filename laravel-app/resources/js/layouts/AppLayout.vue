@@ -63,7 +63,7 @@ async function handleLogout() {
 
 <template>
     <div class="min-h-screen bg-slate-50 flex flex-col">
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40">
             <div class="px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <div class="h-8 w-8 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-sm">AC</div>
@@ -101,7 +101,7 @@ async function handleLogout() {
         </header>
 
         <div class="flex flex-1">
-            <aside class="hidden md:flex md:flex-col w-56 shrink-0 border-r border-slate-200 bg-white">
+            <aside class="no-print hidden md:flex md:flex-col w-56 shrink-0 border-r border-slate-200 bg-white">
                 <nav class="flex-1 px-3 py-4 space-y-1">
                     <RouterLink
                         v-for="item in visibleNavItems"
@@ -120,7 +120,7 @@ async function handleLogout() {
 
             <main class="flex-1 min-w-0 pb-20 md:pb-6">
                 <div class="px-4 sm:px-6 py-4">
-                    <nav v-if="breadcrumb" class="text-sm text-slate-500 mb-4">
+                    <nav v-if="breadcrumb" class="no-print text-sm text-slate-500 mb-4">
                         <RouterLink :to="{ name: 'dashboard' }" class="hover:text-slate-700">Home</RouterLink>
                         <span class="mx-1.5">/</span>
                         <span class="text-slate-700 font-medium">{{ breadcrumb }}</span>
@@ -130,7 +130,7 @@ async function handleLogout() {
             </main>
         </div>
 
-        <footer class="hidden md:block border-t border-slate-200 bg-white">
+        <footer class="no-print hidden md:block border-t border-slate-200 bg-white">
             <div class="px-6 py-4 flex items-center justify-between text-sm text-slate-500">
                 <p>&copy; {{ new Date().getFullYear() }} Arman Computers. All rights reserved.</p>
                 <div class="flex gap-4">
@@ -140,7 +140,7 @@ async function handleLogout() {
             </div>
         </footer>
 
-        <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 flex">
+        <nav class="no-print md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 flex">
             <RouterLink
                 v-for="item in mobilePrimaryItems"
                 :key="item.name"

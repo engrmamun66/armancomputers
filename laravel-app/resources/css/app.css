@@ -10,3 +10,15 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    .print-area {
+        padding: 0 !important;
+    }
+    body {
+        background: #fff !important;
+    }
+}

@@ -51,7 +51,7 @@ class StockInSeeder extends Seeder
                     'reference_no' => ReferenceNumberGenerator::generate('SI', 'stock_ins'),
                     'supplier_name' => $suppliers[array_rand($suppliers)],
                     'supplier_phone' => '01' . random_int(700000000, 999999999),
-                    'purchase_date' => now()->subDays(random_int(1, 60)),
+                    'purchase_date' => now()->subDays(random_int(1, 60))->toDateString(),
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,

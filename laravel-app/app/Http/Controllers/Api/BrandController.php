@@ -73,7 +73,7 @@ class BrandController extends Controller
         $slug = $base;
         $suffix = 1;
 
-        while (Brand::query()->where('slug', $slug)->exists()) {
+        while (Brand::withTrashed()->where('slug', $slug)->exists()) {
             $slug = "{$base}-" . ++$suffix;
         }
 
