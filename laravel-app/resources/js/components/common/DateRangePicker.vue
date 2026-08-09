@@ -26,7 +26,7 @@ function onRangeChange(data) {
         model-value-type="string"
         classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-56"
         :range-picker="true"
-        :use-custom-range--="presets || undefined"
+        :use-custom-range="presets || undefined"
         display-in="bottom_center"
         placeholder="Select date range"
         :resetSelectionToStart="true"

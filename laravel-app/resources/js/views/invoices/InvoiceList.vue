@@ -15,6 +15,8 @@ import { formatCurrency, formatDate } from '@/utils/format';
 
 const toast = useToast();
 
+const DATE_RANGE_PRESETS = ['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year', 'Last Year'];
+
 const columns = [
     { key: 'index', label: '#' },
     { key: 'invoice_number', label: 'Invoice Number' },
@@ -87,7 +89,7 @@ onMounted(loadInvoices);
             <div class="sm:w-64">
                 <SearchInput v-model="filters.search" placeholder="Search invoice number or customer…" />
             </div>
-            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" />
+            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="DATE_RANGE_PRESETS" />
             <button v-if="hasActiveFilters()" type="button" class="text-sm text-link hover:text-link-hover" @click="clearFilters">
                 Reset Filters
             </button>
