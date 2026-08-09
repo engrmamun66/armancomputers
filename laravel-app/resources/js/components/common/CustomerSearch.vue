@@ -60,7 +60,7 @@ function closeSoon() {
             v-model="query"
             type="text"
             :placeholder="placeholder"
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             @focus="results.length && (open = true)"
             @blur="closeSoon"
         />
@@ -79,7 +79,7 @@ function closeSoon() {
                 </button>
                 <button
                     type="button"
-                    class="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm text-blue-600 font-medium"
+                    class="w-full text-left px-3 py-2 hover:bg-primary-50 text-sm text-primary-600 font-medium"
                     @mousedown.prevent="createNew"
                 >
                     + Add "{{ query }}" as a new customer

@@ -9,7 +9,7 @@ defineProps({
 });
 
 const toneClasses = {
-    default: 'bg-blue-50 text-blue-600',
+    default: 'bg-primary-50 text-primary-600',
     warning: 'bg-amber-50 text-amber-600',
     danger: 'bg-rose-50 text-rose-600',
 };

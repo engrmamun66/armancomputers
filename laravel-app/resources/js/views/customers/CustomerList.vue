@@ -150,7 +150,7 @@ async function removeCustomer(customer) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Customers</h1>
-            <button v-if="canManage" type="button" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" @click="openCreate">
+            <button v-if="canManage" type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700" @click="openCreate">
                 + Add Customer
             </button>
         </div>
@@ -177,7 +177,7 @@ async function removeCustomer(customer) {
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-name="{ row }">
-                    <RouterLink :to="{ name: 'customers.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-blue-600">
+                    <RouterLink :to="{ name: 'customers.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-primary-600">
                         {{ row.name }}
                     </RouterLink>
                 </template>
@@ -192,7 +192,7 @@ async function removeCustomer(customer) {
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-3 text-sm">
                         <RouterLink :to="{ name: 'customers.show', params: { id: row.id } }" class="text-slate-500 hover:text-slate-700">View</RouterLink>
-                        <button v-if="canManage" type="button" class="text-blue-600 hover:text-blue-700" @click="openEdit(row)">Edit</button>
+                        <button v-if="canManage" type="button" class="text-primary-600 hover:text-primary-700" @click="openEdit(row)">Edit</button>
                         <button v-if="canManage" type="button" class="text-rose-600 hover:text-rose-700" @click="removeCustomer(row)">Delete</button>
                     </div>
                 </template>
@@ -209,7 +209,7 @@ async function removeCustomer(customer) {
                         <span :class="row.total_due > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.total_due) }}</span>
                     </p>
                     <div class="flex gap-3 mt-3 text-sm">
-                        <button v-if="canManage" type="button" class="text-blue-600" @click="openEdit(row)">Edit</button>
+                        <button v-if="canManage" type="button" class="text-primary-600" @click="openEdit(row)">Edit</button>
                         <button v-if="canManage" type="button" class="text-rose-600" @click="removeCustomer(row)">Delete</button>
                     </div>
                 </div>
@@ -252,7 +252,7 @@ async function removeCustomer(customer) {
                 <button
                     type="button"
                     :disabled="saving"
-                    class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                    class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
                     @click="submitForm"
                 >
                     {{ saving ? 'Saving…' : 'Save' }}

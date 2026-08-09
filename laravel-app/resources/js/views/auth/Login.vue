@@ -51,7 +51,7 @@ async function submit() {
                     type="email"
                     required
                     autocomplete="username"
-                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="errors.email ? 'border-rose-400' : ''"
                 />
                 <p v-if="errors.email" class="mt-1 text-xs text-rose-600">{{ errors.email[0] }}</p>
@@ -63,7 +63,7 @@ async function submit() {
                     type="password"
                     required
                     autocomplete="current-password"
-                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     :class="errors.password ? 'border-rose-400' : ''"
                 />
                 <p v-if="errors.password" class="mt-1 text-xs text-rose-600">{{ errors.password[0] }}</p>
@@ -71,7 +71,7 @@ async function submit() {
             <button
                 type="submit"
                 :disabled="loading"
-                class="w-full py-2.5 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+                class="w-full py-2.5 rounded-md bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 disabled:opacity-60"
             >
                 {{ loading ? 'Signing in…' : 'Sign in' }}
             </button>

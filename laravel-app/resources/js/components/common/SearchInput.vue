@@ -35,7 +35,7 @@ watch(local, (value) => {
             v-model="local"
             type="text"
             :placeholder="placeholder"
-            class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
     </div>
 </template>

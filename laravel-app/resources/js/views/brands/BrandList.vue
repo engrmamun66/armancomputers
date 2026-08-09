@@ -137,7 +137,7 @@ async function removeBrand(brand) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Brands</h1>
-            <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" @click="openCreate">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700" @click="openCreate">
                 + Add Brand
             </button>
         </div>
@@ -168,7 +168,7 @@ async function removeBrand(brand) {
                 <template #cell-created_at="{ row }">{{ formatDate(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-3 text-sm">
-                        <button type="button" class="text-blue-600 hover:text-blue-700" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="text-primary-600 hover:text-primary-700" @click="openEdit(row)">Edit</button>
                         <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeBrand(row)">Delete</button>
                     </div>
                 </template>
@@ -183,7 +183,7 @@ async function removeBrand(brand) {
                     <p class="text-sm text-slate-500 mt-1">{{ row.description || '—' }}</p>
                     <p class="text-xs text-slate-400 mt-1">{{ row.products_count }} products</p>
                     <div class="flex gap-3 mt-3 text-sm">
-                        <button type="button" class="text-blue-600" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="text-primary-600" @click="openEdit(row)">Edit</button>
                         <button type="button" class="text-rose-600" @click="removeBrand(row)">Delete</button>
                     </div>
                 </div>
@@ -215,7 +215,7 @@ async function removeBrand(brand) {
                 <button
                     type="button"
                     :disabled="saving"
-                    class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                    class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
                     @click="submitForm"
                 >
                     {{ saving ? 'Saving…' : 'Save' }}

@@ -4,6 +4,7 @@ import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
 import Icon from '@/components/common/Icon.vue';
+import logoSquare from '@/../images/logo-square.png';
 
 const route = useRoute();
 const router = useRouter();
@@ -40,8 +41,8 @@ const BREADCRUMBS = {
 const visibleNavItems = computed(() => NAV_ITEMS.filter((item) => !item.capability || can(role.value, item.capability)));
 
 const mobilePrimaryNames = computed(() => {
-    const fourth = can(role.value, 'stock-in.manage') ? 'stock-in.index' : 'invoices.index';
-    return ['dashboard', 'stock-out.index', 'products.index', fourth];
+    const second = can(role.value, 'stock-in.manage') ? 'stock-in.index' : 'invoices.index';
+    return ['dashboard', second, 'products.index', 'stock-out.index'];
 });
 
 const mobilePrimaryItems = computed(() =>
@@ -66,7 +67,7 @@ async function handleLogout() {
         <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-40">
             <div class="px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <div class="h-8 w-8 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-sm">AC</div>
+                    <img :src="logoSquare" alt="Arman Computers" class="h-10 w-10 object-contain" />
                     <span class="font-semibold text-slate-900 hidden sm:inline">Arman Computers</span>
                 </div>
 
@@ -109,7 +110,7 @@ async function handleLogout() {
                         :to="{ name: item.name }"
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium"
                         :class="route.name === item.name || route.name?.startsWith(item.name.split('.')[0] + '.')
-                            ? 'bg-blue-50 text-blue-700'
+                            ? 'bg-primary-50 text-primary-700'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
                     >
                         <Icon :name="item.icon" class="h-5 w-5" />
@@ -146,7 +147,7 @@ async function handleLogout() {
                 :key="item.name"
                 :to="{ name: item.name }"
                 class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
-                :class="route.name === item.name ? 'text-blue-600' : 'text-slate-500'"
+                :class="route.name === item.name ? 'text-primary-600' : 'text-slate-500'"
             >
                 <Icon :name="item.icon" class="h-5 w-5" />
                 {{ item.label }}
@@ -154,7 +155,7 @@ async function handleLogout() {
             <button
                 type="button"
                 class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-xs"
-                :class="moreSheetOpen ? 'text-blue-600' : 'text-slate-500'"
+                :class="moreSheetOpen ? 'text-primary-600' : 'text-slate-500'"
                 @click="moreSheetOpen = true"
             >
                 <Icon name="ellipsis-horizontal" class="h-5 w-5" />

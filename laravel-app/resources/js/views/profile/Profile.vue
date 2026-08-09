@@ -100,7 +100,7 @@ async function submitPassword() {
                     <button
                         type="button"
                         :disabled="uploadingAvatar"
-                        class="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs hover:bg-blue-700 disabled:opacity-60"
+                        class="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs hover:bg-primary-700 disabled:opacity-60"
                         @click="triggerAvatarUpload"
                     >
                         {{ uploadingAvatar ? '…' : '✎' }}
@@ -131,7 +131,7 @@ async function submitPassword() {
                             <p v-if="profileErrors.email" class="mt-1 text-xs text-rose-600">{{ profileErrors.email[0] }}</p>
                         </div>
                         <div class="flex justify-end">
-                            <button type="submit" :disabled="savingProfile" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60">
+                            <button type="submit" :disabled="savingProfile" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
                                 {{ savingProfile ? 'Saving…' : 'Save Changes' }}
                             </button>
                         </div>
@@ -159,7 +159,7 @@ async function submitPassword() {
                             </div>
                         </div>
                         <div class="flex justify-end">
-                            <button type="submit" :disabled="savingPassword" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60">
+                            <button type="submit" :disabled="savingPassword" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
                                 {{ savingPassword ? 'Saving…' : 'Change Password' }}
                             </button>
                         </div>

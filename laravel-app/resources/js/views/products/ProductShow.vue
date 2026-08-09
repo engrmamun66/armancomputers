@@ -33,7 +33,7 @@ onMounted(async () => {
                     <RouterLink :to="{ name: 'products.stock-history', params: { id } }" class="px-4 py-2 text-sm rounded-md border border-slate-300">
                         Stock History
                     </RouterLink>
-                    <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700">
+                    <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700">
                         Edit
                     </RouterLink>
                 </div>

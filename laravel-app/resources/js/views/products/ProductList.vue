@@ -115,7 +115,7 @@ async function removeProduct(product) {
             <RouterLink
                 v-if="canManage"
                 :to="{ name: 'products.create' }"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
             >
                 + Add Product
             </RouterLink>
@@ -153,7 +153,7 @@ async function removeProduct(product) {
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-name="{ row }">
-                    <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-blue-600">
+                    <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-primary-600">
                         {{ row.name }}
                     </RouterLink>
                 </template>
@@ -173,7 +173,7 @@ async function removeProduct(product) {
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-3 text-sm">
                         <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="text-slate-500 hover:text-slate-700">History</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-blue-600 hover:text-blue-700">Edit</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-primary-600 hover:text-primary-700">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="text-rose-600 hover:text-rose-700" @click="removeProduct(row)">Delete</button>
                     </div>
                 </template>
@@ -192,7 +192,7 @@ async function removeProduct(product) {
                     </p>
                     <div class="flex gap-3 mt-3 text-sm">
                         <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="text-slate-500">History</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-blue-600">Edit</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-primary-600">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="text-rose-600" @click="removeProduct(row)">Delete</button>
                     </div>
                 </div>

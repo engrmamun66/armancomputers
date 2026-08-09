@@ -14,7 +14,7 @@ defineEmits(['update:from', 'update:to']);
         <EmDateTimePicker
             :model-value="from"
             model-value-type="date"
-            classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-36"
+            classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-36"
             :max-date="to || undefined"
             :keep-empty-the-calendar-first="true"
             placeholder="From"
@@ -24,7 +24,7 @@ defineEmits(['update:from', 'update:to']);
         <EmDateTimePicker
             :model-value="to"
             model-value-type="date"
-            classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-36"
+            classes="px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-36"
             :min-date="from || undefined"
             :keep-empty-the-calendar-first="true"
             placeholder="To"

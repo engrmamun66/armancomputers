@@ -232,7 +232,7 @@ async function submit() {
                         <label class="block text-sm font-medium text-slate-700 mb-1">Customer</label>
                         <div v-if="selectedCustomer" class="flex items-center justify-between px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
                             <span class="text-sm font-medium text-slate-800">{{ selectedCustomer.name }} <span class="text-slate-400 font-normal">· {{ selectedCustomer.phone || 'no phone' }}</span></span>
-                            <button type="button" class="text-sm text-blue-600" @click="selectedCustomer = null; form.customer_id = null">Change</button>
+                            <button type="button" class="text-sm text-primary-600" @click="selectedCustomer = null; form.customer_id = null">Change</button>
                         </div>
                         <CustomerSearch v-else @select="selectCustomer" @create-new="openCustomerModal" />
                     </div>
@@ -335,7 +335,7 @@ async function submit() {
 
             <div class="flex justify-end gap-3">
                 <RouterLink :to="{ name: 'stock-out.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
-                <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60">
+                <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
                     {{ saving ? 'Saving…' : 'Save Stock Out' }}
                 </button>
             </div>
@@ -360,7 +360,7 @@ async function submit() {
             </form>
             <template #footer>
                 <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showCustomerModal = false">Cancel</button>
-                <button type="button" :disabled="savingCustomer" class="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60" @click="submitCustomerModal">
+                <button type="button" :disabled="savingCustomer" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60" @click="submitCustomerModal">
                     {{ savingCustomer ? 'Saving…' : 'Save Customer' }}
                 </button>
             </template>

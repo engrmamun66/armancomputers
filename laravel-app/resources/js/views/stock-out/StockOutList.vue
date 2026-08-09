@@ -111,7 +111,7 @@ async function removeStockOut(stockOut) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Stock Out</h1>
-            <RouterLink :to="{ name: 'stock-out.create' }" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            <RouterLink :to="{ name: 'stock-out.create' }" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700">
                 + Add Stock Out
             </RouterLink>
         </div>
@@ -131,7 +131,7 @@ async function removeStockOut(stockOut) {
                 <option value="partial">Partial</option>
                 <option value="due">Due</option>
             </select>
-            <button v-if="hasActiveFilters()" type="button" class="text-sm text-blue-600 hover:text-blue-700" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="text-sm text-primary-600 hover:text-primary-700" @click="clearFilters">
                 Reset Filters
             </button>
         </div>
@@ -148,7 +148,7 @@ async function removeStockOut(stockOut) {
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-reference_no="{ row }">
-                    <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-blue-600 hover:text-blue-700">
+                    <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="font-medium text-primary-600 hover:text-primary-700">
                         {{ row.reference_no }}
                     </RouterLink>
                 </template>
@@ -168,7 +168,7 @@ async function removeStockOut(stockOut) {
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-3 text-sm">
                         <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="text-slate-500 hover:text-slate-700">View</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="text-blue-600 hover:text-blue-700">Edit</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="text-primary-600 hover:text-primary-700">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="text-rose-600 hover:text-rose-700" @click="removeStockOut(row)">Delete</button>
                     </div>
                 </template>
@@ -188,7 +188,7 @@ async function removeStockOut(stockOut) {
                         <span :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.due_amount) }}</span>
                     </p>
                     <div class="flex gap-3 mt-3 text-sm">
-                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="text-blue-600">Edit</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="text-primary-600">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="text-rose-600" @click="removeStockOut(row)">Delete</button>
                     </div>
                 </div>

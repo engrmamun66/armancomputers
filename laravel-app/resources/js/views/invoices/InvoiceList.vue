@@ -75,7 +75,7 @@ onMounted(loadInvoices);
                 <SearchInput v-model="filters.search" placeholder="Search invoice number or customer…" />
             </div>
             <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" />
-            <button v-if="hasActiveFilters()" type="button" class="text-sm text-blue-600 hover:text-blue-700" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="text-sm text-primary-600 hover:text-primary-700" @click="clearFilters">
                 Reset Filters
             </button>
         </div>
@@ -92,7 +92,7 @@ onMounted(loadInvoices);
             <DataTable :columns="columns" :rows="rows" row-key="id">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-invoice_number="{ row }">
-                    <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="font-medium text-blue-600 hover:text-blue-700">
+                    <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="font-medium text-primary-600 hover:text-primary-700">
                         {{ row.invoice_number }}
                     </RouterLink>
                 </template>

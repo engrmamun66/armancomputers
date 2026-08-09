@@ -22,7 +22,7 @@ const { state, respond } = useConfirm();
                         type="button"
                         :class="[
                             'px-4 py-2 text-sm font-medium rounded-md text-white',
-                            state.danger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-blue-600 hover:bg-blue-700',
+                            state.danger ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700',
                         ]"
                         @click="respond(true)"
                     >
