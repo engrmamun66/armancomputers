@@ -71,6 +71,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
   final _additionalCostController = TextEditingController();
 
   DateTime? _purchaseDate;
+  DateTime? _warrantyEndDate;
   final List<_LineItemDraft> _items = [];
 
   bool _loading = false;
@@ -116,6 +117,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
       _discountController.text = purchase.discount == 0 ? '' : purchase.discount.toStringAsFixed(2);
       _additionalCostController.text = purchase.additionalCost == 0 ? '' : purchase.additionalCost.toStringAsFixed(2);
       _purchaseDate = DateTime.tryParse(purchase.purchaseDate) ?? DateTime.now();
+      _warrantyEndDate = purchase.warrantyEndDate != null ? DateTime.tryParse(purchase.warrantyEndDate!) : null;
       for (final item in _items) {
         item.dispose();
       }
@@ -193,6 +195,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
       'supplier_name': _emptyToNull(_supplierNameController.text),
       'supplier_phone': _emptyToNull(_supplierPhoneController.text),
       'purchase_date': apiDate(_purchaseDate!),
+      'warranty_end_date': _warrantyEndDate != null ? apiDate(_warrantyEndDate!) : null,
       'notes': _emptyToNull(_notesController.text),
       'discount': _discount,
       'additional_cost': _additionalCost,
@@ -276,6 +279,13 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                     label: 'Purchase Date',
                     value: _purchaseDate,
                     onChanged: (d) => setState(() => _purchaseDate = d),
+                  ),
+                  const SizedBox(height: 14),
+                  AppDateField(
+                    label: 'Warranty End Date (optional)',
+                    value: _warrantyEndDate,
+                    onChanged: (d) => setState(() => _warrantyEndDate = d),
+                    onClear: () => setState(() => _warrantyEndDate = null),
                   ),
                   const SizedBox(height: 14),
                   TextField(

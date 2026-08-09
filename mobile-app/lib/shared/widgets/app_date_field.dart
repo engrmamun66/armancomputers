@@ -11,6 +11,7 @@ class AppDateField extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final String? errorText;
+  final VoidCallback? onClear;
 
   const AppDateField({
     super.key,
@@ -20,6 +21,7 @@ class AppDateField extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.errorText,
+    this.onClear,
   });
 
   Future<void> _pick(BuildContext context) async {
@@ -53,7 +55,17 @@ class AppDateField extends StatelessWidget {
                     style: TextStyle(color: value == null ? scheme.onSurfaceVariant : null),
                   ),
                 ),
-                Icon(Icons.calendar_today_outlined, size: 16, color: scheme.onSurfaceVariant),
+                if (onClear != null && value != null)
+                  InkWell(
+                    onTap: onClear,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(Icons.close, size: 16, color: scheme.onSurfaceVariant),
+                    ),
+                  )
+                else
+                  Icon(Icons.calendar_today_outlined, size: 16, color: scheme.onSurfaceVariant),
               ],
             ),
           ),

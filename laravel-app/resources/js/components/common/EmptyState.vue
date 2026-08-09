@@ -18,7 +18,7 @@ defineEmits(['clear']);
         <button
             v-if="showClear"
             type="button"
-            class="mt-4 text-sm font-medium text-link hover:text-link-hover"
+            class="mt-4 px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50"
             @click="$emit('clear')"
         >
             Clear Filters

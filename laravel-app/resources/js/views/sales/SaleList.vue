@@ -3,6 +3,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/tables/DataTable.vue';
+import Icon from '@/components/common/Icon.vue';
 import Pagination from '@/components/common/Pagination.vue';
 import SearchInput from '@/components/common/SearchInput.vue';
 import DateRangePicker from '@/components/common/DateRangePicker.vue';
@@ -15,7 +16,7 @@ import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
 import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
-import { formatCurrency, formatDate, formatDateTime } from '@/utils/format';
+import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
 
 const auth = useAuthStore();
 const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
@@ -29,13 +30,11 @@ const columns = [
     { key: 'reference_no', label: 'Reference No' },
     { key: 'sale_date', label: 'Date' },
     { key: 'customer', label: 'Customer' },
-    { key: 'items_count', label: 'Items', align: 'center' },
-    { key: 'total_qty', label: 'Total Qty', align: 'right' },
+    { key: 'total_qty', label: 'Items / Qty', align: 'right' },
     { key: 'grand_total', label: 'Total Amount', align: 'right' },
-    { key: 'paid_amount', label: 'Paid', align: 'right' },
-    { key: 'due_amount', label: 'Due', align: 'right' },
+    { key: 'payment', label: 'Payment', align: 'right', sortable: false },
+    { key: 'warranty', label: 'Warranty', sortable: false },
     { key: 'status', label: 'Status' },
-    { key: 'created_by', label: 'Created By' },
     { key: 'actions', label: 'Actions', align: 'right' },
 ];
 
@@ -148,7 +147,7 @@ async function removeSale(sale) {
                 <option value="partial">Partial</option>
                 <option value="due">Due</option>
             </select>
-            <button v-if="hasActiveFilters()" type="button" class="text-sm text-link hover:text-link-hover" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50" @click="clearFilters">
                 Reset Filters
             </button>
         </div>
@@ -167,10 +166,9 @@ async function removeSale(sale) {
                 <template #footer>
                     <tr v-if="rows.length" class="bg-slate-50 font-semibold text-slate-700 border-t border-slate-200">
                         <td class="px-4 py-3" colspan="4">Totals</td>
-                        <td class="px-4 py-3 text-center">{{ totals.items_count }}</td>
-                        <td class="px-4 py-3 text-right">{{ totals.total_qty }}</td>
+                        <td class="px-4 py-3 text-right">{{ totals.items_count }} / {{ totals.total_qty }}</td>
                         <td class="px-4 py-3 text-right">{{ formatCurrency(totals.total_amount) }}</td>
-                        <td class="px-4 py-3" colspan="5"></td>
+                        <td class="px-4 py-3" colspan="4"></td>
                     </tr>
                 </template>
                 <template #cell-reference_no="{ row }">
@@ -180,11 +178,13 @@ async function removeSale(sale) {
                 </template>
                 <template #cell-sale_date="{ row }">{{ formatDate(row.sale_date) }}</template>
                 <template #cell-customer="{ row }">{{ row.customer?.name }}</template>
+                <template #cell-total_qty="{ row }">{{ row.items_count }} / {{ row.total_qty }}</template>
                 <template #cell-grand_total="{ row }">{{ formatCurrency(row.grand_total) }}</template>
-                <template #cell-paid_amount="{ row }">{{ formatCurrency(row.paid_amount) }}</template>
-                <template #cell-due_amount="{ row }">
-                    <span :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.due_amount) }}</span>
+                <template #cell-payment="{ row }">
+                    <div>Paid: {{ formatCurrency(row.paid_amount) }}</div>
+                    <div :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : 'text-slate-400'">Due: {{ formatCurrency(row.due_amount) }}</div>
                 </template>
+                <template #cell-warranty="{ row }">{{ formatWarranty(row.sale_date, row.warranty_end_date) || '—' }}</template>
                 <template #cell-status="{ row }">
                     <div class="flex flex-col gap-1 items-start">
                         <StatusBadge :status="row.status?.slug" />
@@ -192,11 +192,19 @@ async function removeSale(sale) {
                     </div>
                 </template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-2 text-sm">
-                        <RouterLink :to="{ name: 'sales.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
-                        <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">Invoice</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
-                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeSale(row)">Delete</button>
+                    <div class="flex justify-end gap-1">
+                        <RouterLink :to="{ name: 'sales.show', params: { id: row.id } }" title="View" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-slate-600 bg-slate-200 hover:bg-slate-300">
+                            <Icon name="eye" class="h-4 w-4" />
+                        </RouterLink>
+                        <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" title="Invoice" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-slate-600 bg-slate-200 hover:bg-slate-300">
+                            <Icon name="document-text" class="h-4 w-4" />
+                        </RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" title="Edit" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-primary-700 bg-primary-50 hover:bg-primary-100">
+                            <Icon name="pencil" class="h-4 w-4" />
+                        </RouterLink>
+                        <button v-if="canManage" type="button" title="Delete" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeSale(row)">
+                            <Icon name="trash" class="h-4 w-4" />
+                        </button>
                     </div>
                 </template>
             </DataTable>
@@ -214,6 +222,7 @@ async function removeSale(sale) {
                         Paid: {{ formatCurrency(row.paid_amount) }} · Due:
                         <span :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.due_amount) }}</span>
                     </p>
+                    <p class="text-sm text-slate-500">Warranty: {{ formatWarranty(row.sale_date, row.warranty_end_date) || '—' }}</p>
                     <div class="flex gap-2 mt-3 text-sm">
                         <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">Invoice</RouterLink>
                         <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>

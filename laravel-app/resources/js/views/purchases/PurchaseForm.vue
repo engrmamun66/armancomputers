@@ -5,7 +5,12 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ProductSearch from '@/components/common/ProductSearch.vue';
 import EmDateTimePicker from '@/components/common/EmDateTimePicker.vue';
+import Modal from '@/components/common/Modal.vue';
+import SelectSearch from '@/components/common/SelectSearch.vue';
 import purchasesApi from '@/services/purchases';
+import productsApi from '@/services/products';
+import brandsApi from '@/services/brands';
+import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
 import { formatCurrency } from '@/utils/format';
 
@@ -32,7 +37,14 @@ const form = reactive({
 
 const items = ref([]);
 
+const brands = ref([]);
+const productStatuses = ref([]);
+
 onMounted(async () => {
+    const [brandRes, statusRes] = await Promise.all([brandsApi.all(), lookups.statuses('general')]);
+    brands.value = brandRes.data.data;
+    productStatuses.value = statusRes.data.data;
+
     if (isEdit.value) {
         const { data } = await purchasesApi.get(props.id);
         const purchase = data.data;
@@ -78,6 +90,68 @@ function removeItem(index) {
 }
 
 const excludeIds = computed(() => items.value.map((item) => item.product_id));
+
+// --- inline "create new product" ---
+const brandOptions = computed(() => brands.value.map((brand) => ({ value: brand.id, label: brand.name })));
+const statusOptions = computed(() => productStatuses.value.map((status) => ({ value: status.id, label: status.name })));
+
+const showProductModal = ref(false);
+const productForm = reactive({
+    brand_id: '',
+    name: '',
+    sku: '',
+    barcode: '',
+    description: '',
+    purchase_price: '',
+    selling_price: '',
+    minimum_stock: 5,
+    status_id: '',
+});
+const productErrors = ref({});
+const savingProduct = ref(false);
+
+function openProductModal(prefillName) {
+    Object.assign(productForm, {
+        brand_id: '',
+        name: prefillName || '',
+        sku: '',
+        barcode: '',
+        description: '',
+        purchase_price: '',
+        selling_price: '',
+        minimum_stock: 5,
+        status_id: productStatuses.value.find((s) => s.slug === 'active')?.id ?? '',
+    });
+    productErrors.value = {};
+    showProductModal.value = true;
+}
+
+async function createBrand(name) {
+    const activeStatusId = productStatuses.value.find((s) => s.slug === 'active')?.id;
+    const { data } = await brandsApi.create({ name, status_id: activeStatusId });
+    brands.value.push(data.data);
+    toast.success(`Brand "${data.data.name}" added.`);
+    return { value: data.data.id, label: data.data.name };
+}
+
+async function submitProductModal() {
+    savingProduct.value = true;
+    productErrors.value = {};
+    try {
+        const { data } = await productsApi.create(productForm);
+        addProduct(data.data);
+        showProductModal.value = false;
+        toast.success('Product created successfully.');
+    } catch (error) {
+        if (error.response?.status === 422) {
+            productErrors.value = error.response.data.errors || {};
+        } else {
+            toast.error(error.response?.data?.message || 'Something went wrong.');
+        }
+    } finally {
+        savingProduct.value = false;
+    }
+}
 
 const subtotal = computed(() => items.value.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0), 0));
 const grandTotal = computed(() => subtotal.value - (Number(form.discount) || 0) + (Number(form.additional_cost) || 0));
@@ -191,8 +265,17 @@ async function submit() {
             </div>
 
             <div class="bg-white border border-slate-200 rounded-lg p-6">
-                <h2 class="text-sm font-semibold text-slate-700 mb-4">Products</h2>
-                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to add…" @select="addProduct" />
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-slate-700">Products</h2>
+                    <button
+                        type="button"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover"
+                        @click="openProductModal()"
+                    >
+                        + Add new product
+                    </button>
+                </div>
+                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to add…" allow-create @select="addProduct" @create-new="openProductModal" />
 
                 <div class="mt-4 overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -257,5 +340,68 @@ async function submit() {
                 </button>
             </div>
         </form>
+
+        <Modal v-model="showProductModal" title="Add New Product" size="lg">
+            <form class="space-y-4" @submit.prevent="submitProductModal">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Brand</label>
+                        <SelectSearch
+                            v-model="productForm.brand_id"
+                            :options="brandOptions"
+                            placeholder="Select a brand"
+                            allow-create
+                            :create-fn="createBrand"
+                            create-label="Add brand"
+                        />
+                        <p v-if="productErrors.brand_id" class="mt-1 text-xs text-rose-600">{{ productErrors.brand_id[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                        <SelectSearch v-model="productForm.status_id" :options="statusOptions" placeholder="Select a status" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+                    <input v-model="productForm.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                    <p v-if="productErrors.name" class="mt-1 text-xs text-rose-600">{{ productErrors.name[0] }}</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">SKU</label>
+                        <input v-model="productForm.sku" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <p v-if="productErrors.sku" class="mt-1 text-xs text-rose-600">{{ productErrors.sku[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
+                        <input v-model="productForm.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <p v-if="productErrors.barcode" class="mt-1 text-xs text-rose-600">{{ productErrors.barcode[0] }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Price</label>
+                        <input v-model="productForm.purchase_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <p v-if="productErrors.purchase_price" class="mt-1 text-xs text-rose-600">{{ productErrors.purchase_price[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Selling Price</label>
+                        <input v-model="productForm.selling_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <p v-if="productErrors.selling_price" class="mt-1 text-xs text-rose-600">{{ productErrors.selling_price[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stock</label>
+                        <input v-model="productForm.minimum_stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <p v-if="productErrors.minimum_stock" class="mt-1 text-xs text-rose-600">{{ productErrors.minimum_stock[0] }}</p>
+                    </div>
+                </div>
+            </form>
+            <template #footer>
+                <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showProductModal = false">Cancel</button>
+                <button type="button" :disabled="savingProduct" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60" @click="submitProductModal">
+                    {{ savingProduct ? 'Saving…' : 'Save Product' }}
+                </button>
+            </template>
+        </Modal>
     </AppLayout>
 </template>

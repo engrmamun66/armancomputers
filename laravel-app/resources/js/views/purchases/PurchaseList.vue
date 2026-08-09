@@ -3,6 +3,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/tables/DataTable.vue';
+import Icon from '@/components/common/Icon.vue';
 import Pagination from '@/components/common/Pagination.vue';
 import SearchInput from '@/components/common/SearchInput.vue';
 import DateRangePicker from '@/components/common/DateRangePicker.vue';
@@ -13,7 +14,7 @@ import purchasesApi from '@/services/purchases';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
-import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
+import { formatCurrency, formatDate, formatWarranty } from '@/utils/format';
 
 const toast = useToast();
 const { confirm } = useConfirm();
@@ -25,12 +26,10 @@ const columns = [
     { key: 'reference_no', label: 'Reference No' },
     { key: 'purchase_date', label: 'Date' },
     { key: 'supplier_name', label: 'Supplier' },
-    { key: 'items_count', label: 'Items', align: 'center' },
-    { key: 'total_qty', label: 'Total Qty', align: 'right' },
+    { key: 'total_qty', label: 'Items / Qty', align: 'right' },
     { key: 'grand_total', label: 'Total Amount', align: 'right' },
     { key: 'warranty', label: 'Warranty', sortable: false },
     { key: 'status', label: 'Status' },
-    { key: 'created_at', label: 'Created', sortable: false },
     { key: 'actions', label: 'Actions', align: 'right' },
 ];
 
@@ -133,7 +132,7 @@ async function removePurchase(purchase) {
                 <option value="">All Statuses</option>
                 <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
             </select>
-            <button v-if="hasActiveFilters()" type="button" class="text-sm text-link hover:text-link-hover" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50" @click="clearFilters">
                 Reset Filters
             </button>
         </div>
@@ -152,10 +151,9 @@ async function removePurchase(purchase) {
                 <template #footer>
                     <tr v-if="rows.length" class="bg-slate-50 font-semibold text-slate-700 border-t border-slate-200">
                         <td class="px-4 py-3" colspan="4">Totals</td>
-                        <td class="px-4 py-3 text-center">{{ totals.items_count }}</td>
-                        <td class="px-4 py-3 text-right">{{ totals.total_qty }}</td>
+                        <td class="px-4 py-3 text-right">{{ totals.items_count }} / {{ totals.total_qty }}</td>
                         <td class="px-4 py-3 text-right">{{ formatCurrency(totals.total_amount) }}</td>
-                        <td class="px-4 py-3" colspan="4"></td>
+                        <td class="px-4 py-3" colspan="3"></td>
                     </tr>
                 </template>
                 <template #cell-reference_no="{ row }">
@@ -165,14 +163,21 @@ async function removePurchase(purchase) {
                 </template>
                 <template #cell-purchase_date="{ row }">{{ formatDate(row.purchase_date) }}</template>
                 <template #cell-supplier_name="{ row }">{{ row.supplier_name || '—' }}</template>
+                <template #cell-total_qty="{ row }">{{ row.items_count }} / {{ row.total_qty }}</template>
                 <template #cell-grand_total="{ row }">{{ formatCurrency(row.grand_total) }}</template>
+                <template #cell-warranty="{ row }">{{ formatWarranty(row.purchase_date, row.warranty_end_date) || '—' }}</template>
                 <template #cell-status="{ row }"><StatusBadge :status="row.status?.slug" /></template>
-                <template #cell-created_at="{ row }">{{ formatDateTime(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-2 text-sm">
-                        <RouterLink :to="{ name: 'purchases.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
-                        <RouterLink :to="{ name: 'purchases.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
-                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removePurchase(row)">Delete</button>
+                    <div class="flex justify-end gap-1">
+                        <RouterLink :to="{ name: 'purchases.show', params: { id: row.id } }" title="View" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-slate-600 bg-slate-200 hover:bg-slate-300">
+                            <Icon name="eye" class="h-4 w-4" />
+                        </RouterLink>
+                        <RouterLink :to="{ name: 'purchases.edit', params: { id: row.id } }" title="Edit" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-primary-700 bg-primary-50 hover:bg-primary-100">
+                            <Icon name="pencil" class="h-4 w-4" />
+                        </RouterLink>
+                        <button type="button" title="Delete" class="inline-flex items-center justify-center h-8 w-8 rounded-md text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removePurchase(row)">
+                            <Icon name="trash" class="h-4 w-4" />
+                        </button>
                     </div>
                 </template>
             </DataTable>
@@ -186,6 +191,7 @@ async function removePurchase(purchase) {
                     <p class="text-sm text-slate-500 mt-1">Supplier: {{ row.supplier_name || '—' }}</p>
                     <p class="text-sm text-slate-500">Date: {{ formatDate(row.purchase_date) }}</p>
                     <p class="text-sm text-slate-500">Items: {{ row.items_count }} · Total: {{ formatCurrency(row.grand_total) }}</p>
+                    <p class="text-sm text-slate-500">Warranty: {{ formatWarranty(row.purchase_date, row.warranty_end_date) || '—' }}</p>
                     <div class="flex gap-2 mt-3 text-sm">
                         <RouterLink :to="{ name: 'purchases.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
                         <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removePurchase(row)">Delete</button>

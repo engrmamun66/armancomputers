@@ -7,6 +7,7 @@ class PurchaseModel {
   final String? supplierName;
   final String? supplierPhone;
   final String purchaseDate;
+  final String? warrantyEndDate;
   final double subtotal;
   final double discount;
   final double additionalCost;
@@ -25,6 +26,7 @@ class PurchaseModel {
     this.supplierName,
     this.supplierPhone,
     required this.purchaseDate,
+    this.warrantyEndDate,
     required this.subtotal,
     required this.discount,
     required this.additionalCost,
@@ -44,6 +46,7 @@ class PurchaseModel {
         supplierName: json['supplier_name'] as String?,
         supplierPhone: json['supplier_phone'] as String?,
         purchaseDate: json['purchase_date'] as String,
+        warrantyEndDate: json['warranty_end_date'] as String?,
         subtotal: (json['subtotal'] as num).toDouble(),
         discount: (json['discount'] as num).toDouble(),
         additionalCost: (json['additional_cost'] as num).toDouble(),

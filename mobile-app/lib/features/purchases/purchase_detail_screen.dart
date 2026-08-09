@@ -163,6 +163,13 @@ class _PurchaseDetailScreenState extends ConsumerState<PurchaseDetailScreen> {
                   _infoRow(context, 'Purchase Date', formatDate(purchase.purchaseDate)),
                   _infoRow(
                     context,
+                    'Warranty',
+                    purchase.warrantyEndDate != null
+                        ? '${formatWarranty(purchase.purchaseDate, purchase.warrantyEndDate) ?? '—'} (until ${formatDate(purchase.warrantyEndDate)})'
+                        : '—',
+                  ),
+                  _infoRow(
+                    context,
                     'Supplier',
                     (purchase.supplierName?.isNotEmpty ?? false) ? purchase.supplierName! : '—',
                   ),

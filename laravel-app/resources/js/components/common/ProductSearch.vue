@@ -5,9 +5,10 @@ import api from '@/services/api';
 const props = defineProps({
     excludeIds: { type: Array, default: () => [] },
     placeholder: { type: String, default: 'Search product by name, SKU, or barcode…' },
+    allowCreate: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['select']);
+const emit = defineEmits(['select', 'create-new']);
 
 const query = ref('');
 const results = ref([]);
@@ -43,6 +44,13 @@ function select(product) {
     open.value = false;
 }
 
+function createNew() {
+    emit('create-new', query.value);
+    query.value = '';
+    results.value = [];
+    open.value = false;
+}
+
 function closeSoon() {
     setTimeout(() => (open.value = false), 150);
 }
@@ -59,27 +67,36 @@ function closeSoon() {
             @blur="closeSoon"
         />
         <div
-            v-if="open && results.length"
+            v-if="open"
             class="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-lg max-h-64 overflow-y-auto"
         >
-            <button
-                v-for="product in results"
-                :key="product.id"
-                type="button"
-                class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
-                @mousedown.prevent="select(product)"
-            >
-                <span>
-                    <span class="font-medium text-slate-800">{{ product.name }}</span>
-                    <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
-                </span>
-                <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">
-                    {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}
-                </span>
-            </button>
-        </div>
-        <div v-else-if="open && loading" class="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-lg px-3 py-2 text-sm text-slate-400">
-            Searching…
+            <p v-if="loading" class="px-3 py-2 text-sm text-slate-400">Searching…</p>
+            <template v-else>
+                <button
+                    v-for="product in results"
+                    :key="product.id"
+                    type="button"
+                    class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
+                    @mousedown.prevent="select(product)"
+                >
+                    <span>
+                        <span class="font-medium text-slate-800">{{ product.name }}</span>
+                        <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
+                    </span>
+                    <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">
+                        {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}
+                    </span>
+                </button>
+                <p v-if="!results.length" class="px-3 py-2 text-sm text-slate-400">No products found.</p>
+                <button
+                    v-if="allowCreate"
+                    type="button"
+                    class="w-full text-left px-3 py-2 hover:bg-primary-50 text-sm text-primary-600 font-medium"
+                    @mousedown.prevent="createNew"
+                >
+                    + Add "{{ query }}" as a new product
+                </button>
+            </template>
         </div>
     </div>
 </template>

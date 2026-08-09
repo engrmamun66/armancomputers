@@ -194,6 +194,19 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
               Text(formatDate(sale.saleDate), style: TextStyle(color: scheme.onSurfaceVariant)),
             ],
           ),
+          if (sale.warrantyEndDate != null) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(Icons.shield_outlined, size: 16, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 6),
+                Text(
+                  'Warranty: ${formatWarranty(sale.saleDate, sale.warrantyEndDate) ?? '—'} (until ${formatDate(sale.warrantyEndDate)})',
+                  style: TextStyle(color: scheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,

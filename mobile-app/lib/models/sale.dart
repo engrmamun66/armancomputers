@@ -7,6 +7,7 @@ class SaleModel {
   final String referenceNo;
   final CustomerRef? customer;
   final String saleDate;
+  final String? warrantyEndDate;
   final double subtotal;
   final double discount;
   final double additionalCost;
@@ -29,6 +30,7 @@ class SaleModel {
     required this.referenceNo,
     this.customer,
     required this.saleDate,
+    this.warrantyEndDate,
     required this.subtotal,
     required this.discount,
     required this.additionalCost,
@@ -52,6 +54,7 @@ class SaleModel {
         referenceNo: json['reference_no'] as String,
         customer: json['customer'] != null ? CustomerRef.fromJson(json['customer'] as Map<String, dynamic>) : null,
         saleDate: json['sale_date'] as String,
+        warrantyEndDate: json['warranty_end_date'] as String?,
         subtotal: (json['subtotal'] as num).toDouble(),
         discount: (json['discount'] as num).toDouble(),
         additionalCost: (json['additional_cost'] as num).toDouble(),

@@ -368,6 +368,8 @@ class _PurchaseCard extends StatelessWidget {
                       children: [
                         Text('${item.itemsCount ?? item.items.length} item(s)', style: TextStyle(fontSize: 12, color: muted)),
                         Text('Qty ${item.totalQty ?? 0}', style: TextStyle(fontSize: 12, color: muted)),
+                        if (formatWarranty(item.purchaseDate, item.warrantyEndDate) != null)
+                          Text('Warranty: ${formatWarranty(item.purchaseDate, item.warrantyEndDate)}', style: TextStyle(fontSize: 12, color: muted)),
                       ],
                     ),
                   ),
