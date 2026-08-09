@@ -17,6 +17,7 @@ class Purchase extends Model
         'supplier_name',
         'supplier_phone',
         'purchase_date',
+        'warranty_end_date',
         'subtotal',
         'discount',
         'additional_cost',

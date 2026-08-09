@@ -16,6 +16,7 @@ class Sale extends Model
         'reference_no',
         'customer_id',
         'sale_date',
+        'warranty_end_date',
         'subtotal',
         'discount',
         'additional_cost',

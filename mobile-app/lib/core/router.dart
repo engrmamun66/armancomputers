@@ -60,6 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
           GoRoute(path: '/products', builder: (context, state) => const ProductListScreen()),
+          GoRoute(path: '/purchases', builder: (context, state) => const PurchaseListScreen()),
           GoRoute(path: '/sales', builder: (context, state) => const SaleListScreen()),
         ],
       ),
@@ -82,8 +83,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => CustomerDetailScreen(id: _intParam(state, 'id')),
       ),
 
-      // Purchase
-      GoRoute(path: '/purchases', builder: (context, state) => const PurchaseListScreen()),
+      // Purchase — detail/form pushed full-screen (list itself is a shell tab).
       GoRoute(path: '/purchases/create', builder: (context, state) => const PurchaseFormScreen()),
       GoRoute(
         path: '/purchases/:id',

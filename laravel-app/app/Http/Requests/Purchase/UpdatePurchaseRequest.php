@@ -17,6 +17,7 @@ class UpdatePurchaseRequest extends FormRequest
             'supplier_name' => ['nullable', 'string', 'max:255'],
             'supplier_phone' => ['nullable', 'string', 'max:30'],
             'purchase_date' => ['required', 'date'],
+            'warranty_end_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'additional_cost' => ['nullable', 'numeric', 'min:0'],

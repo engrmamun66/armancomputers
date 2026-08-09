@@ -16,6 +16,7 @@ class PurchaseResource extends JsonResource
             'supplier_name' => $this->supplier_name,
             'supplier_phone' => $this->supplier_phone,
             'purchase_date' => $this->purchase_date,
+            'warranty_end_date' => $this->warranty_end_date,
             'subtotal' => (float) $this->subtotal,
             'discount' => (float) $this->discount,
             'additional_cost' => (float) $this->additional_cost,

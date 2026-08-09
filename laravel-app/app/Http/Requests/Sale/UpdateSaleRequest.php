@@ -16,6 +16,7 @@ class UpdateSaleRequest extends FormRequest
         return [
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'sale_date' => ['required', 'date'],
+            'warranty_end_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'additional_cost' => ['nullable', 'numeric', 'min:0'],

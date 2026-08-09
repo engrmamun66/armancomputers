@@ -19,6 +19,7 @@ class SaleResource extends JsonResource
                 'phone' => $this->customer->phone,
             ] : null,
             'sale_date' => $this->sale_date,
+            'warranty_end_date' => $this->warranty_end_date,
             'subtotal' => (float) $this->subtotal,
             'discount' => (float) $this->discount,
             'additional_cost' => (float) $this->additional_cost,

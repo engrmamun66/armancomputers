@@ -13,7 +13,7 @@ import purchasesApi from '@/services/purchases';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
-import { formatCurrency, formatDate, formatDateTime } from '@/utils/format';
+import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
 
 const toast = useToast();
 const { confirm } = useConfirm();
@@ -28,9 +28,9 @@ const columns = [
     { key: 'items_count', label: 'Items', align: 'center' },
     { key: 'total_qty', label: 'Total Qty', align: 'right' },
     { key: 'grand_total', label: 'Total Amount', align: 'right' },
+    { key: 'warranty', label: 'Warranty', sortable: false },
     { key: 'status', label: 'Status' },
-    { key: 'created_by', label: 'Created By' },
-    { key: 'created_at', label: 'Created At' },
+    { key: 'created_at', label: 'Created', sortable: false },
     { key: 'actions', label: 'Actions', align: 'right' },
 ];
 

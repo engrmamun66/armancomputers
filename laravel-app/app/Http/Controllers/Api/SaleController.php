@@ -115,6 +115,7 @@ class SaleController extends Controller
                     'reference_no' => ReferenceNumberGenerator::generate('SAL', 'sales'),
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
+                    'warranty_end_date' => $validated['warranty_end_date'] ?? null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,
@@ -256,6 +257,7 @@ class SaleController extends Controller
                 $sale->update([
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
+                    'warranty_end_date' => $validated['warranty_end_date'] ?? null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('reference_no')->unique();
             $table->foreignId('customer_id')->constrained('customers');
             $table->date('sale_date');
+            $table->date('warranty_end_date')->nullable();
             $table->decimal('subtotal', 14, 2)->default(0);
             $table->decimal('discount', 14, 2)->default(0);
             $table->decimal('additional_cost', 14, 2)->default(0);

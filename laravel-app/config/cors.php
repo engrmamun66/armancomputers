@@ -11,7 +11,9 @@ return [
     | supports_credentials stays false. Origins listed below cover the web
     | SPA dev server plus every way the Flutter mobile app reaches this API
     | (see mobile-app/.env.example): emulator (10.0.2.2), Chrome (127.0.0.1),
-    | and a real device over LAN.
+    | and a real device over LAN. The patterns additionally cover
+    | `flutter run -d chrome`, which serves from a random localhost/127.0.0.1
+    | port every launch (e.g. http://localhost:50967).
     |
     */
 
@@ -26,7 +28,10 @@ return [
         'http://192.168.68.100:7878',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^http://localhost:\d+$#',
+        '#^http://127\.0\.0\.1:\d+$#',
+    ],
 
     'allowed_headers' => ['*'],
 

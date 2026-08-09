@@ -36,6 +36,7 @@ const PAYMENT_METHODS = [
 const form = reactive({
     customer_id: null,
     sale_date: new Date().toISOString().slice(0, 10),
+    warranty_end_date: '',
     notes: '',
     discount: 0,
     additional_cost: 0,
@@ -55,6 +56,7 @@ onMounted(async () => {
         Object.assign(form, {
             customer_id: sale.customer?.id,
             sale_date: sale.sale_date?.slice(0, 10),
+            warranty_end_date: sale.warranty_end_date?.slice(0, 10) || '',
             notes: sale.notes || '',
             discount: sale.discount,
             additional_cost: sale.additional_cost,
@@ -183,6 +185,7 @@ async function submit() {
         const payload = {
             customer_id: form.customer_id,
             sale_date: form.sale_date,
+            warranty_end_date: form.warranty_end_date || null,
             notes: form.notes,
             discount: Number(form.discount) || 0,
             additional_cost: Number(form.additional_cost) || 0,
@@ -249,6 +252,16 @@ async function submit() {
                             classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
                         />
                         <p v-if="errors.sale_date" class="mt-1 text-xs text-rose-600">{{ errors.sale_date[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Warranty End Date</label>
+                        <EmDateTimePicker
+                            v-model="form.warranty_end_date"
+                            model-value-type="date"
+                            placeholder="Optional"
+                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
+                        />
+                        <p v-if="errors.warranty_end_date" class="mt-1 text-xs text-rose-600">{{ errors.warranty_end_date[0] }}</p>
                     </div>
                 </div>
             </div>

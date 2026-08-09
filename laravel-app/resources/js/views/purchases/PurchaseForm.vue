@@ -24,6 +24,7 @@ const form = reactive({
     supplier_name: '',
     supplier_phone: '',
     purchase_date: new Date().toISOString().slice(0, 10),
+    warranty_end_date: '',
     notes: '',
     discount: 0,
     additional_cost: 0,
@@ -40,6 +41,7 @@ onMounted(async () => {
             supplier_name: purchase.supplier_name || '',
             supplier_phone: purchase.supplier_phone || '',
             purchase_date: purchase.purchase_date?.slice(0, 10),
+            warranty_end_date: purchase.warranty_end_date?.slice(0, 10) || '',
             notes: purchase.notes || '',
             discount: purchase.discount,
             additional_cost: purchase.additional_cost,
@@ -103,6 +105,7 @@ async function submit() {
     try {
         const payload = {
             ...form,
+            warranty_end_date: form.warranty_end_date || null,
             items: items.value.map((item) => ({
                 product_id: item.product_id,
                 quantity: Number(item.quantity),
@@ -161,6 +164,16 @@ async function submit() {
                             classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
                         />
                         <p v-if="errors.purchase_date" class="mt-1 text-xs text-rose-600">{{ errors.purchase_date[0] }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Warranty End Date</label>
+                        <EmDateTimePicker
+                            v-model="form.warranty_end_date"
+                            model-value-type="date"
+                            placeholder="Optional"
+                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
+                        />
+                        <p v-if="errors.warranty_end_date" class="mt-1 text-xs text-rose-600">{{ errors.warranty_end_date[0] }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Supplier Name</label>

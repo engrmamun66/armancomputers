@@ -6,7 +6,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import DataTable from '@/components/tables/DataTable.vue';
 import purchasesApi from '@/services/purchases';
-import { formatCurrency, formatDate, formatDateTime } from '@/utils/format';
+import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], required: true } });
 
@@ -45,6 +45,13 @@ onMounted(async () => {
                     <div><dt class="text-slate-400">Supplier</dt><dd class="text-slate-800 font-medium">{{ purchase.supplier_name || '—' }}</dd></div>
                     <div><dt class="text-slate-400">Supplier Phone</dt><dd class="text-slate-800 font-medium">{{ purchase.supplier_phone || '—' }}</dd></div>
                     <div><dt class="text-slate-400">Purchase Date</dt><dd class="text-slate-800 font-medium">{{ formatDate(purchase.purchase_date) }}</dd></div>
+                    <div>
+                        <dt class="text-slate-400">Warranty</dt>
+                        <dd class="text-slate-800 font-medium">
+                            {{ formatWarranty(purchase.purchase_date, purchase.warranty_end_date) || '—' }}
+                            <span v-if="purchase.warranty_end_date" class="text-slate-400 font-normal">(until {{ formatDate(purchase.warranty_end_date) }})</span>
+                        </dd>
+                    </div>
                     <div><dt class="text-slate-400">Status</dt><dd><StatusBadge :status="purchase.status?.slug" /></dd></div>
                     <div><dt class="text-slate-400">Created By</dt><dd class="text-slate-800 font-medium">{{ purchase.created_by }}</dd></div>
                     <div><dt class="text-slate-400">Created At</dt><dd class="text-slate-800 font-medium">{{ formatDateTime(purchase.created_at) }}</dd></div>

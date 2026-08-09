@@ -73,7 +73,9 @@ class SaleSeeder extends Seeder
                 };
                 $dueAmount = round($grandTotal - $paidAmount, 2);
 
-                $saleDate = now()->subDays(random_int(0, 30))->toDateString();
+                $saleDateCarbon = now()->subDays(random_int(0, 30));
+                $saleDate = $saleDateCarbon->toDateString();
+                $warrantyDays = [null, 20, 90, 365][random_int(0, 3)];
                 $createdBy = $creators->random();
                 $customerId = $customers->random();
 
@@ -81,6 +83,7 @@ class SaleSeeder extends Seeder
                     'reference_no' => ReferenceNumberGenerator::generate('SAL', 'sales'),
                     'customer_id' => $customerId,
                     'sale_date' => $saleDate,
+                    'warranty_end_date' => $warrantyDays ? $saleDateCarbon->copy()->addDays($warrantyDays)->toDateString() : null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,

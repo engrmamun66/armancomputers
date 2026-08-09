@@ -47,11 +47,15 @@ class PurchaseSeeder extends Seeder
                 $additionalCost = random_int(0, 1) ? random_int(100, 500) : 0;
                 $grandTotal = $subtotal - $discount + $additionalCost;
 
+                $purchaseDate = now()->subDays(random_int(1, 60));
+                $warrantyDays = [null, 20, 90, 365][random_int(0, 3)];
+
                 $purchase = Purchase::query()->create([
                     'reference_no' => ReferenceNumberGenerator::generate('PUR', 'purchases'),
                     'supplier_name' => $suppliers[array_rand($suppliers)],
                     'supplier_phone' => '01' . random_int(700000000, 999999999),
-                    'purchase_date' => now()->subDays(random_int(1, 60))->toDateString(),
+                    'purchase_date' => $purchaseDate->toDateString(),
+                    'warranty_end_date' => $warrantyDays ? $purchaseDate->copy()->addDays($warrantyDays)->toDateString() : null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,

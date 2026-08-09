@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('supplier_name')->nullable();
             $table->string('supplier_phone')->nullable();
             $table->date('purchase_date');
+            $table->date('warranty_end_date')->nullable();
             $table->decimal('subtotal', 14, 2)->default(0);
             $table->decimal('discount', 14, 2)->default(0);
             $table->decimal('additional_cost', 14, 2)->default(0);
