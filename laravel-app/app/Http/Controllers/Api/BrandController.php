@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Brand\StoreBrandRequest;
 use App\Http\Requests\Brand\UpdateBrandRequest;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 
 class BrandController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Brand::class);
@@ -19,9 +22,17 @@ class BrandController extends Controller
         $brands = Brand::query()
             ->withCount('products')
             ->when($request->filled('search'), fn ($q) => $q->where('name', 'like', "%{$request->string('search')}%"))
-            ->when($request->filled('status_id'), fn ($q) => $q->where('status_id', $request->integer('status_id')))
-            ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            ->when($request->filled('status_id'), fn ($q) => $q->where('status_id', $request->integer('status_id')));
+
+        $this->applySort($brands, $request, [
+            'name' => 'name',
+            'description' => 'description',
+            'products_count' => 'products_count',
+            'status' => 'status_id',
+            'created_at' => 'created_at',
+        ], 'name');
+
+        $brands = $brands->paginate($request->integer('per_page', 15));
 
         return BrandResource::collection($brands)->additional(['success' => true, 'message' => '']);
     }

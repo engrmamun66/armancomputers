@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StockOut\StoreStockOutRequest;
 use App\Http\Requests\StockOut\UpdateStockOutRequest;
 use App\Http\Resources\StockOutResource;
+use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StockOut;
 use App\Models\StockOutItem;
+use App\Models\User;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +21,8 @@ use RuntimeException;
 
 class StockOutController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', StockOut::class);
@@ -51,13 +56,26 @@ class StockOutController extends Controller
             'total_amount' => (float) (clone $filtered)->sum('grand_total'),
         ];
 
-        $stockOuts = $filtered
+        $filtered
             ->with(['customer', 'status', 'creator'])
             ->withCount('items')
-            ->withSum('items as total_qty', 'quantity')
-            ->orderByDesc('sale_date')
-            ->orderByDesc('id')
-            ->paginate($request->integer('per_page', 15));
+            ->withSum('items as total_qty', 'quantity');
+
+        $this->applySort($filtered, $request, [
+            'reference_no' => 'reference_no',
+            'sale_date' => 'sale_date',
+            'customer' => fn ($q, $dir) => $q->orderBy(Customer::select('name')->whereColumn('customers.id', 'stock_outs.customer_id'), $dir),
+            'items_count' => 'items_count',
+            'total_qty' => 'total_qty',
+            'grand_total' => 'grand_total',
+            'paid_amount' => 'paid_amount',
+            'due_amount' => 'due_amount',
+            'status' => 'status_id',
+            'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'stock_outs.created_by'), $dir),
+        ], 'sale_date', 'desc');
+        $filtered->orderByDesc('id');
+
+        $stockOuts = $filtered->paginate($request->integer('per_page', 15));
 
         return StockOutResource::collection($stockOuts)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
     }

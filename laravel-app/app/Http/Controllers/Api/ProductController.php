@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Product::class);
@@ -33,9 +37,21 @@ class ProductController extends Controller
                     'in-stock' => $query->whereColumn('current_stock', '>', 'minimum_stock'),
                     default => null,
                 };
-            })
-            ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            });
+
+        $this->applySort($products, $request, [
+            'name' => 'name',
+            'sku' => 'sku',
+            'barcode' => 'barcode',
+            'brand' => fn ($q, $dir) => $q->orderBy(Brand::select('name')->whereColumn('brands.id', 'products.brand_id'), $dir),
+            'purchase_price' => 'purchase_price',
+            'selling_price' => 'selling_price',
+            'current_stock' => 'current_stock',
+            'minimum_stock' => 'minimum_stock',
+            'status' => 'status_id',
+        ], 'name');
+
+        $products = $products->paginate($request->integer('per_page', 15));
 
         return ProductResource::collection($products)->additional(['success' => true, 'message' => '']);
     }

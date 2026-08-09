@@ -23,14 +23,14 @@ const columns = [
     { key: 'grand_total', label: 'Total', align: 'right' },
     { key: 'paid_amount', label: 'Paid', align: 'right' },
     { key: 'due_amount', label: 'Due', align: 'right' },
-    { key: 'payment_status', label: 'Payment' },
+    { key: 'payment_status', label: 'Payment', sortable: false },
     { key: 'actions', label: 'Actions', align: 'right' },
 ];
 
 const rows = ref([]);
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const loading = ref(false);
-const filters = reactive({ search: '', date_from: '', date_to: '', page: 1 });
+const filters = reactive({ search: '', date_from: '', date_to: '', sort_by: 'invoice_date', sort_dir: 'desc', page: 1 });
 
 async function loadInvoices() {
     loading.value = true;
@@ -39,6 +39,8 @@ async function loadInvoices() {
             search: filters.search || undefined,
             date_from: filters.date_from || undefined,
             date_to: filters.date_to || undefined,
+            sort_by: filters.sort_by,
+            sort_dir: filters.sort_dir,
             page: filters.page,
         });
         rows.value = data.data;
@@ -56,6 +58,17 @@ function hasActiveFilters() {
 
 function clearFilters() {
     Object.assign(filters, { search: '', date_from: '', date_to: '', page: 1 });
+}
+
+function onSort(key) {
+    if (filters.sort_by === key) {
+        filters.sort_dir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        filters.sort_by = key;
+        filters.sort_dir = 'asc';
+    }
+    filters.page = 1;
+    loadInvoices();
 }
 
 watch([() => filters.search, () => filters.date_from, () => filters.date_to], () => {
@@ -89,7 +102,7 @@ onMounted(loadInvoices);
             @clear="clearFilters"
         />
         <template v-else>
-            <DataTable :columns="columns" :rows="rows" row-key="id">
+            <DataTable :columns="columns" :rows="rows" row-key="id" :sort-by="filters.sort_by" :sort-dir="filters.sort_dir" @sort="onSort">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-invoice_number="{ row }">
                     <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="font-medium text-link hover:text-link-hover">

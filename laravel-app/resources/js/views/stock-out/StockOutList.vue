@@ -44,7 +44,7 @@ const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0 });
 const loading = ref(false);
 const statuses = ref([]);
-const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', page: 1 });
+const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', sort_by: 'sale_date', sort_dir: 'desc', page: 1 });
 
 async function loadStatuses() {
     const { data } = await lookups.statuses('stock_out');
@@ -60,6 +60,8 @@ async function loadStockOuts() {
             date_to: filters.date_to || undefined,
             status_id: filters.status_id || undefined,
             payment_status: filters.payment_status || undefined,
+            sort_by: filters.sort_by,
+            sort_dir: filters.sort_dir,
             page: filters.page,
         });
         rows.value = data.data;
@@ -70,6 +72,17 @@ async function loadStockOuts() {
     } finally {
         loading.value = false;
     }
+}
+
+function onSort(key) {
+    if (filters.sort_by === key) {
+        filters.sort_dir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        filters.sort_by = key;
+        filters.sort_dir = 'asc';
+    }
+    filters.page = 1;
+    loadStockOuts();
 }
 
 function hasActiveFilters() {
@@ -149,7 +162,7 @@ async function removeStockOut(stockOut) {
             @clear="clearFilters"
         />
         <template v-else>
-            <DataTable :columns="columns" :rows="rows" row-key="id">
+            <DataTable :columns="columns" :rows="rows" row-key="id" :sort-by="filters.sort_by" :sort-dir="filters.sort_dir" @sort="onSort">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #footer>
                     <tr v-if="rows.length" class="bg-slate-50 font-semibold text-slate-700 border-t border-slate-200">

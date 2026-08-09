@@ -37,12 +37,23 @@ const statuses = ref([]);
 const roleOptions = computed(() => roles.value.map((role) => ({ value: role.id, label: role.name })));
 const statusOptions = computed(() => statuses.value.map((status) => ({ value: status.id, label: status.name })));
 
-const filters = reactive({ search: '', role_id: '', status_id: '', page: 1 });
+const filters = reactive({ search: '', role_id: '', status_id: '', sort_by: 'created_at', sort_dir: 'desc', page: 1 });
 
 async function loadLookups() {
     const [roleRes, statusRes] = await Promise.all([lookups.roles(), lookups.statuses('general')]);
     roles.value = roleRes.data.data;
     statuses.value = statusRes.data.data;
+}
+
+function onSort(key) {
+    if (filters.sort_by === key) {
+        filters.sort_dir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        filters.sort_by = key;
+        filters.sort_dir = 'asc';
+    }
+    filters.page = 1;
+    loadUsers();
 }
 
 async function loadUsers() {
@@ -52,6 +63,8 @@ async function loadUsers() {
             search: filters.search || undefined,
             role_id: filters.role_id || undefined,
             status_id: filters.status_id || undefined,
+            sort_by: filters.sort_by,
+            sort_dir: filters.sort_dir,
             page: filters.page,
         });
         rows.value = data.data;
@@ -233,7 +246,7 @@ async function removeUser(user) {
             @clear="clearFilters"
         />
         <template v-else>
-            <DataTable :columns="columns" :rows="rows" row-key="id">
+            <DataTable :columns="columns" :rows="rows" row-key="id" :sort-by="filters.sort_by" :sort-dir="filters.sort_dir" @sort="onSort">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
                 <template #cell-role="{ row }">{{ row.role?.name }}</template>
                 <template #cell-status="{ row }"><StatusBadge :status="row.status?.slug" /></template>

@@ -1,14 +1,31 @@
 <script setup>
-defineProps({
+import Icon from '@/components/common/Icon.vue';
+
+const props = defineProps({
     columns: {
         type: Array,
         required: true,
-        // [{ key, label, align: 'left'|'right'|'center', class }]
+        // [{ key, label, align: 'left'|'right'|'center', class, sortable: false }]
     },
     rows: { type: Array, required: true },
     rowKey: { type: String, default: 'id' },
     loading: { type: Boolean, default: false },
+    sortBy: { type: String, default: null },
+    sortDir: { type: String, default: 'asc' },
 });
+
+const emit = defineEmits(['sort']);
+
+const NOT_SORTABLE = ['index', 'actions'];
+
+function isSortable(column) {
+    return column.sortable !== false && !NOT_SORTABLE.includes(column.key);
+}
+
+function sortIcon(column) {
+    if (props.sortBy !== column.key) return 'sort';
+    return props.sortDir === 'asc' ? 'chevron-up' : 'chevron-down';
+}
 </script>
 
 <template>
@@ -25,7 +42,21 @@ defineProps({
                             column.class,
                         ]"
                     >
-                        {{ column.label }}
+                        <button
+                            v-if="isSortable(column)"
+                            type="button"
+                            class="inline-flex items-center gap-1 group hover:text-slate-700"
+                            :class="column.align === 'right' ? 'flex-row-reverse' : ''"
+                            @click="emit('sort', column.key)"
+                        >
+                            {{ column.label }}
+                            <Icon
+                                :name="sortIcon(column)"
+                                class="h-3.5 w-3.5 shrink-0"
+                                :class="sortBy === column.key ? 'text-slate-700' : 'text-slate-400 group-hover:text-slate-500'"
+                            />
+                        </button>
+                        <span v-else>{{ column.label }}</span>
                     </th>
                 </tr>
             </thead>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StockIn\StoreStockInRequest;
 use App\Http\Requests\StockIn\UpdateStockInRequest;
@@ -10,6 +11,7 @@ use App\Models\Product;
 use App\Models\Status;
 use App\Models\StockIn;
 use App\Models\StockInItem;
+use App\Models\User;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +19,8 @@ use RuntimeException;
 
 class StockInController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', StockIn::class);
@@ -38,13 +42,25 @@ class StockInController extends Controller
             'total_amount' => (float) (clone $filtered)->sum('grand_total'),
         ];
 
-        $stockIns = $filtered
+        $filtered
             ->with(['status', 'creator'])
             ->withCount('items')
-            ->withSum('items as total_qty', 'quantity')
-            ->orderByDesc('purchase_date')
-            ->orderByDesc('id')
-            ->paginate($request->integer('per_page', 15));
+            ->withSum('items as total_qty', 'quantity');
+
+        $this->applySort($filtered, $request, [
+            'reference_no' => 'reference_no',
+            'purchase_date' => 'purchase_date',
+            'supplier_name' => 'supplier_name',
+            'items_count' => 'items_count',
+            'total_qty' => 'total_qty',
+            'grand_total' => 'grand_total',
+            'status' => 'status_id',
+            'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'stock_ins.created_by'), $dir),
+            'created_at' => 'created_at',
+        ], 'purchase_date', 'desc');
+        $filtered->orderByDesc('id');
+
+        $stockIns = $filtered->paginate($request->integer('per_page', 15));
 
         return StockInResource::collection($stockIns)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
     }

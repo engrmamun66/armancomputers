@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ResetPasswordRequest;
 use App\Http\Requests\User\StoreUserRequest;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', User::class);
@@ -24,9 +27,18 @@ class UserController extends Controller
                 $query->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('email', 'like', $term));
             })
             ->when($request->filled('role_id'), fn ($query) => $query->where('role_id', $request->integer('role_id')))
-            ->when($request->filled('status_id'), fn ($query) => $query->where('status_id', $request->integer('status_id')))
-            ->orderByDesc('created_at')
-            ->paginate($request->integer('per_page', 15));
+            ->when($request->filled('status_id'), fn ($query) => $query->where('status_id', $request->integer('status_id')));
+
+        $this->applySort($users, $request, [
+            'name' => 'name',
+            'email' => 'email',
+            'role' => 'role_id',
+            'status' => 'status_id',
+            'last_login_at' => 'last_login_at',
+            'created_at' => 'created_at',
+        ], 'created_at', 'desc');
+
+        $users = $users->paginate($request->integer('per_page', 15));
 
         return UserResource::collection($users)->additional(['success' => true, 'message' => '']);
     }

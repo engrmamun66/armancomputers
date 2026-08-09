@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\Sortable;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    use Sortable;
+
     public function index(Request $request)
     {
         $this->authorize('viewAny', Customer::class);
@@ -25,9 +28,19 @@ class CustomerController extends Controller
                     ->orWhere('phone', 'like', $term)
                     ->orWhere('email', 'like', $term));
             })
-            ->when($request->filled('status_id'), fn ($q) => $q->where('status_id', $request->integer('status_id')))
-            ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            ->when($request->filled('status_id'), fn ($q) => $q->where('status_id', $request->integer('status_id')));
+
+        $this->applySort($customers, $request, [
+            'name' => 'name',
+            'phone' => 'phone',
+            'email' => 'email',
+            'total_purchases' => 'stock_outs_count',
+            'total_paid' => 'total_paid_amount',
+            'total_due' => 'total_due_amount',
+            'status' => 'status_id',
+        ], 'name');
+
+        $customers = $customers->paginate($request->integer('per_page', 15));
 
         return CustomerResource::collection($customers)->additional(['success' => true, 'message' => '']);
     }
