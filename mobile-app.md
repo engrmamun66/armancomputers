@@ -26,8 +26,8 @@ flutter run -d <device_id>
 
 ```bash
 cd mobile-app
-flutter build apk --debug      # debug APK, faster build, unoptimized
-flutter build apk --release    # release APK, optimized + minified
+flutter build apk --debug --dart-define-from-file=env.json      # debug APK, faster build, unoptimized
+flutter build apk --release --dart-define-from-file=env.json   # release APK, optimized + minified
 ```
 
 Output:
