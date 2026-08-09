@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_exception.dart';
-import '../../core/company.dart';
 import '../../providers/auth_provider.dart';
 import '../../shared/widgets/loading.dart';
 
@@ -60,14 +59,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.laptop_mac, size: 56, color: Theme.of(context).colorScheme.primary),
+                    Image.asset('assets/splash/logo_full.png', height: 120),
                     const SizedBox(height: 12),
-                    Text(
-                      Company.name,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
                     Text(
                       'Stock Management',
                       textAlign: TextAlign.center,

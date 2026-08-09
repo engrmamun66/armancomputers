@@ -2,7 +2,7 @@
 ### Run in Chrome (fast UI iteration only) 
 
 ```bash
-flutter run -d chrome
+flutter run -d chrome --dart-define-from-file=.env
 ```
 
 Useful for quick layout checks only — this app targets Android, and flows like avatar upload (`image_picker`) behave differently on web and haven't been verified there.
@@ -11,24 +11,21 @@ Useful for quick layout checks only — this app targets Android, and flows like
 
 ```bash
 flutter emulators --launch <emulator_id>   # or launch one from Android Studio
-flutter run -d emulator-5554
+flutter run -d emulator-5554 --dart-define-from-file=.env
 ```
 
-`api_config.dart`'s default (`10.0.2.2`) already matches the emulator — no edit needed.
-
-### Run on a real Android Real device
+### Run on a real Android device
 ```bash
 flutter devices
-flutter run -d <device_id>
-flutter run -d 0G02A20X4000157C
+flutter run -d 0G02A20X4000157C --dart-define-from-file=.env
 ```
 
 ### Build APK
 
 ```bash
 cd mobile-app
-flutter build apk --debug --dart-define-from-file=env.json      # debug APK, faster build, unoptimized
-flutter build apk --release --dart-define-from-file=env.json   # release APK, optimized + minified
+flutter build apk --debug --dart-define-from-file=.env      # debug APK, faster build, unoptimized
+flutter build apk --release --dart-define-from-file=.env    # release APK, optimized + minified
 ```
 
 Output:
