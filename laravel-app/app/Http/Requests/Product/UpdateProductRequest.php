@@ -12,18 +12,32 @@ class UpdateProductRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+        if ($this->has('sku')) {
+            $data['sku'] = $this->sku !== null && $this->sku !== '' ? $this->sku : null;
+        }
+        if ($this->has('barcode')) {
+            $data['barcode'] = $this->barcode !== null && $this->barcode !== '' ? $this->barcode : null;
+        }
+        if ($data) {
+            $this->merge($data);
+        }
+    }
+
     public function rules(): array
     {
         return [
-            'brand_id' => ['required', 'integer', 'exists:brands,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:100', Rule::unique('products', 'sku')->ignore($this->route('product'))],
-            'barcode' => ['nullable', 'string', 'max:100', Rule::unique('products', 'barcode')->ignore($this->route('product'))],
-            'description' => ['nullable', 'string'],
-            'purchase_price' => ['required', 'numeric', 'min:0'],
-            'selling_price' => ['required', 'numeric', 'min:0'],
-            'minimum_stock' => ['required', 'integer', 'min:0'],
-            'status_id' => ['required', 'integer', 'exists:statuses,id'],
+            'brand_id' => ['sometimes', 'required', 'integer', 'exists:brands,id'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'sku' => ['sometimes', 'nullable', 'string', 'max:100', Rule::unique('products', 'sku')->ignore($this->route('product'))],
+            'barcode' => ['sometimes', 'nullable', 'string', 'max:100', Rule::unique('products', 'barcode')->ignore($this->route('product'))],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'purchase_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'selling_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'minimum_stock' => ['sometimes', 'required', 'integer', 'min:0'],
+            'status_id' => ['sometimes', 'required', 'integer', 'exists:statuses,id'],
         ];
     }
 }

@@ -12,6 +12,7 @@ import productsApi from '@/services/products';
 import brandsApi from '@/services/brands';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
+import Icon from '@/components/common/Icon.vue';
 import { formatCurrency } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
@@ -87,6 +88,24 @@ function addProduct(product) {
 
 function removeItem(index) {
     items.value.splice(index, 1);
+}
+
+const savingPriceFor = ref(null);
+
+async function savePurchasePrice(item) {
+    if (item.unit_price === '' || item.unit_price < 0) {
+        toast.error('Enter a valid price before saving.');
+        return;
+    }
+    savingPriceFor.value = item.product_id;
+    try {
+        await productsApi.update(item.product_id, { purchase_price: Number(item.unit_price) });
+        toast.success(`Updated ${item.name}'s purchase price.`);
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to update purchase price.');
+    } finally {
+        savingPriceFor.value = null;
+    }
 }
 
 const excludeIds = computed(() => items.value.map((item) => item.product_id));
@@ -283,7 +302,7 @@ async function submit() {
                             <tr class="text-left text-slate-500 border-b border-slate-200">
                                 <th class="py-2 pr-3">Product</th>
                                 <th class="py-2 pr-3">SKU</th>
-                                <th class="py-2 pr-3 text-right">Current Stock</th>
+                                <th class="py-2 pr-3 text-center">Current Stock</th>
                                 <th class="py-2 pr-3 text-center w-28">Qty</th>
                                 <th class="py-2 pr-3 text-right w-32">Unit Price</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
@@ -297,12 +316,24 @@ async function submit() {
                             <tr v-for="(item, index) in items" :key="item.product_id" class="border-b border-slate-100">
                                 <td class="py-2 pr-3 font-medium text-slate-800">{{ item.name }}</td>
                                 <td class="py-2 pr-3 text-slate-500">{{ item.sku }}</td>
-                                <td class="py-2 pr-3 text-right text-slate-500">{{ item.current_stock ?? '—' }}</td>
+                                <td class="py-2 pr-3 text-center text-slate-500">{{ item.current_stock ?? '—' }}</td>
                                 <td class="py-2 pr-3">
                                     <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-center border border-slate-300 rounded-md" />
                                 </td>
                                 <td class="py-2 pr-3">
-                                    <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
+                                    <div class="flex items-center gap-1">
+                                        <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
+                                        <button
+                                            type="button"
+                                            title="Save as this product's purchase price"
+                                            :disabled="savingPriceFor === item.product_id"
+                                            class="shrink-0 h-7 w-7 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+                                            @click="savePurchasePrice(item)"
+                                        >
+                                            <Icon v-if="savingPriceFor !== item.product_id" name="check" class="h-4 w-4" />
+                                            <svg v-else class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M12 3a9 9 0 100 18" /></svg>
+                                        </button>
+                                    </div>
                                 </td>
                                 <td class="py-2 pr-3 text-right font-medium">{{ formatCurrency((item.quantity || 0) * (item.unit_price || 0)) }}</td>
                                 <td class="py-2 text-right">
@@ -368,12 +399,12 @@ async function submit() {
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">SKU</label>
-                        <input v-model="productForm.sku" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                        <label class="block text-sm font-medium text-slate-700 mb-1">SKU <span class="text-slate-400 font-normal">(optional)</span></label>
+                        <input v-model="productForm.sku" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                         <p v-if="productErrors.sku" class="mt-1 text-xs text-rose-600">{{ productErrors.sku[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
                         <input v-model="productForm.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                         <p v-if="productErrors.barcode" class="mt-1 text-xs text-rose-600">{{ productErrors.barcode[0] }}</p>
                     </div>

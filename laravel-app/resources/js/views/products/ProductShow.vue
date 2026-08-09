@@ -58,7 +58,7 @@ onMounted(async () => {
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
                     <div><dt class="text-slate-400">Brand</dt><dd class="text-slate-800 font-medium">{{ product.brand?.name }}</dd></div>
                     <div><dt class="text-slate-400">Status</dt><dd><StatusBadge :status="product.status?.slug" /></dd></div>
-                    <div><dt class="text-slate-400">SKU</dt><dd class="text-slate-800 font-medium">{{ product.sku }}</dd></div>
+                    <div><dt class="text-slate-400">SKU</dt><dd class="text-slate-800 font-medium">{{ product.sku || '—' }}</dd></div>
                     <div><dt class="text-slate-400">Barcode</dt><dd class="text-slate-800 font-medium">{{ product.barcode || '—' }}</dd></div>
                     <div><dt class="text-slate-400">Purchase Price</dt><dd class="text-slate-800 font-medium">{{ formatCurrency(product.purchase_price) }}</dd></div>
                     <div><dt class="text-slate-400">Selling Price</dt><dd class="text-slate-800 font-medium">{{ formatCurrency(product.selling_price) }}</dd></div>

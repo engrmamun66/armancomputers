@@ -84,7 +84,7 @@ function closeSoon() {
                         <ProductThumbnail :src="product.image_url" :alt="product.name" size="h-8 w-8" />
                         <span class="min-w-0">
                             <span class="font-medium text-slate-800">{{ product.name }}</span>
-                            <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
+                            <span class="text-slate-400"><template v-if="product.sku"> · {{ product.sku }}</template> · {{ product.brand?.name }}</span>
                         </span>
                     </span>
                     <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">

@@ -11,12 +11,20 @@ class StoreProductRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'sku' => $this->sku !== null && $this->sku !== '' ? $this->sku : null,
+            'barcode' => $this->barcode !== null && $this->barcode !== '' ? $this->barcode : null,
+        ]);
+    }
+
     public function rules(): array
     {
         return [
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
             'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:100', 'unique:products,sku'],
+            'sku' => ['nullable', 'string', 'max:100', 'unique:products,sku'],
             'barcode' => ['nullable', 'string', 'max:100', 'unique:products,barcode'],
             'description' => ['nullable', 'string'],
             'purchase_price' => ['required', 'numeric', 'min:0'],

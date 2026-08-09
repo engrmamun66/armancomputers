@@ -206,7 +206,7 @@ async function removeProduct(product) {
                                 <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-900 truncate">{{ row.name }}</RouterLink>
                                 <StatusBadge :status="row.status?.slug" />
                             </div>
-                            <p class="text-sm text-slate-500 mt-1">{{ row.sku }} · {{ row.brand?.name }}</p>
+                            <p class="text-sm text-slate-500 mt-1"><template v-if="row.sku">{{ row.sku }} · </template>{{ row.brand?.name }}</p>
                             <p class="text-sm text-slate-500">Selling: {{ formatCurrency(row.selling_price) }}</p>
                             <p class="text-sm mt-1" :class="row.stock_state !== 'in-stock' ? 'font-semibold text-amber-600' : 'text-slate-500'">
                                 Stock: {{ row.current_stock }} <span v-if="row.stock_state !== 'in-stock'">({{ row.stock_state }})</span>
