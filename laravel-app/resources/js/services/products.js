@@ -19,4 +19,15 @@ export default {
     stockHistory(id) {
         return api.get(`/products/${id}/stock-history`);
     },
+    uploadImage(productId, formData) {
+        return api.post(`/products/${productId}/images`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    },
+    deleteImage(productId, imageId) {
+        return api.delete(`/products/${productId}/images/${imageId}`);
+    },
+    setDefaultImage(productId, imageId) {
+        return api.patch(`/products/${productId}/images/${imageId}/default`);
+    },
 };

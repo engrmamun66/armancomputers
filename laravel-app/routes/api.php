@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductImageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -35,6 +36,9 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('products/{product}/stock-history', [ProductController::class, 'stockHistory']);
     Route::apiResource('products', ProductController::class);
+    Route::post('products/{product}/images', [ProductImageController::class, 'store']);
+    Route::delete('products/{product}/images/{image}', [ProductImageController::class, 'destroy']);
+    Route::patch('products/{product}/images/{image}/default', [ProductImageController::class, 'setDefault']);
 
     Route::apiResource('customers', CustomerController::class);
 

@@ -7,11 +7,15 @@ import productsApi from '@/services/products';
 import brandsApi from '@/services/brands';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
+import { useConfirm } from '@/composables/useConfirm';
 import SelectSearch from '@/components/common/SelectSearch.vue';
+import ProductThumbnail from '@/components/common/ProductThumbnail.vue';
+import Icon from '@/components/common/Icon.vue';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
 const router = useRouter();
 const toast = useToast();
+const { confirm } = useConfirm();
 
 const isEdit = computed(() => !!props.id);
 const loading = ref(true);
@@ -20,6 +24,9 @@ const brands = ref([]);
 const statuses = ref([]);
 const currentStock = ref(null);
 const errors = ref({});
+const images = ref([]);
+const uploadingImage = ref(false);
+const imageInput = ref(null);
 
 const form = reactive({
     brand_id: '',
@@ -53,6 +60,7 @@ onMounted(async () => {
             status_id: product.status?.id,
         });
         currentStock.value = product.current_stock;
+        images.value = product.images || [];
     } else {
         form.status_id = statuses.value[0]?.id ?? '';
     }
@@ -69,6 +77,62 @@ async function createBrand(name) {
     brands.value.push(data.data);
     toast.success(`Brand "${data.data.name}" added.`);
     return { value: data.data.id, label: data.data.name };
+}
+
+function pickImage() {
+    imageInput.value?.click();
+}
+
+async function onImageSelected(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    uploadingImage.value = true;
+    try {
+        const formData = new FormData();
+        formData.append('image', file);
+        const { data } = await productsApi.uploadImage(props.id, formData);
+        if (data.data.is_default) {
+            images.value.forEach((img) => (img.is_default = false));
+        }
+        images.value.push(data.data);
+        toast.success('Image uploaded successfully.');
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to upload image.');
+    } finally {
+        uploadingImage.value = false;
+    }
+}
+
+async function setDefaultImage(image) {
+    if (image.is_default) return;
+    try {
+        await productsApi.setDefaultImage(props.id, image.id);
+        images.value.forEach((img) => (img.is_default = img.id === image.id));
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to set default image.');
+    }
+}
+
+async function removeImage(image) {
+    const ok = await confirm({
+        title: 'Delete this image?',
+        message: 'This cannot be undone.',
+        confirmText: 'Delete',
+    });
+    if (!ok) return;
+
+    try {
+        await productsApi.deleteImage(props.id, image.id);
+        images.value = images.value.filter((img) => img.id !== image.id);
+        if (image.is_default && images.value.length) {
+            images.value[0].is_default = true;
+        }
+        toast.success('Image deleted successfully.');
+    } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to delete image.');
+    }
 }
 
 async function submit() {
@@ -105,6 +169,48 @@ async function submit() {
                 <span>Current stock: <strong>{{ currentStock }}</strong> (managed via Stock In / Stock Out, not editable here)</span>
                 <RouterLink :to="{ name: 'products.stock-history', params: { id } }" class="text-link hover:text-link-hover font-medium">View History</RouterLink>
             </div>
+
+            <div v-if="isEdit">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-medium text-slate-700">Images</label>
+                    <button
+                        type="button"
+                        :disabled="uploadingImage"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60"
+                        @click="pickImage"
+                    >
+                        {{ uploadingImage ? 'Uploading…' : '+ Add Image' }}
+                    </button>
+                    <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
+                </div>
+                <div v-if="!images.length" class="text-sm text-slate-400">No images yet.</div>
+                <div v-else class="flex flex-wrap gap-3">
+                    <div v-for="image in images" :key="image.id" class="relative group">
+                        <ProductThumbnail :src="image.url" size="h-20 w-20" />
+                        <span v-if="image.is_default" class="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 text-[10px] font-semibold rounded bg-accent-solid text-on-accent-solid">Default</span>
+                        <div class="absolute inset-0 rounded-md bg-overlay-solid/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                            <button
+                                v-if="!image.is_default"
+                                type="button"
+                                title="Set as default"
+                                class="h-6 w-6 flex items-center justify-center rounded bg-white text-slate-700 hover:bg-slate-100"
+                                @click="setDefaultImage(image)"
+                            >
+                                <Icon name="check" class="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                title="Delete"
+                                class="h-6 w-6 flex items-center justify-center rounded bg-white text-rose-600 hover:bg-rose-50"
+                                @click="removeImage(image)"
+                            >
+                                <Icon name="trash" class="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p v-else class="text-sm text-slate-400">Save the product first, then add images from the edit page.</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

@@ -21,7 +21,7 @@ class ProductController extends Controller
         $this->authorize('viewAny', Product::class);
 
         $products = Product::query()
-            ->with(['brand', 'status'])
+            ->with(['brand', 'status', 'images'])
             ->when($request->filled('search'), function ($query) use ($request) {
                 $term = "%{$request->string('search')}%";
                 $query->where(fn ($q) => $q->where('name', 'like', $term)
@@ -65,14 +65,14 @@ class ProductController extends Controller
             'current_stock' => 0,
         ]);
 
-        return $this->success(new ProductResource($product->load('brand', 'status')), 'Product created successfully.', 201);
+        return $this->success(new ProductResource($product->load('brand', 'status', 'images')), 'Product created successfully.', 201);
     }
 
     public function show(Product $product)
     {
         $this->authorize('view', Product::class);
 
-        return $this->success(new ProductResource($product->load('brand', 'status')));
+        return $this->success(new ProductResource($product->load('brand', 'status', 'images')));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
@@ -81,7 +81,7 @@ class ProductController extends Controller
 
         $product->update($request->validated());
 
-        return $this->success(new ProductResource($product->fresh()->load('brand', 'status')), 'Product updated successfully.');
+        return $this->success(new ProductResource($product->fresh()->load('brand', 'status', 'images')), 'Product updated successfully.');
     }
 
     public function destroy(Product $product)
@@ -144,7 +144,7 @@ class ProductController extends Controller
         })->reverse()->values();
 
         return $this->success([
-            'product' => new ProductResource($product->load('brand', 'status')),
+            'product' => new ProductResource($product->load('brand', 'status', 'images')),
             'history' => $history,
         ]);
     }

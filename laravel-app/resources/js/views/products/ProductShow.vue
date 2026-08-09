@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
+import ProductThumbnail from '@/components/common/ProductThumbnail.vue';
 import productsApi from '@/services/products';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
@@ -36,6 +37,20 @@ onMounted(async () => {
                     <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover">
                         Edit
                     </RouterLink>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-lg p-6 max-w-2xl mb-6 flex items-start gap-4">
+                <ProductThumbnail :src="product.image_url" :alt="product.name" size="h-28 w-28" />
+                <div v-if="product.images?.length > 1" class="flex flex-wrap gap-2">
+                    <img
+                        v-for="image in product.images"
+                        :key="image.id"
+                        :src="image.url"
+                        :alt="product.name"
+                        class="h-12 w-12 rounded-md object-cover border"
+                        :class="image.is_default ? 'border-accent-solid' : 'border-slate-200'"
+                    />
                 </div>
             </div>
 

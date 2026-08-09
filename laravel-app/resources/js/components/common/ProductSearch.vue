@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import api from '@/services/api';
+import ProductThumbnail from './ProductThumbnail.vue';
 
 const props = defineProps({
     excludeIds: { type: Array, default: () => [] },
@@ -79,9 +80,12 @@ function closeSoon() {
                     class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
                     @mousedown.prevent="select(product)"
                 >
-                    <span>
-                        <span class="font-medium text-slate-800">{{ product.name }}</span>
-                        <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
+                    <span class="flex items-center gap-2 min-w-0">
+                        <ProductThumbnail :src="product.image_url" :alt="product.name" size="h-8 w-8" />
+                        <span class="min-w-0">
+                            <span class="font-medium text-slate-800">{{ product.name }}</span>
+                            <span class="text-slate-400"> · {{ product.sku }} · {{ product.brand?.name }}</span>
+                        </span>
                     </span>
                     <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">
                         {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}

@@ -8,6 +8,7 @@ import SearchInput from '@/components/common/SearchInput.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import ProductThumbnail from '@/components/common/ProductThumbnail.vue';
 import productsApi from '@/services/products';
 import brandsApi from '@/services/brands';
 import lookups from '@/services/lookups';
@@ -26,6 +27,7 @@ const canManage = can(auth.roleSlug, 'products.manage');
 
 const columns = [
     { key: 'index', label: '#' },
+    { key: 'image', label: 'Image', sortable: false },
     { key: 'name', label: 'Product' },
     { key: 'sku', label: 'SKU' },
     { key: 'barcode', label: 'Barcode' },
@@ -165,6 +167,9 @@ async function removeProduct(product) {
         <template v-else>
             <DataTable :columns="columns" :rows="rows" row-key="id" :sort-by="filters.sort_by" :sort-dir="filters.sort_dir" @sort="onSort">
                 <template #cell-index="{ index }">{{ (meta.current_page - 1) * meta.per_page + index + 1 }}</template>
+                <template #cell-image="{ row }">
+                    <ProductThumbnail :src="row.image_url" :alt="row.name" size="h-10 w-10" />
+                </template>
                 <template #cell-name="{ row }">
                     <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-800 hover:text-link">
                         {{ row.name }}
@@ -194,15 +199,20 @@ async function removeProduct(product) {
 
             <div class="md:hidden space-y-3">
                 <div v-for="row in rows" :key="row.id" class="bg-white border border-slate-200 rounded-lg p-4">
-                    <div class="flex items-center justify-between">
-                        <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-900">{{ row.name }}</RouterLink>
-                        <StatusBadge :status="row.status?.slug" />
+                    <div class="flex items-start gap-3">
+                        <ProductThumbnail :src="row.image_url" :alt="row.name" size="h-14 w-14" />
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <RouterLink :to="{ name: 'products.show', params: { id: row.id } }" class="font-medium text-slate-900 truncate">{{ row.name }}</RouterLink>
+                                <StatusBadge :status="row.status?.slug" />
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">{{ row.sku }} · {{ row.brand?.name }}</p>
+                            <p class="text-sm text-slate-500">Selling: {{ formatCurrency(row.selling_price) }}</p>
+                            <p class="text-sm mt-1" :class="row.stock_state !== 'in-stock' ? 'font-semibold text-amber-600' : 'text-slate-500'">
+                                Stock: {{ row.current_stock }} <span v-if="row.stock_state !== 'in-stock'">({{ row.stock_state }})</span>
+                            </p>
+                        </div>
                     </div>
-                    <p class="text-sm text-slate-500 mt-1">{{ row.sku }} · {{ row.brand?.name }}</p>
-                    <p class="text-sm text-slate-500">Selling: {{ formatCurrency(row.selling_price) }}</p>
-                    <p class="text-sm mt-1" :class="row.stock_state !== 'in-stock' ? 'font-semibold text-amber-600' : 'text-slate-500'">
-                        Stock: {{ row.current_stock }} <span v-if="row.stock_state !== 'in-stock'">({{ row.stock_state }})</span>
-                    </p>
                     <div class="flex gap-2 mt-3 text-sm">
                         <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">History</RouterLink>
                         <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
