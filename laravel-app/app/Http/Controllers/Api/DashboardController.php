@@ -81,7 +81,8 @@ class DashboardController extends Controller
             ->groupBy('products.id', 'products.name')
             ->orderByDesc('qty_sold')
             ->limit(5)
-            ->get();
+            ->get()
+            ->map(fn ($row) => ['name' => $row->name, 'qty_sold' => (int) $row->qty_sold]);
 
         $lowStockProducts = Product::query()
             ->whereColumn('current_stock', '<=', 'minimum_stock')
