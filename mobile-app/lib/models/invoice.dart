@@ -23,7 +23,7 @@ class InvoiceModel {
   InvoiceModel({
     required this.id,
     required this.invoiceNumber,
-    this.stockOutId,
+    this.saleId,
     this.customer,
     required this.invoiceDate,
     required this.subtotal,
@@ -42,7 +42,7 @@ class InvoiceModel {
   factory InvoiceModel.fromJson(Map<String, dynamic> json) => InvoiceModel(
         id: json['id'] as int,
         invoiceNumber: json['invoice_number'] as String,
-        stockOutId: (json['stock_out_id'] as num?)?.toInt(),
+        saleId: (json['sale_id'] as num?)?.toInt(),
         customer: json['customer'] != null ? CustomerRef.fromJson(json['customer'] as Map<String, dynamic>) : null,
         invoiceDate: json['invoice_date'] as String,
         subtotal: (json['subtotal'] as num).toDouble(),

@@ -39,7 +39,7 @@ class CustomerModel {
       );
 }
 
-/// The compact {id, name, phone} shape embedded in StockOut/Invoice resources.
+/// The compact {id, name, phone} shape embedded in Sale/Invoice resources.
 class CustomerRef {
   final int id;
   final String name;
