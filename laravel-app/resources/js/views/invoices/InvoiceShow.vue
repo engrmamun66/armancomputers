@@ -5,10 +5,15 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import invoicesApi from '@/services/invoices';
+import { useAuthStore } from '@/stores/auth';
+import { can } from '@/utils/permissions';
 import { COMPANY } from '@/utils/company';
 import { formatCurrency, formatDate } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], required: true } });
+
+const auth = useAuthStore();
+const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 'staff';
 
 const invoice = ref(null);
 const loading = ref(true);
@@ -31,6 +36,13 @@ function print() {
             <div class="no-print flex items-center justify-between mb-4">
                 <h1 class="text-lg font-semibold text-slate-900">Invoice {{ invoice.invoice_number }}</h1>
                 <div class="flex gap-3">
+                    <RouterLink
+                        v-if="canManage && invoice.stock_out_id"
+                        :to="{ name: 'stock-out.edit', params: { id: invoice.stock_out_id } }"
+                        class="px-4 py-2 text-sm rounded-md border border-slate-300"
+                    >
+                        Edit Stock Out
+                    </RouterLink>
                     <button type="button" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover" @click="print">Print</button>
                     <RouterLink :to="{ name: 'invoices.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Back</RouterLink>
                 </div>

@@ -57,7 +57,7 @@ class StockOutController extends Controller
         ];
 
         $filtered
-            ->with(['customer', 'status', 'creator'])
+            ->with(['customer', 'status', 'creator', 'invoice'])
             ->withCount('items')
             ->withSum('items as total_qty', 'quantity');
 

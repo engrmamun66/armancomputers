@@ -11,9 +11,13 @@ import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import invoicesApi from '@/services/invoices';
 import { useToast } from '@/composables/useToast';
+import { useAuthStore } from '@/stores/auth';
+import { can } from '@/utils/permissions';
 import { formatCurrency, formatDate } from '@/utils/format';
 
 const toast = useToast();
+const auth = useAuthStore();
+const canManage = can(auth.roleSlug, 'stock-out.manage') && auth.roleSlug !== 'staff';
 
 const DATE_RANGE_PRESETS = ['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year', 'Last Year'];
 
@@ -120,7 +124,10 @@ onMounted(loadInvoices);
                 </template>
                 <template #cell-payment_status="{ row }"><StatusBadge :status="row.payment_status" /></template>
                 <template #cell-actions="{ row }">
-                    <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                    <div class="flex justify-end gap-2 text-sm">
+                        <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                        <RouterLink v-if="canManage && row.stock_out_id" :to="{ name: 'stock-out.edit', params: { id: row.stock_out_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit Stock Out</RouterLink>
+                    </div>
                 </template>
             </DataTable>
 
@@ -132,6 +139,9 @@ onMounted(loadInvoices);
                     </div>
                     <p class="text-sm text-slate-500 mt-1">{{ row.customer?.name }} · {{ formatDate(row.invoice_date) }}</p>
                     <p class="text-sm text-slate-500">Total: {{ formatCurrency(row.grand_total) }} · Due: {{ formatCurrency(row.due_amount) }}</p>
+                    <div v-if="canManage && row.stock_out_id" class="flex gap-2 mt-3 text-sm">
+                        <RouterLink :to="{ name: 'stock-out.edit', params: { id: row.stock_out_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit Stock Out</RouterLink>
+                    </div>
                 </div>
             </div>
 

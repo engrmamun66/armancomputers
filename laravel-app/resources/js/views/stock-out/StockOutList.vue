@@ -194,6 +194,7 @@ async function removeStockOut(stockOut) {
                 <template #cell-actions="{ row }">
                     <div class="flex justify-end gap-2 text-sm">
                         <RouterLink :to="{ name: 'stock-out.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                        <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">Invoice</RouterLink>
                         <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeStockOut(row)">Delete</button>
                     </div>
@@ -214,6 +215,7 @@ async function removeStockOut(stockOut) {
                         <span :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.due_amount) }}</span>
                     </p>
                     <div class="flex gap-2 mt-3 text-sm">
+                        <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">Invoice</RouterLink>
                         <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
                         <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeStockOut(row)">Delete</button>
                     </div>
