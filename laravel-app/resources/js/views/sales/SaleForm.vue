@@ -12,7 +12,7 @@ import salesApi from '@/services/sales';
 import customersApi from '@/services/customers';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, formatWarranty } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
 const router = useRouter();
@@ -221,7 +221,16 @@ async function submit() {
 
 <template>
     <AppLayout>
-        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Sale' : 'New Sale' }}</h1>
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-lg font-semibold text-slate-900">{{ isEdit ? 'Edit Sale' : 'New Sale' }}</h1>
+            <RouterLink
+                v-if="isEdit"
+                :to="{ name: 'sales.show', params: { id: props.id } }"
+                class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50"
+            >
+                View Details
+            </RouterLink>
+        </div>
 
         <LoadingSpinner v-if="loading" />
         <form v-else class="space-y-6" @submit.prevent="submit">
@@ -276,37 +285,39 @@ async function submit() {
                             <tr class="text-left text-slate-500 border-b border-slate-200">
                                 <th class="py-2 pr-3">Product</th>
                                 <th class="py-2 pr-3">SKU</th>
-                                <th class="py-2 pr-3 text-right">Available Stock</th>
-                                <th class="py-2 pr-3 text-right w-28">Qty</th>
+                                <th class="py-2 pr-3 text-center">Available Stock</th>
+                                <th class="py-2 pr-3 text-center w-28">Qty</th>
                                 <th class="py-2 pr-3 text-right w-32">Unit Price</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
+                                <th class="py-2 pr-3">Warranty</th>
                                 <th class="py-2"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="!items.length">
-                                <td colspan="7" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
+                                <td colspan="8" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
                             </tr>
                             <template v-for="(item, index) in items" :key="item.product_id">
                                 <tr class="border-b border-slate-100">
                                     <td class="py-2 pr-3 font-medium text-slate-800">{{ item.name }}</td>
                                     <td class="py-2 pr-3 text-slate-500">{{ item.sku }}</td>
-                                    <td class="py-2 pr-3 text-right" :class="item.available_stock <= 0 ? 'text-rose-600 font-medium' : 'text-slate-500'">
+                                    <td class="py-2 pr-3 text-center" :class="item.available_stock <= 0 ? 'text-rose-600 font-medium' : 'text-slate-500'">
                                         {{ item.available_stock ?? '—' }}
                                     </td>
                                     <td class="py-2 pr-3">
-                                        <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-right border rounded-md" :class="itemError(item) ? 'border-rose-400' : 'border-slate-300'" />
+                                        <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-center border rounded-md" :class="itemError(item) ? 'border-rose-400' : 'border-slate-300'" />
                                     </td>
                                     <td class="py-2 pr-3">
                                         <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
                                     </td>
                                     <td class="py-2 pr-3 text-right font-medium">{{ formatCurrency((item.quantity || 0) * (item.unit_price || 0)) }}</td>
+                                    <td class="py-2 pr-3 text-slate-500">{{ formatWarranty(form.sale_date, form.warranty_end_date) || '—' }}</td>
                                     <td class="py-2 text-right">
                                         <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeItem(index)">Remove</button>
                                     </td>
                                 </tr>
                                 <tr v-if="itemError(item)">
-                                    <td colspan="7" class="pb-2 text-xs text-rose-600">{{ itemError(item) }}</td>
+                                    <td colspan="8" class="pb-2 text-xs text-rose-600">{{ itemError(item) }}</td>
                                 </tr>
                             </template>
                         </tbody>
@@ -348,7 +359,7 @@ async function submit() {
             </div>
 
             <div class="flex justify-end gap-3">
-                <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
+                <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]">Cancel</RouterLink>
                 <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
                     {{ saving ? 'Saving…' : 'Save Sale' }}
                 </button>
@@ -373,7 +384,7 @@ async function submit() {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showCustomerModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showCustomerModal = false">Cancel</button>
                 <button type="button" :disabled="savingCustomer" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60" @click="submitCustomerModal">
                     {{ savingCustomer ? 'Saving…' : 'Save Customer' }}
                 </button>

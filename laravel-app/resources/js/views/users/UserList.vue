@@ -316,7 +316,7 @@ async function removeUser(user) {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showFormModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showFormModal = false">Cancel</button>
                 <button
                     type="button"
                     :disabled="saving"
@@ -338,7 +338,7 @@ async function removeUser(user) {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showResetModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showResetModal = false">Cancel</button>
                 <button
                     type="button"
                     :disabled="resetting"

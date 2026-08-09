@@ -8,7 +8,7 @@ import invoicesApi from '@/services/invoices';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
 import { COMPANY } from '@/utils/company';
-import { formatCurrency, formatDate } from '@/utils/format';
+import { formatCurrency, formatDate, formatWarranty } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], required: true } });
 
@@ -59,6 +59,9 @@ function print() {
                         <p class="text-lg font-semibold text-slate-900">INVOICE</p>
                         <p class="text-sm text-slate-500 mt-1">{{ invoice.invoice_number }}</p>
                         <p class="text-sm text-slate-500">{{ formatDate(invoice.invoice_date) }}</p>
+                        <p v-if="invoice.warranty_end_date" class="text-sm text-slate-500">
+                            Warranty: {{ formatWarranty(invoice.sale_date, invoice.warranty_end_date) }} (until {{ formatDate(invoice.warranty_end_date) }})
+                        </p>
                         <div class="mt-2"><StatusBadge :status="invoice.payment_status" /></div>
                     </div>
                 </div>

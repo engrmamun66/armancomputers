@@ -47,6 +47,6 @@ class InvoiceController extends Controller
     {
         $this->authorize('view', Invoice::class);
 
-        return $this->success(new InvoiceResource($invoice->load('items.product', 'status', 'creator', 'customer')));
+        return $this->success(new InvoiceResource($invoice->load('items.product', 'status', 'creator', 'customer', 'sale')));
     }
 }

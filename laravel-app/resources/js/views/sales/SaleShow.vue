@@ -22,6 +22,7 @@ const columns = [
     { key: 'sku', label: 'SKU' },
     { key: 'quantity', label: 'Qty', align: 'right' },
     { key: 'unit_price', label: 'Unit Price', align: 'right' },
+    { key: 'warranty', label: 'Warranty', sortable: false },
     { key: 'total_price', label: 'Total', align: 'right' },
 ];
 
@@ -69,6 +70,7 @@ onMounted(async () => {
 
             <DataTable :columns="columns" :rows="sale.items" row-key="id">
                 <template #cell-unit_price="{ row }">{{ formatCurrency(row.unit_price) }}</template>
+                <template #cell-warranty>{{ formatWarranty(sale.sale_date, sale.warranty_end_date) || '—' }}</template>
                 <template #cell-total_price="{ row }">{{ formatCurrency(row.total_price) }}</template>
             </DataTable>
 

@@ -284,7 +284,7 @@ async function submit() {
                                 <th class="py-2 pr-3">Product</th>
                                 <th class="py-2 pr-3">SKU</th>
                                 <th class="py-2 pr-3 text-right">Current Stock</th>
-                                <th class="py-2 pr-3 text-right w-28">Qty</th>
+                                <th class="py-2 pr-3 text-center w-28">Qty</th>
                                 <th class="py-2 pr-3 text-right w-32">Unit Price</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
                                 <th class="py-2"></th>
@@ -299,7 +299,7 @@ async function submit() {
                                 <td class="py-2 pr-3 text-slate-500">{{ item.sku }}</td>
                                 <td class="py-2 pr-3 text-right text-slate-500">{{ item.current_stock ?? '—' }}</td>
                                 <td class="py-2 pr-3">
-                                    <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
+                                    <input v-model.number="item.quantity" type="number" min="1" class="w-full px-2 py-1 text-center border border-slate-300 rounded-md" />
                                 </td>
                                 <td class="py-2 pr-3">
                                     <input v-model.number="item.unit_price" type="number" min="0" step="0.01" class="w-full px-2 py-1 text-right border border-slate-300 rounded-md" />
@@ -334,7 +334,7 @@ async function submit() {
             </div>
 
             <div class="flex justify-end gap-3">
-                <RouterLink :to="{ name: 'purchases.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
+                <RouterLink :to="{ name: 'purchases.index' }" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]">Cancel</RouterLink>
                 <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
                     {{ saving ? 'Saving…' : 'Save Purchase' }}
                 </button>
@@ -397,7 +397,7 @@ async function submit() {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md border border-slate-300" @click="showProductModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showProductModal = false">Cancel</button>
                 <button type="button" :disabled="savingProduct" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60" @click="submitProductModal">
                     {{ savingProduct ? 'Saving…' : 'Save Product' }}
                 </button>
