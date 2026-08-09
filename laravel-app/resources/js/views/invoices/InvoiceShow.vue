@@ -38,6 +38,13 @@ function print() {
                 <div class="flex gap-3">
                     <RouterLink
                         v-if="canManage && invoice.sale_id"
+                        :to="{ name: 'sales.show', params: { id: invoice.sale_id } }"
+                        class="px-4 py-2 text-sm rounded-md border border-slate-300"
+                    >
+                        View Sale
+                    </RouterLink>
+                    <RouterLink
+                        v-if="canManage && invoice.sale_id"
                         :to="{ name: 'sales.edit', params: { id: invoice.sale_id } }"
                         class="px-4 py-2 text-sm rounded-md border border-slate-300"
                     >

@@ -470,7 +470,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           RemoteSearchField<ProductModel>(
-            hint: 'Search product by name or SKU',
+            hint: 'Search product by name or barcode',
             search: (q) => ref.read(productsServiceProvider).search(q),
             itemBuilder: (ctx, p) => Row(
               children: [
@@ -479,7 +479,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(p.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      Text('SKU: ${p.sku}', style: TextStyle(fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
                     ],
                   ),
                 ),
@@ -543,8 +542,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(item.productName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    if (item.sku != null && item.sku!.isNotEmpty)
-                      Text('SKU: ${item.sku}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   ],
                 ),
               ),

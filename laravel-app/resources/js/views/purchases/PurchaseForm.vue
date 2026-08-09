@@ -227,7 +227,12 @@ async function submit() {
 
 <template>
     <AppLayout>
-        <h1 class="text-lg font-semibold text-slate-900 mb-4">{{ isEdit ? 'Edit Purchase' : 'New Purchase' }}</h1>
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-lg font-semibold text-slate-900">{{ isEdit ? 'Edit Purchase' : 'New Purchase' }}</h1>
+            <RouterLink :to="{ name: 'purchases.index' }" class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50">
+                Back
+            </RouterLink>
+        </div>
 
         <LoadingSpinner v-if="loading" />
         <form v-else class="space-y-6" @submit.prevent="submit">

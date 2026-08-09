@@ -308,7 +308,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   RemoteSearchField<ProductModel>(
-                    hint: 'Search product by name, SKU or barcode…',
+                    hint: 'Search product by name or barcode…',
                     search: (q) => ref.read(productsServiceProvider).search(q),
                     itemBuilder: _buildProductResult,
                     onSelected: _addProduct,
@@ -388,7 +388,6 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
           spacing: 10,
           runSpacing: 2,
           children: [
-            Text('SKU: ${product.sku}', style: TextStyle(fontSize: 12, color: muted)),
             if (product.brand != null) Text(product.brand!.name, style: TextStyle(fontSize: 12, color: muted)),
             Text('Stock: ${product.currentStock}', style: TextStyle(fontSize: 12, color: muted)),
             Text('Purchase: ${formatCurrency(product.purchasePrice)}', style: TextStyle(fontSize: 12, color: muted)),
@@ -418,8 +417,6 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(draft.productName ?? 'Product #${draft.productId}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    if (draft.sku != null && draft.sku!.isNotEmpty)
-                      Text('SKU: ${draft.sku}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
                   ],
                 ),
               ),

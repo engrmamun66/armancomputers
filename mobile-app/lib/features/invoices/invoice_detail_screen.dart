@@ -366,10 +366,6 @@ class _ItemRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        if (item.sku != null && item.sku!.isNotEmpty) ...[
-          const SizedBox(height: 2),
-          Text('SKU: ${item.sku}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-        ],
         const SizedBox(height: 6),
         Row(
           children: [

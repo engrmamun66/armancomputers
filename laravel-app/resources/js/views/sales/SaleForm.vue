@@ -243,13 +243,18 @@ async function submit() {
     <AppLayout>
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-lg font-semibold text-slate-900">{{ isEdit ? 'Edit Sale' : 'New Sale' }}</h1>
-            <RouterLink
-                v-if="isEdit"
-                :to="{ name: 'sales.show', params: { id: props.id } }"
-                class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50"
-            >
-                View Details
-            </RouterLink>
+            <div class="flex gap-3">
+                <RouterLink
+                    v-if="isEdit"
+                    :to="{ name: 'sales.show', params: { id: props.id } }"
+                    class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50"
+                >
+                    View Details
+                </RouterLink>
+                <RouterLink :to="{ name: 'sales.index' }" class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50">
+                    Back
+                </RouterLink>
+            </div>
         </div>
 
         <LoadingSpinner v-if="loading" />

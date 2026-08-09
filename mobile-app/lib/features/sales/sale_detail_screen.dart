@@ -284,11 +284,6 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(item.productName ?? 'Product #${item.productId}', style: const TextStyle(fontWeight: FontWeight.w600)),
-        if (item.sku != null && item.sku!.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text('SKU: ${item.sku}', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
-          ),
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

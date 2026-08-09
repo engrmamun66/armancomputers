@@ -10,6 +10,7 @@ import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
 import SelectSearch from '@/components/common/SelectSearch.vue';
 import ProductThumbnail from '@/components/common/ProductThumbnail.vue';
+import ImageCropModal from '@/components/common/ImageCropModal.vue';
 import Icon from '@/components/common/Icon.vue';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
@@ -27,6 +28,12 @@ const errors = ref({});
 const images = ref([]);
 const uploadingImage = ref(false);
 const imageInput = ref(null);
+
+// --- create-mode pending image (cropped client-side, uploaded after the product is created) ---
+const showCropModal = ref(false);
+const pickedFile = ref(null);
+const pendingImageBlob = ref(null);
+const pendingImagePreviewUrl = ref(null);
 
 const form = reactive({
     brand_id: '',
@@ -86,6 +93,12 @@ async function onImageSelected(event) {
     event.target.value = '';
     if (!file) return;
 
+    if (!isEdit.value) {
+        pickedFile.value = file;
+        showCropModal.value = true;
+        return;
+    }
+
     uploadingImage.value = true;
     try {
         const formData = new FormData();
@@ -101,6 +114,23 @@ async function onImageSelected(event) {
     } finally {
         uploadingImage.value = false;
     }
+}
+
+function onImageCropped(blob) {
+    if (pendingImagePreviewUrl.value) {
+        URL.revokeObjectURL(pendingImagePreviewUrl.value);
+    }
+    pendingImageBlob.value = blob;
+    pendingImagePreviewUrl.value = URL.createObjectURL(blob);
+    pickedFile.value = null;
+}
+
+function removePendingImage() {
+    if (pendingImagePreviewUrl.value) {
+        URL.revokeObjectURL(pendingImagePreviewUrl.value);
+    }
+    pendingImageBlob.value = null;
+    pendingImagePreviewUrl.value = null;
 }
 
 async function setDefaultImage(image) {
@@ -141,8 +171,17 @@ async function submit() {
             await productsApi.update(props.id, form);
             toast.success('Product updated successfully.');
         } else {
-            await productsApi.create(form);
+            const { data } = await productsApi.create(form);
             toast.success('Product created successfully.');
+            if (pendingImageBlob.value) {
+                try {
+                    const formData = new FormData();
+                    formData.append('image', pendingImageBlob.value, 'product.jpg');
+                    await productsApi.uploadImage(data.data.id, formData);
+                } catch {
+                    toast.error('Product was created, but the image failed to upload.');
+                }
+            }
         }
         router.push({ name: 'products.index' });
     } catch (error) {
@@ -208,7 +247,32 @@ async function submit() {
                     </div>
                 </div>
             </div>
-            <p v-else class="text-sm text-slate-400">Save the product first, then add images from the edit page.</p>
+            <div v-else>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Image <span class="text-slate-400 font-normal">(optional)</span></label>
+                <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
+                <div v-if="!pendingImagePreviewUrl">
+                    <button
+                        type="button"
+                        class="h-20 w-20 rounded-md border border-dashed border-slate-300 text-slate-400 hover:text-slate-600 hover:border-slate-400 flex items-center justify-center"
+                        @click="pickImage"
+                    >
+                        <Icon name="photo" class="h-6 w-6" />
+                    </button>
+                </div>
+                <div v-else class="relative inline-block group">
+                    <img :src="pendingImagePreviewUrl" alt="Product preview" class="h-20 w-20 rounded-md object-cover border border-slate-200" />
+                    <button
+                        type="button"
+                        title="Remove"
+                        class="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center rounded-full bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 shadow-sm"
+                        @click="removePendingImage"
+                    >
+                        <Icon name="x-mark" class="h-3.5 w-3.5" />
+                    </button>
+                </div>
+            </div>
+
+            <ImageCropModal v-model="showCropModal" :file="pickedFile" :output-size="600" @cropped="onImageCropped" />
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
