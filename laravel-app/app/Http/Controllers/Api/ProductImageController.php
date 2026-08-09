@@ -16,7 +16,7 @@ class ProductImageController extends Controller
         $this->authorize('update', $product);
 
         $request->validate([
-            'image' => ['required', 'image', 'max:4096'],
+            'image' => ['required', 'image', 'max:2048'],
             'is_default' => ['nullable', 'boolean'],
         ]);
 
