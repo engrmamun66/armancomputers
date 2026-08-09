@@ -115,7 +115,7 @@ async function removeProduct(product) {
             <RouterLink
                 v-if="canManage"
                 :to="{ name: 'products.create' }"
-                class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700"
+                class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover"
             >
                 + Add Product
             </RouterLink>
@@ -171,10 +171,10 @@ async function removeProduct(product) {
                     </div>
                 </template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-3 text-sm">
-                        <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="text-slate-500 hover:text-slate-700">History</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-primary-600 hover:text-primary-700">Edit</RouterLink>
-                        <button v-if="canManage" type="button" class="text-rose-600 hover:text-rose-700" @click="removeProduct(row)">Delete</button>
+                    <div class="flex justify-end gap-2 text-sm">
+                        <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">History</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
+                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeProduct(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -190,10 +190,10 @@ async function removeProduct(product) {
                     <p class="text-sm mt-1" :class="row.stock_state !== 'in-stock' ? 'font-semibold text-amber-600' : 'text-slate-500'">
                         Stock: {{ row.current_stock }} <span v-if="row.stock_state !== 'in-stock'">({{ row.stock_state }})</span>
                     </p>
-                    <div class="flex gap-3 mt-3 text-sm">
-                        <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="text-slate-500">History</RouterLink>
-                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="text-primary-600">Edit</RouterLink>
-                        <button v-if="canManage" type="button" class="text-rose-600" @click="removeProduct(row)">Delete</button>
+                    <div class="flex gap-2 mt-3 text-sm">
+                        <RouterLink :to="{ name: 'products.stock-history', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">History</RouterLink>
+                        <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
+                        <button v-if="canManage" type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeProduct(row)">Delete</button>
                     </div>
                 </div>
             </div>

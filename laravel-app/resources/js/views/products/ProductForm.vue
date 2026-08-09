@@ -169,7 +169,7 @@ async function submit() {
 
             <div class="flex justify-end gap-3 pt-2">
                 <RouterLink :to="{ name: 'products.index' }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Cancel</RouterLink>
-                <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700 disabled:opacity-60">
+                <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
                     {{ saving ? 'Saving…' : 'Save' }}
                 </button>
             </div>

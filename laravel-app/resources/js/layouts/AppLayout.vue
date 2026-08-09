@@ -95,7 +95,7 @@ async function handleLogout() {
                     >
                         <p class="px-4 py-2 text-xs text-slate-400 uppercase tracking-wide">{{ auth.user?.role?.name }}</p>
                         <RouterLink :to="{ name: 'profile' }" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Profile</RouterLink>
-                        <RouterLink :to="{ name: 'contact' }" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Contact</RouterLink>
+                        <RouterLink v-if="route.name !== 'contact'" :to="{ name: 'contact' }" class="block px-4 py-2 text-slate-700 hover:bg-slate-50">Contact</RouterLink>
                         <button type="button" class="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50" @click="handleLogout">
                             Logout
                         </button>
@@ -114,8 +114,8 @@ async function handleLogout() {
                         :to="{ name: item.name }"
                         class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium"
                         :class="route.name === item.name || route.name?.startsWith(item.name.split('.')[0] + '.')
-                            ? 'bg-primary-50 text-primary-700'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                            ? 'bg-accent-solid text-on-accent-solid'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
                     >
                         <Icon :name="item.icon" class="h-5 w-5" />
                         {{ item.label }}
@@ -139,8 +139,8 @@ async function handleLogout() {
             <div class="px-6 py-4 flex items-center justify-between text-sm text-slate-500">
                 <p>&copy; {{ new Date().getFullYear() }} Arman Computers. All rights reserved.</p>
                 <div class="flex gap-4">
-                    <RouterLink :to="{ name: 'contact' }" class="hover:text-slate-700">Contact</RouterLink>
-                    <RouterLink :to="{ name: 'privacy' }" class="hover:text-slate-700">Privacy Policy</RouterLink>
+                    <RouterLink v-if="route.name !== 'contact'" :to="{ name: 'contact' }" class="hover:text-slate-700">Contact</RouterLink>
+                    <RouterLink v-if="route.name !== 'privacy'" :to="{ name: 'privacy' }" class="hover:text-slate-700">Privacy Policy</RouterLink>
                 </div>
             </div>
         </footer>
@@ -195,6 +195,7 @@ async function handleLogout() {
                             Profile
                         </RouterLink>
                         <RouterLink
+                            v-if="route.name !== 'contact'"
                             :to="{ name: 'contact' }"
                             class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
                             @click="moreSheetOpen = false"
@@ -203,6 +204,7 @@ async function handleLogout() {
                             Contact
                         </RouterLink>
                         <RouterLink
+                            v-if="route.name !== 'privacy'"
                             :to="{ name: 'privacy' }"
                             class="flex flex-col items-center gap-1 p-3 rounded-lg text-slate-600 hover:bg-slate-50 text-xs"
                             @click="moreSheetOpen = false"

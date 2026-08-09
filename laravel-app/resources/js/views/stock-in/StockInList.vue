@@ -104,7 +104,7 @@ async function removeStockIn(stockIn) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Stock In</h1>
-            <RouterLink :to="{ name: 'stock-in.create' }" class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700">
+            <RouterLink :to="{ name: 'stock-in.create' }" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover">
                 + Add Stock In
             </RouterLink>
         </div>
@@ -145,10 +145,10 @@ async function removeStockIn(stockIn) {
                 <template #cell-status="{ row }"><StatusBadge :status="row.status?.slug" /></template>
                 <template #cell-created_at="{ row }">{{ formatDateTime(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-3 text-sm">
-                        <RouterLink :to="{ name: 'stock-in.show', params: { id: row.id } }" class="text-slate-500 hover:text-slate-700">View</RouterLink>
-                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="text-primary-600 hover:text-primary-700">Edit</RouterLink>
-                        <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeStockIn(row)">Delete</button>
+                    <div class="flex justify-end gap-2 text-sm">
+                        <RouterLink :to="{ name: 'stock-in.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
+                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100">Edit</RouterLink>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeStockIn(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -162,9 +162,9 @@ async function removeStockIn(stockIn) {
                     <p class="text-sm text-slate-500 mt-1">Supplier: {{ row.supplier_name || '—' }}</p>
                     <p class="text-sm text-slate-500">Date: {{ formatDate(row.purchase_date) }}</p>
                     <p class="text-sm text-slate-500">Items: {{ row.items_count }} · Total: {{ formatCurrency(row.grand_total) }}</p>
-                    <div class="flex gap-3 mt-3 text-sm">
-                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="text-primary-600">Edit</RouterLink>
-                        <button type="button" class="text-rose-600" @click="removeStockIn(row)">Delete</button>
+                    <div class="flex gap-2 mt-3 text-sm">
+                        <RouterLink :to="{ name: 'stock-in.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeStockIn(row)">Delete</button>
                     </div>
                 </div>
             </div>

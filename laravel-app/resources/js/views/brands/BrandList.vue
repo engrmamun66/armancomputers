@@ -139,7 +139,7 @@ async function removeBrand(brand) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Brands</h1>
-            <button type="button" class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700" @click="openCreate">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover" @click="openCreate">
                 + Add Brand
             </button>
         </div>
@@ -169,9 +169,9 @@ async function removeBrand(brand) {
                 <template #cell-status="{ row }"><StatusBadge :status="row.status?.slug" /></template>
                 <template #cell-created_at="{ row }">{{ formatDate(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-3 text-sm">
-                        <button type="button" class="text-primary-600 hover:text-primary-700" @click="openEdit(row)">Edit</button>
-                        <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeBrand(row)">Delete</button>
+                    <div class="flex justify-end gap-2 text-sm">
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeBrand(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -184,9 +184,9 @@ async function removeBrand(brand) {
                     </div>
                     <p class="text-sm text-slate-500 mt-1">{{ row.description || '—' }}</p>
                     <p class="text-xs text-slate-400 mt-1">{{ row.products_count }} products</p>
-                    <div class="flex gap-3 mt-3 text-sm">
-                        <button type="button" class="text-primary-600" @click="openEdit(row)">Edit</button>
-                        <button type="button" class="text-rose-600" @click="removeBrand(row)">Delete</button>
+                    <div class="flex gap-2 mt-3 text-sm">
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeBrand(row)">Delete</button>
                     </div>
                 </div>
             </div>
@@ -215,7 +215,7 @@ async function removeBrand(brand) {
                 <button
                     type="button"
                     :disabled="saving"
-                    class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700 disabled:opacity-60"
+                    class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60"
                     @click="submitForm"
                 >
                     {{ saving ? 'Saving…' : 'Save' }}

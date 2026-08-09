@@ -38,6 +38,14 @@
     --color-ink-solid: oklch(27.9% 0.041 260.031);
     --color-overlay-solid: oklch(20.8% 0.042 265.755);
 
+    /* Bold "selected" surface (active sidebar/nav item) — unlike primary-600
+       above, this INVERTS in dark mode (dark chip on light page becomes a
+       bright light chip on the dark page) so the active state still reads
+       as the brightest thing in the sidebar rather than blending in. */
+    --color-accent-solid: light-dark(#262626, #fff);
+    --color-accent-solid-hover: light-dark(#171717, #e5e5e5);
+    --color-on-accent-solid: light-dark(#fff, #262626);
+
     /* Neutral surface ramp. Native CSS light-dark() re-resolves these against
        the page's color-scheme (set by the theme store), so every existing
        bg-white, text-slate, and border-slate class project-wide becomes

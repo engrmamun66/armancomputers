@@ -9,6 +9,7 @@ use App\Http\Resources\StockInResource;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StockIn;
+use App\Models\StockInItem;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,10 +21,7 @@ class StockInController extends Controller
     {
         $this->authorize('viewAny', StockIn::class);
 
-        $stockIns = StockIn::query()
-            ->with(['status', 'creator'])
-            ->withCount('items')
-            ->withSum('items as total_qty', 'quantity')
+        $filtered = StockIn::query()
             ->when($request->filled('search'), function ($query) use ($request) {
                 $term = "%{$request->string('search')}%";
                 $query->where(fn ($q) => $q->where('reference_no', 'like', $term)->orWhere('supplier_name', 'like', $term));
@@ -31,12 +29,24 @@ class StockInController extends Controller
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('purchase_date', '>=', $request->string('date_from')))
             ->when($request->filled('date_to'), fn ($q) => $q->whereDate('purchase_date', '<=', $request->string('date_to')))
             ->when($request->filled('status_id'), fn ($q) => $q->where('status_id', $request->integer('status_id')))
-            ->when($request->filled('user_id'), fn ($q) => $q->where('created_by', $request->integer('user_id')))
+            ->when($request->filled('user_id'), fn ($q) => $q->where('created_by', $request->integer('user_id')));
+
+        $ids = (clone $filtered)->pluck('id');
+        $totals = [
+            'items_count' => (int) StockInItem::whereIn('stock_in_id', $ids)->count(),
+            'total_qty' => (int) StockInItem::whereIn('stock_in_id', $ids)->sum('quantity'),
+            'total_amount' => (float) (clone $filtered)->sum('grand_total'),
+        ];
+
+        $stockIns = $filtered
+            ->with(['status', 'creator'])
+            ->withCount('items')
+            ->withSum('items as total_qty', 'quantity')
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
             ->paginate($request->integer('per_page', 15));
 
-        return StockInResource::collection($stockIns)->additional(['success' => true, 'message' => '']);
+        return StockInResource::collection($stockIns)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
     }
 
     public function store(StoreStockInRequest $request)

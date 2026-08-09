@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StockOut;
+use App\Models\StockOutItem;
 use App\Services\ReferenceNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +22,7 @@ class StockOutController extends Controller
     {
         $this->authorize('viewAny', StockOut::class);
 
-        $stockOuts = StockOut::query()
-            ->with(['customer', 'status', 'creator'])
-            ->withCount('items')
-            ->withSum('items as total_qty', 'quantity')
+        $filtered = StockOut::query()
             ->when($request->filled('search'), function ($query) use ($request) {
                 $term = "%{$request->string('search')}%";
                 $query->where(function ($q) use ($term) {
@@ -44,12 +42,24 @@ class StockOutController extends Controller
                     'due' => $query->where('paid_amount', '<=', 0),
                     default => null,
                 };
-            })
+            });
+
+        $ids = (clone $filtered)->pluck('id');
+        $totals = [
+            'items_count' => (int) StockOutItem::whereIn('stock_out_id', $ids)->count(),
+            'total_qty' => (int) StockOutItem::whereIn('stock_out_id', $ids)->sum('quantity'),
+            'total_amount' => (float) (clone $filtered)->sum('grand_total'),
+        ];
+
+        $stockOuts = $filtered
+            ->with(['customer', 'status', 'creator'])
+            ->withCount('items')
+            ->withSum('items as total_qty', 'quantity')
             ->orderByDesc('sale_date')
             ->orderByDesc('id')
             ->paginate($request->integer('per_page', 15));
 
-        return StockOutResource::collection($stockOuts)->additional(['success' => true, 'message' => '']);
+        return StockOutResource::collection($stockOuts)->additional(['success' => true, 'message' => '', 'totals' => $totals]);
     }
 
     public function store(StoreStockOutRequest $request)

@@ -64,7 +64,7 @@ function submit() {
                         <textarea v-model="form.message" rows="4" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"></textarea>
                     </div>
                     <div class="flex justify-end">
-                        <button type="submit" :disabled="sending" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700 disabled:opacity-60">
+                        <button type="submit" :disabled="sending" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
                             {{ sending ? 'Sending…' : 'Send Message' }}
                         </button>
                     </div>

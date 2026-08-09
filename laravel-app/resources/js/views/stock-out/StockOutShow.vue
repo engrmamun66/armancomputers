@@ -43,7 +43,7 @@ onMounted(async () => {
                         View Invoice
                     </RouterLink>
                     <RouterLink v-if="canManage" :to="{ name: 'stock-out.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Edit</RouterLink>
-                    <RouterLink :to="{ name: 'stock-out.index' }" class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700">Back</RouterLink>
+                    <RouterLink :to="{ name: 'stock-out.index' }" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover">Back</RouterLink>
                 </div>
             </div>
 

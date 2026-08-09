@@ -205,7 +205,7 @@ async function removeUser(user) {
     <AppLayout>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h1 class="text-lg font-semibold text-slate-900">Users</h1>
-            <button type="button" class="px-4 py-2 text-sm font-medium text-onbrand bg-primary-600 rounded-md hover:bg-primary-700" @click="openCreate">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-on-accent-solid bg-accent-solid rounded-md hover:bg-accent-solid-hover" @click="openCreate">
                 + Add User
             </button>
         </div>
@@ -240,13 +240,13 @@ async function removeUser(user) {
                 <template #cell-last_login_at="{ row }">{{ row.last_login_at ? formatDateTime(row.last_login_at) : 'Never' }}</template>
                 <template #cell-created_at="{ row }">{{ formatDateTime(row.created_at) }}</template>
                 <template #cell-actions="{ row }">
-                    <div class="flex justify-end gap-3 text-sm">
-                        <button type="button" class="text-primary-600 hover:text-primary-700" @click="openEdit(row)">Edit</button>
-                        <button type="button" class="text-slate-600 hover:text-slate-800" @click="toggleStatus(row)">
+                    <div class="flex justify-end gap-2 text-sm">
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300" @click="toggleStatus(row)">
                             {{ row.status?.slug === 'active' ? 'Deactivate' : 'Activate' }}
                         </button>
-                        <button type="button" class="text-amber-600 hover:text-amber-700" @click="openReset(row)">Reset Password</button>
-                        <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeUser(row)">Delete</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100" @click="openReset(row)">Reset Password</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50 hover:bg-rose-100" @click="removeUser(row)">Delete</button>
                     </div>
                 </template>
             </DataTable>
@@ -260,13 +260,13 @@ async function removeUser(user) {
                     <p class="text-sm text-slate-500 mt-1">{{ row.email }}</p>
                     <p class="text-sm text-slate-500">Role: {{ row.role?.name }}</p>
                     <p class="text-xs text-slate-400 mt-1">Last login: {{ row.last_login_at ? formatDateTime(row.last_login_at) : 'Never' }}</p>
-                    <div class="flex flex-wrap gap-3 mt-3 text-sm">
-                        <button type="button" class="text-primary-600" @click="openEdit(row)">Edit</button>
-                        <button type="button" class="text-slate-600" @click="toggleStatus(row)">
+                    <div class="flex flex-wrap gap-2 mt-3 text-sm">
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50" @click="openEdit(row)">Edit</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200" @click="toggleStatus(row)">
                             {{ row.status?.slug === 'active' ? 'Deactivate' : 'Activate' }}
                         </button>
-                        <button type="button" class="text-amber-600" @click="openReset(row)">Reset Password</button>
-                        <button type="button" class="text-rose-600" @click="removeUser(row)">Delete</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-amber-700 bg-amber-50" @click="openReset(row)">Reset Password</button>
+                        <button type="button" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-rose-700 bg-rose-50" @click="removeUser(row)">Delete</button>
                     </div>
                 </div>
             </div>
@@ -307,7 +307,7 @@ async function removeUser(user) {
                 <button
                     type="button"
                     :disabled="saving"
-                    class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700 disabled:opacity-60"
+                    class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60"
                     @click="submitForm"
                 >
                     {{ saving ? 'Saving…' : 'Save' }}
@@ -329,7 +329,7 @@ async function removeUser(user) {
                 <button
                     type="button"
                     :disabled="resetting"
-                    class="px-4 py-2 text-sm rounded-md bg-primary-600 text-onbrand hover:bg-primary-700 disabled:opacity-60"
+                    class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60"
                     @click="submitReset"
                 >
                     {{ resetting ? 'Saving…' : 'Reset Password' }}

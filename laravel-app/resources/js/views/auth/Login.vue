@@ -71,7 +71,7 @@ async function submit() {
             <button
                 type="submit"
                 :disabled="loading"
-                class="w-full py-2.5 rounded-md bg-primary-600 text-onbrand text-sm font-medium hover:bg-primary-700 disabled:opacity-60"
+                class="w-full py-2.5 rounded-md bg-accent-solid text-on-accent-solid text-sm font-medium hover:bg-accent-solid-hover disabled:opacity-60"
             >
                 {{ loading ? 'Signing in…' : 'Sign in' }}
             </button>

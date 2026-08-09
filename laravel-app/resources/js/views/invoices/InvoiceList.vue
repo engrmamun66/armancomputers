@@ -105,7 +105,7 @@ onMounted(loadInvoices);
                 </template>
                 <template #cell-payment_status="{ row }"><StatusBadge :status="row.payment_status" /></template>
                 <template #cell-actions="{ row }">
-                    <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="text-sm text-slate-500 hover:text-slate-700">View</RouterLink>
+                    <RouterLink :to="{ name: 'invoices.show', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200 hover:bg-slate-300">View</RouterLink>
                 </template>
             </DataTable>
 
