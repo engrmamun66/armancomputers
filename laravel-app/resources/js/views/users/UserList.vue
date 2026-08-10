@@ -34,8 +34,6 @@ const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const loading = ref(false);
 const roles = ref([]);
 const statuses = ref([]);
-const roleOptions = computed(() => roles.value.map((role) => ({ value: role.id, label: role.name })));
-const statusOptions = computed(() => statuses.value.map((status) => ({ value: status.id, label: status.name })));
 
 const filters = reactive({ search: '', role_id: '', status_id: '', sort_by: 'created_at', sort_dir: 'desc', page: 1 });
 
@@ -307,11 +305,17 @@ async function removeUser(user) {
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Role <span class="text-rose-600">*</span></label>
-                        <SelectSearch v-model="form.role_id" :options="roleOptions" placeholder="Select a role" />
+                        <select v-model="form.role_id" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md">
+                            <option value="" disabled>Select a role</option>
+                            <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
-                        <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
+                        <select v-model="form.status_id" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md">
+                            <option value="" disabled>Select a status</option>
+                            <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
+                        </select>
                     </div>
                 </div>
             </form>
