@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/tables/DataTable.vue';
 import Pagination from '@/components/common/Pagination.vue';
