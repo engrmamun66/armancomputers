@@ -59,8 +59,8 @@ function print() {
                 <div class="flex items-start justify-between border-b border-slate-200 pb-6 mb-6">
                     <div>
                         <h2 class="text-xl font-bold text-slate-900">{{ COMPANY.name }}</h2>
-                        <p class="text-sm text-slate-500 mt-1">{{ COMPANY.address }}</p>
-                        <p class="text-sm text-slate-500">{{ COMPANY.phone }} · {{ COMPANY.email }}</p>
+                        <p class="text-sm text-slate-500 mt-1">{{ COMPANY.phone }} · {{ COMPANY.email }}</p>
+                        <p class="text-sm text-slate-500">{{ COMPANY.address }}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-lg font-semibold text-slate-900">INVOICE</p>
