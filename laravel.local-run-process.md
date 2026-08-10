@@ -50,7 +50,7 @@ php artisan migrate:fresh --seed
 php artisan storage:link   # required once, for profile avatar uploads
 ```
 
-Seed creates: 3 roles, general/stock_in/stock_out/invoice statuses, 4 demo users, 8 brands, 24 products, 10 customers, sample Stock In/Out transactions with auto-generated invoices.
+Seed creates: 2 roles (admin/manager), general/purchase/sale/invoice statuses, 2 demo users, 8 brands, 24 products, 10 customers, sample Purchase/Sale transactions with auto-generated invoices.
 
 ## Running the app
 
@@ -69,9 +69,8 @@ Visit **http://127.0.0.1:7878** — Vite is only used for asset compilation/HMR,
 |---|---|---|
 | admin@armancomputers.com | Admin | `AdminAC!2026#Xk9` |
 | manager@armancomputers.com | Manager | `ManagerAC!2026#Qz4` |
-| staff1@armancomputers.com | Staff | `StaffOneAC!2026#Rp7` |
 
-Note: `staff2@armancomputers.com` is listed in older docs but isn't actually seeded by `UserSeeder.php` — only the three above exist.
+Note: a Staff role/account existed previously and has been fully retired — only admin/manager remain.
 
 ## Production build
 

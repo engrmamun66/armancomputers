@@ -123,8 +123,7 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
       appBar: AppBar(
         title: const Text('Sales'),
         actions: [
-          // All roles (including staff) may create a Sale — this is
-          // never permission-gated.
+          // Any role may create a Sale — this is never permission-gated.
           IconButton(icon: const Icon(Icons.add), tooltip: 'Add Sale', onPressed: _openCreate),
         ],
       ),

@@ -17,10 +17,6 @@ import '../../shared/widgets/loading.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
 
-/// All roles (including staff) can create a Sale, but only admin/manager
-/// may edit or delete an existing one — staff is explicitly excluded even
-/// though `can('staff', 'sales.manage')` is true, per the app's business
-/// rule that staff can record sales but not alter/void them afterwards.
 class SaleDetailScreen extends ConsumerStatefulWidget {
   final int id;
   const SaleDetailScreen({super.key, required this.id});
@@ -98,10 +94,7 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    // Staff CAN create (see SaleListScreen's always-visible "+"), but
-    // must NOT see edit/delete here even though sales.manage is granted
-    // to their role — hence the explicit role != 'staff' exclusion.
-    final canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug != 'staff';
+    final canManage = can(auth.roleSlug, 'sales.manage');
     final sale = _sale;
 
     return Scaffold(
