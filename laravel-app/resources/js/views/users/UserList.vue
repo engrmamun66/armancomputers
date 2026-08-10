@@ -8,7 +8,6 @@ import Modal from '@/components/common/Modal.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import SelectSearch from '@/components/common/SelectSearch.vue';
 import usersApi from '@/services/users';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
