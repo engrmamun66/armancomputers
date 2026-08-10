@@ -18,14 +18,14 @@ class UserSeeder extends Seeder
         $users = [
             // Super admin (full access)
             [
-                'name' => 'Arman Admin',
-                'email' => 'admin@armancomputers.com',
+                'name' => 'Superadmin',
+                'email' => 'suadmin@armancomputers.com',
                 'role' => Role::ADMIN,
                 'password' => 'AdminAC!2026#Xk9'
             ],
             [
-                'name' => 'Manager User',
-                'email' => 'manager@armancomputers.com',
+                'name' => 'Arman',
+                'email' => 'admin@armancomputers.com',
                 'role' => Role::MANAGER,
                 'password' => 'ManagerAC!2026#Qz4'
             ],
