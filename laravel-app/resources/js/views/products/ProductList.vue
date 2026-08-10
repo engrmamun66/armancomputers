@@ -43,7 +43,9 @@ const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const loading = ref(false);
 const brands = ref([]);
 const statuses = ref([]);
-const filters = reactive({ search: '', brand_id: '', stock_status: '', status_id: '', sort_by: 'name', sort_dir: 'asc', page: 1 });
+const DEFAULT_SORT_BY = 'name';
+const DEFAULT_SORT_DIR = 'asc';
+const filters = reactive({ search: '', brand_id: '', stock_status: '', status_id: '', sort_by: DEFAULT_SORT_BY, sort_dir: DEFAULT_SORT_DIR, page: 1 });
 
 async function loadLookups() {
     const [brandRes, statusRes] = await Promise.all([brandsApi.all(), lookups.statuses('general')]);
@@ -73,11 +75,16 @@ async function loadProducts() {
 }
 
 function clearFilters() {
-    filters.search = '';
-    filters.brand_id = '';
-    filters.stock_status = '';
-    filters.status_id = '';
-    filters.page = 1;
+    Object.assign(filters, {
+        search: '',
+        brand_id: '',
+        stock_status: '',
+        status_id: '',
+        sort_by: DEFAULT_SORT_BY,
+        sort_dir: DEFAULT_SORT_DIR,
+        page: 1,
+    });
+    loadProducts();
 }
 
 function onSort(key) {
@@ -91,7 +98,15 @@ function onSort(key) {
     loadProducts();
 }
 
-const hasActiveFilters = () => !!(filters.search || filters.brand_id || filters.stock_status || filters.status_id);
+const hasActiveFilters = () =>
+    !!(
+        filters.search ||
+        filters.brand_id ||
+        filters.stock_status ||
+        filters.status_id ||
+        filters.sort_by !== DEFAULT_SORT_BY ||
+        filters.sort_dir !== DEFAULT_SORT_DIR
+    );
 
 watch([() => filters.search, () => filters.brand_id, () => filters.stock_status, () => filters.status_id], () => {
     filters.page = 1;
@@ -152,6 +167,9 @@ async function removeProduct(product) {
                 <option value="">All Statuses</option>
                 <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
             </select>
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="clearFilters">
+                Reset Filters
+            </button>
         </div>
 
         <LoadingSpinner v-if="loading" />
