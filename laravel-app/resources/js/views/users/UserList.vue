@@ -34,7 +34,9 @@ const loading = ref(false);
 const roles = ref([]);
 const statuses = ref([]);
 
-const filters = reactive({ search: '', role_id: '', status_id: '', sort_by: 'created_at', sort_dir: 'desc', page: 1 });
+const DEFAULT_SORT_BY = 'created_at';
+const DEFAULT_SORT_DIR = 'desc';
+const filters = reactive({ search: '', role_id: '', status_id: '', sort_by: DEFAULT_SORT_BY, sort_dir: DEFAULT_SORT_DIR, page: 1 });
 
 async function loadLookups() {
     const [roleRes, statusRes] = await Promise.all([lookups.roles(), lookups.statuses('general')]);
@@ -74,10 +76,25 @@ async function loadUsers() {
 }
 
 function clearFilters() {
-    filters.search = '';
-    filters.role_id = '';
-    filters.status_id = '';
-    filters.page = 1;
+    Object.assign(filters, {
+        search: '',
+        role_id: '',
+        status_id: '',
+        sort_by: DEFAULT_SORT_BY,
+        sort_dir: DEFAULT_SORT_DIR,
+        page: 1,
+    });
+    loadUsers();
+}
+
+function hasActiveFilters() {
+    return !!(
+        filters.search ||
+        filters.role_id ||
+        filters.status_id ||
+        filters.sort_by !== DEFAULT_SORT_BY ||
+        filters.sort_dir !== DEFAULT_SORT_DIR
+    );
 }
 
 watch([() => filters.search, () => filters.role_id, () => filters.status_id], () => {
@@ -220,7 +237,7 @@ async function removeUser(user) {
             </button>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
             <div class="sm:w-64">
                 <SearchInput v-model="filters.search" placeholder="Search name or email…" />
             </div>
@@ -232,14 +249,17 @@ async function removeUser(user) {
                 <option value="">All Statuses</option>
                 <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
             </select>
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="clearFilters">
+                Reset Filters
+            </button>
         </div>
 
         <LoadingSpinner v-if="loading" />
         <EmptyState
             v-else-if="!rows.length"
             title="No users found."
-            :message="filters.search || filters.role_id || filters.status_id ? 'No records match your current filters.' : ''"
-            :show-clear="!!(filters.search || filters.role_id || filters.status_id)"
+            :message="hasActiveFilters() ? 'No records match your current filters.' : ''"
+            :show-clear="hasActiveFilters()"
             @clear="clearFilters"
         />
         <template v-else>

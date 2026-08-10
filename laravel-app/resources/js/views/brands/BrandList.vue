@@ -33,7 +33,9 @@ const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const loading = ref(false);
 const statuses = ref([]);
 const statusOptions = computed(() => statuses.value.map((status) => ({ value: status.id, label: status.name })));
-const filters = reactive({ search: '', status_id: '', sort_by: 'name', sort_dir: 'asc', page: 1 });
+const DEFAULT_SORT_BY = 'name';
+const DEFAULT_SORT_DIR = 'asc';
+const filters = reactive({ search: '', status_id: '', sort_by: DEFAULT_SORT_BY, sort_dir: DEFAULT_SORT_DIR, page: 1 });
 
 async function loadStatuses() {
     const { data } = await lookups.statuses('general');
@@ -60,9 +62,23 @@ async function loadBrands() {
 }
 
 function clearFilters() {
-    filters.search = '';
-    filters.status_id = '';
-    filters.page = 1;
+    Object.assign(filters, {
+        search: '',
+        status_id: '',
+        sort_by: DEFAULT_SORT_BY,
+        sort_dir: DEFAULT_SORT_DIR,
+        page: 1,
+    });
+    loadBrands();
+}
+
+function hasActiveFilters() {
+    return !!(
+        filters.search ||
+        filters.status_id ||
+        filters.sort_by !== DEFAULT_SORT_BY ||
+        filters.sort_dir !== DEFAULT_SORT_DIR
+    );
 }
 
 function onSort(key) {
@@ -157,7 +173,7 @@ async function removeBrand(brand) {
             </button>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
             <div class="sm:w-64">
                 <SearchInput v-model="filters.search" placeholder="Search brand name…" />
             </div>
@@ -165,14 +181,17 @@ async function removeBrand(brand) {
                 <option value="">All Statuses</option>
                 <option v-for="status in statuses" :key="status.id" :value="status.id">{{ status.name }}</option>
             </select>
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="clearFilters">
+                Reset Filters
+            </button>
         </div>
 
         <LoadingSpinner v-if="loading" />
         <EmptyState
             v-else-if="!rows.length"
             title="No brands found."
-            :message="filters.search || filters.status_id ? 'No records match your current filters.' : ''"
-            :show-clear="!!(filters.search || filters.status_id)"
+            :message="hasActiveFilters() ? 'No records match your current filters.' : ''"
+            :show-clear="hasActiveFilters()"
             @clear="clearFilters"
         />
         <template v-else>
