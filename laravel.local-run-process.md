@@ -65,14 +65,13 @@ Visit **http://127.0.0.1:7878** — Vite is only used for asset compilation/HMR,
 
 ## Demo logins
 
-All passwords: `password`
+| Email | Role | Password |
+|---|---|---|
+| admin@armancomputers.com | Admin | `AdminAC!2026#Xk9` |
+| manager@armancomputers.com | Manager | `ManagerAC!2026#Qz4` |
+| staff1@armancomputers.com | Staff | `StaffOneAC!2026#Rp7` |
 
-| Email | Role |
-|---|---|
-| admin@armancomputers.com | Admin |
-| manager@armancomputers.com | Manager |
-| staff1@armancomputers.com | Staff |
-| staff2@armancomputers.com | Staff |
+Note: `staff2@armancomputers.com` is listed in older docs but isn't actually seeded by `UserSeeder.php` — only the three above exist.
 
 ## Production build
 

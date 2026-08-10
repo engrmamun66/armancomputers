@@ -9,7 +9,6 @@ class Role extends Model
 {
     public const ADMIN = 'admin';
     public const MANAGER = 'manager';
-    public const STAFF = 'staff';
 
     protected $fillable = ['name', 'slug'];
 

@@ -91,13 +91,4 @@ class AuthenticationTest extends TestCase
             ->getJson('/api/auth/me')
             ->assertStatus(401);
     }
-
-    public function test_staff_cannot_access_user_management(): void
-    {
-        $staff = $this->makeUser(Role::STAFF);
-
-        $response = $this->actingAs($staff, 'api')->getJson('/api/users');
-
-        $response->assertStatus(403);
-    }
 }

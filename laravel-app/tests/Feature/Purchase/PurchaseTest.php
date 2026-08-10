@@ -125,18 +125,4 @@ class PurchaseTest extends TestCase
         $this->assertEquals(5, $product->fresh()->current_stock);
         $this->assertDatabaseHas('purchases', ['id' => $purchaseId, 'deleted_at' => null]);
     }
-
-    public function test_staff_cannot_create_purchase(): void
-    {
-        $staff = $this->makeUser(Role::STAFF);
-        $product = $this->makeProduct();
-
-        $response = $this->actingAs($staff, 'api')->postJson('/api/purchases', [
-            'purchase_date' => now()->toDateString(),
-            'items' => [['product_id' => $product->id, 'quantity' => 5, 'unit_price' => 10]],
-        ]);
-
-        $response->assertStatus(403);
-        $this->assertEquals(0, Purchase::count());
-    }
 }

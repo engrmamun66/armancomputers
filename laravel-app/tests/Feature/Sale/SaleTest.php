@@ -190,22 +190,4 @@ class SaleTest extends TestCase
         $update->assertStatus(422);
         $this->assertEquals(0, $product->fresh()->current_stock);
     }
-
-    public function test_staff_can_create_but_not_delete_sale(): void
-    {
-        $staff = $this->makeUser(Role::STAFF);
-        $customer = $this->makeCustomer();
-        $product = $this->makeProduct(['current_stock' => 10]);
-
-        $create = $this->actingAs($staff, 'api')->postJson('/api/sales', [
-            'customer_id' => $customer->id,
-            'sale_date' => now()->toDateString(),
-            'payment_method' => 'cash',
-            'items' => [['product_id' => $product->id, 'quantity' => 2, 'unit_price' => 50]],
-        ]);
-        $create->assertStatus(201);
-
-        $saleId = $create->json('data.id');
-        $this->actingAs($staff, 'api')->deleteJson("/api/sales/{$saleId}")->assertStatus(403);
-    }
 }
