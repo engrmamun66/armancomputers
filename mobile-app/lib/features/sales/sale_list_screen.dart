@@ -18,7 +18,6 @@ import '../../shared/widgets/search_field.dart';
 import '../../shared/widgets/searchable_select.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
-import '../dashboard/widgets/stat_card.dart';
 
 /// Bottom-nav shell tab — the single most business-critical screen in the
 /// app, since every Sale here auto-creates a linked Invoice server-side.
@@ -36,6 +35,7 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
   int? _statusId;
   String _paymentStatus = '';
   int _page = 1;
+  bool _filtersExpanded = false;
 
   List<StatusModel> _statuses = [];
 
@@ -142,9 +142,17 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
     );
   }
 
+  int get _hiddenFilterCount =>
+      [_from != null, _to != null, _statusId != null, _paymentStatus.isNotEmpty].where((v) => v).length;
+
   Widget _buildFilters(BuildContext context) {
     return SectionCard(
       title: 'Filters',
+      trailing: TextButton.icon(
+        onPressed: () => setState(() => _filtersExpanded = !_filtersExpanded),
+        icon: Icon(_filtersExpanded ? Icons.expand_less : Icons.expand_more, size: 18),
+        label: Text(_hiddenFilterCount > 0 ? 'More ($_hiddenFilterCount)' : 'More'),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -158,81 +166,91 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
               _fetch();
             },
           ),
-          const SizedBox(height: 12),
-          AppDateRangeFilter(
-            from: _from,
-            to: _to,
-            onFromChanged: (d) {
-              setState(() {
-                _from = d;
-                _page = 1;
-              });
-              _fetch();
-            },
-            onToChanged: (d) {
-              setState(() {
-                _to = d;
-                _page = 1;
-              });
-              _fetch();
-            },
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            child: !_filtersExpanded
+                ? const SizedBox(width: double.infinity)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 12),
+                      AppDateRangeFilter(
+                        from: _from,
+                        to: _to,
+                        onFromChanged: (d) {
+                          setState(() {
+                            _from = d;
+                            _page = 1;
+                          });
+                          _fetch();
+                        },
+                        onToChanged: (d) {
+                          setState(() {
+                            _to = d;
+                            _page = 1;
+                          });
+                          _fetch();
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: SearchableSelect<int?>(
+                              label: 'Status',
+                              value: _statusId,
+                              placeholder: 'All Statuses',
+                              options: [
+                                const SelectOption<int?>(null, 'All Statuses'),
+                                ..._statuses.map((s) => SelectOption<int?>(s.id, s.name)),
+                              ],
+                              onChanged: (v) {
+                                setState(() {
+                                  _statusId = v;
+                                  _page = 1;
+                                });
+                                _fetch();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SearchableSelect<String>(
+                              label: 'Payment Status',
+                              value: _paymentStatus,
+                              placeholder: 'All',
+                              options: const [
+                                SelectOption('', 'All'),
+                                SelectOption('paid', 'Paid'),
+                                SelectOption('partial', 'Partial'),
+                                SelectOption('due', 'Due'),
+                              ],
+                              onChanged: (v) {
+                                setState(() {
+                                  _paymentStatus = v;
+                                  _page = 1;
+                                });
+                                _fetch();
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_hasFilters) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: _resetFilters,
+                            icon: const Icon(Icons.filter_alt_off_outlined, size: 16),
+                            label: const Text('Reset filters'),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SearchableSelect<int?>(
-                  label: 'Status',
-                  value: _statusId,
-                  placeholder: 'All Statuses',
-                  options: [
-                    const SelectOption<int?>(null, 'All Statuses'),
-                    ..._statuses.map((s) => SelectOption<int?>(s.id, s.name)),
-                  ],
-                  onChanged: (v) {
-                    setState(() {
-                      _statusId = v;
-                      _page = 1;
-                    });
-                    _fetch();
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: SearchableSelect<String>(
-                  label: 'Payment Status',
-                  value: _paymentStatus,
-                  placeholder: 'All',
-                  options: const [
-                    SelectOption('', 'All'),
-                    SelectOption('paid', 'Paid'),
-                    SelectOption('partial', 'Partial'),
-                    SelectOption('due', 'Due'),
-                  ],
-                  onChanged: (v) {
-                    setState(() {
-                      _paymentStatus = v;
-                      _page = 1;
-                    });
-                    _fetch();
-                  },
-                ),
-              ),
-            ],
-          ),
-          if (_hasFilters) ...[
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: _resetFilters,
-                icon: const Icon(Icons.filter_alt_off_outlined, size: 16),
-                label: const Text('Reset filters'),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -290,83 +308,58 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
     final profit = (totals['total_profit'] as num?)?.toDouble() ?? 0;
     final due = (totals['total_due'] as num?)?.toDouble() ?? 0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SectionCard(
-          title: 'Summary (filtered)',
-          child: Row(
+    return SectionCard(
+      title: 'Summary (filtered)',
+      child: Column(
+        children: [
+          Row(
             children: [
               Expanded(child: _stat(context, 'Items', '${totals['items_count'] ?? 0}')),
+              _statDivider(context),
               Expanded(child: _stat(context, 'Total Qty', '${totals['total_qty'] ?? 0}')),
+              _statDivider(context),
               Expanded(child: _stat(context, 'Total Sale', formatCurrency(totals['total_amount'] as num?))),
             ],
           ),
-        ),
-        const SizedBox(height: 12),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            const spacing = 12.0;
-            final itemWidth = (constraints.maxWidth - spacing) / 2;
-            return Wrap(
-              spacing: spacing,
-              runSpacing: spacing,
-              children: [
-                SizedBox(
-                  width: itemWidth,
-                  child: StatCard(
-                    data: StatCardData(
-                      label: 'Total Purchase Cost',
-                      value: formatCurrency(totals['total_cost'] as num?),
-                      icon: Icons.arrow_circle_down_outlined,
-                      emphasize: true,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: itemWidth,
-                  child: StatCard(
-                    data: StatCardData(
-                      label: 'Total Profit',
-                      value: formatCurrency(profit),
-                      icon: Icons.trending_up,
-                      tint: profit >= 0 ? success : danger,
-                      emphasize: true,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: itemWidth,
-                  child: StatCard(
-                    data: StatCardData(
-                      label: 'Total Due',
-                      value: formatCurrency(due),
-                      icon: Icons.receipt_long_outlined,
-                      tint: due > 0 ? danger : success,
-                      emphasize: true,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
+          const SizedBox(height: 12),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outlineVariant),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _stat(context, 'Purchase Cost', formatCurrency(totals['total_cost'] as num?))),
+              _statDivider(context),
+              Expanded(child: _stat(context, 'Profit', formatCurrency(profit), color: profit >= 0 ? success : danger)),
+              _statDivider(context),
+              Expanded(child: _stat(context, 'Due', formatCurrency(due), color: due > 0 ? danger : success)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _stat(BuildContext context, String label, String value) {
+  Widget _statDivider(BuildContext context) =>
+      Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outlineVariant);
+
+  Widget _stat(BuildContext context, String label, String value, {Color? color}) {
     final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: color),
           textAlign: TextAlign.center,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
-        Text(label, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant), textAlign: TextAlign.center),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }

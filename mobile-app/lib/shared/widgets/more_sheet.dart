@@ -52,10 +52,6 @@ void showMoreSheet(BuildContext context, WidgetRef ref) {
                     Navigator.of(sheetContext).pop();
                     sheetContext.push('/contact');
                   }),
-                  _tile(sheetContext, Icons.privacy_tip_outlined, 'Privacy', () {
-                    Navigator.of(sheetContext).pop();
-                    sheetContext.push('/privacy');
-                  }),
                 ],
               ),
               const Divider(height: 24),
