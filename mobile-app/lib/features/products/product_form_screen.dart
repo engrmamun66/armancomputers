@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/api_client.dart';
 import '../../core/api_exception.dart';
 import '../../models/brand.dart';
 import '../../models/lookup.dart';
+import '../../models/product.dart';
 import '../../services/brands_service.dart';
 import '../../services/lookups_service.dart';
 import '../../services/products_service.dart';
 import '../../shared/widgets/app_snackbar.dart';
+import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
+import '../../shared/widgets/product_thumbnail.dart';
+import '../../shared/widgets/required_label.dart';
 import '../../shared/widgets/searchable_select.dart';
 
 class ProductFormScreen extends ConsumerStatefulWidget {
@@ -49,6 +57,12 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   String? _brandError;
   String? _statusError;
   Map<String, String> _serverErrors = {};
+
+  // Edit mode: uploaded images already persisted on the product.
+  List<ProductImageModel> _images = [];
+  bool _uploadingImage = false;
+  // Create mode: a single cropped image held locally until the product exists.
+  String? _pendingImagePath;
 
   @override
   void initState() {
@@ -91,6 +105,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         _brandId = product.brand?.id;
         _statusId = product.status?.id;
         _currentStock = product.currentStock;
+        _images = product.images;
       } else if (_statuses.isNotEmpty) {
         final active = _statuses.firstWhere((s) => s.slug == 'active', orElse: () => _statuses.first);
         _statusId = active.id;
@@ -129,6 +144,96 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     }
   }
 
+  Future<String?> _pickAndCropImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
+    if (picked == null) return null;
+    final cropped = await ImageCropper().cropImage(
+      sourcePath: picked.path,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      maxWidth: 600,
+      maxHeight: 600,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 90,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          lockAspectRatio: true,
+          initAspectRatio: CropAspectRatioPreset.square,
+        ),
+      ],
+    );
+    return cropped?.path;
+  }
+
+  Future<void> _pickImage() async {
+    final path = await _pickAndCropImage();
+    if (path == null || !mounted) return;
+
+    if (widget.id == null) {
+      setState(() => _pendingImagePath = path);
+      return;
+    }
+
+    setState(() => _uploadingImage = true);
+    try {
+      final image = await ref.read(productsServiceProvider).uploadImage(widget.id!, path);
+      setState(() {
+        if (image.isDefault) {
+          _images = _images.map((i) => ProductImageModel(id: i.id, url: i.url, isDefault: false)).toList();
+        }
+        _images = [..._images, image];
+      });
+      if (mounted) AppSnackbar.success(context, 'Image uploaded');
+    } catch (e) {
+      final ex = ApiClient.toApiException(e);
+      if (mounted) AppSnackbar.error(context, ex.message);
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
+    }
+  }
+
+  Future<void> _setDefaultImage(ProductImageModel image) async {
+    if (image.isDefault) return;
+    try {
+      await ref.read(productsServiceProvider).setDefaultImage(widget.id!, image.id);
+      setState(() {
+        _images = _images.map((i) => ProductImageModel(id: i.id, url: i.url, isDefault: i.id == image.id)).toList();
+      });
+    } catch (e) {
+      final ex = ApiClient.toApiException(e);
+      if (mounted) AppSnackbar.error(context, ex.message);
+    }
+  }
+
+  Future<void> _deleteImage(ProductImageModel image) async {
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: 'Delete this image?',
+      message: 'This cannot be undone.',
+      confirmText: 'Delete',
+      danger: true,
+    );
+    if (!confirmed) return;
+
+    try {
+      await ref.read(productsServiceProvider).deleteImage(widget.id!, image.id);
+      setState(() {
+        _images = _images.where((i) => i.id != image.id).toList();
+        if (image.isDefault && _images.isNotEmpty) {
+          final first = _images.first;
+          _images = [
+            ProductImageModel(id: first.id, url: first.url, isDefault: true),
+            ..._images.skip(1),
+          ];
+        }
+      });
+      if (mounted) AppSnackbar.success(context, 'Image deleted');
+    } catch (e) {
+      final ex = ApiClient.toApiException(e);
+      if (mounted) AppSnackbar.error(context, ex.message);
+    }
+  }
+
   Future<void> _submit() async {
     final formValid = _formKey.currentState?.validate() ?? false;
     setState(() {
@@ -157,7 +262,14 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
     try {
       if (widget.id == null) {
-        await ref.read(productsServiceProvider).create(payload);
+        final created = await ref.read(productsServiceProvider).create(payload);
+        if (_pendingImagePath != null) {
+          try {
+            await ref.read(productsServiceProvider).uploadImage(created.id, _pendingImagePath!);
+          } catch (_) {
+            if (mounted) AppSnackbar.error(context, 'Product was created, but the image failed to upload.');
+          }
+        }
       } else {
         await ref.read(productsServiceProvider).update(widget.id!, payload);
       }
@@ -184,6 +296,106 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.id == null ? 'Add Product' : 'Edit Product')),
       body: _buildBody(context),
+    );
+  }
+
+  Widget _buildImageSection(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEdit = widget.id != null;
+
+    Widget addButton() => InkWell(
+          onTap: _uploadingImage ? null : _pickImage,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              border: Border.all(color: scheme.outlineVariant, style: BorderStyle.solid),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: _uploadingImage
+                ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+                : Icon(Icons.add_photo_alternate_outlined, color: scheme.onSurfaceVariant),
+          ),
+        );
+
+    Widget badge(IconData icon, VoidCallback onTap, {Color? bg, Color? fg}) => Positioned(
+          top: -6,
+          right: -6,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: bg ?? scheme.surface,
+                shape: BoxShape.circle,
+                border: Border.all(color: scheme.outlineVariant),
+              ),
+              child: Icon(icon, size: 14, color: fg ?? scheme.onSurfaceVariant),
+            ),
+          ),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Image', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            if (isEdit)
+              ..._images.map(
+                (image) => Padding(
+                  padding: const EdgeInsets.only(top: 6, right: 6),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      InkWell(
+                        onTap: () => _setDefaultImage(image),
+                        borderRadius: BorderRadius.circular(8),
+                        child: ProductThumbnail(url: image.url, size: 72, radius: 8),
+                      ),
+                      if (image.isDefault)
+                        Positioned(
+                          bottom: -4,
+                          left: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
+                            child: Icon(Icons.check, size: 12, color: scheme.onPrimary),
+                          ),
+                        ),
+                      badge(Icons.close, () => _deleteImage(image), bg: scheme.errorContainer, fg: scheme.onErrorContainer),
+                    ],
+                  ),
+                ),
+              )
+            else if (_pendingImagePath != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, right: 6),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(File(_pendingImagePath!), width: 72, height: 72, fit: BoxFit.cover),
+                    ),
+                    badge(Icons.close, () => setState(() => _pendingImagePath = null), bg: scheme.errorContainer, fg: scheme.onErrorContainer),
+                  ],
+                ),
+              ),
+            if (isEdit || _pendingImagePath == null) addButton(),
+          ],
+        ),
+        if (isEdit && _images.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text('Tap an image to set it as default.', style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          ),
+      ],
     );
   }
 
@@ -230,8 +442,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             ),
             const SizedBox(height: 16),
           ],
+          _buildImageSection(context),
+          const SizedBox(height: 16),
           SearchableSelect<int>(
             label: 'Brand',
+            required: true,
             value: _brandId,
             placeholder: 'Select brand',
             options: _brands.map((b) => SelectOption(b.id, b.name)).toList(),
@@ -246,6 +461,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           const SizedBox(height: 16),
           SearchableSelect<int>(
             label: 'Status',
+            required: true,
             value: _statusId,
             placeholder: 'Select status',
             options: _statuses.map((s) => SelectOption(s.id, s.name)).toList(),
@@ -258,7 +474,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Product Name'),
+            decoration: InputDecoration(label: requiredLabel('Product Name')),
             textInputAction: TextInputAction.next,
             validator: (v) {
               if ((v ?? '').trim().isEmpty) return 'Product name is required';
@@ -288,7 +504,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _purchasePriceController,
-                  decoration: const InputDecoration(labelText: 'Purchase Price'),
+                  decoration: InputDecoration(label: requiredLabel('Purchase Price')),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   textInputAction: TextInputAction.next,
                   validator: (v) {
@@ -305,7 +521,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _sellingPriceController,
-                  decoration: const InputDecoration(labelText: 'Selling Price'),
+                  decoration: InputDecoration(label: requiredLabel('Selling Price')),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   textInputAction: TextInputAction.next,
                   validator: (v) {
@@ -323,7 +539,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _minimumStockController,
-            decoration: const InputDecoration(labelText: 'Minimum Stock'),
+            decoration: InputDecoration(label: requiredLabel('Minimum Stock')),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
             validator: (v) {

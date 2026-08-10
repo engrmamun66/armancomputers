@@ -18,6 +18,7 @@ class SearchableSelect<T> extends StatelessWidget {
   final bool allowCreate;
   final Future<SelectOption<T>?> Function(String query)? onCreate;
   final String? errorText;
+  final bool required;
 
   const SearchableSelect({
     super.key,
@@ -29,6 +30,7 @@ class SearchableSelect<T> extends StatelessWidget {
     this.allowCreate = false,
     this.onCreate,
     this.errorText,
+    this.required = false,
   });
 
   String? get _selectedLabel {
@@ -57,7 +59,13 @@ class SearchableSelect<T> extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        Text.rich(
+          TextSpan(
+            text: label,
+            style: Theme.of(context).textTheme.labelLarge,
+            children: required ? const [TextSpan(text: ' *', style: TextStyle(color: Colors.red))] : null,
+          ),
+        ),
         const SizedBox(height: 6),
         InkWell(
           borderRadius: BorderRadius.circular(10),

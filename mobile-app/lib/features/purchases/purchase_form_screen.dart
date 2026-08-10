@@ -12,6 +12,7 @@ import '../../services/purchases_service.dart';
 import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/loading.dart';
+import '../../shared/widgets/product_thumbnail.dart';
 import '../../shared/widgets/remote_search_field.dart';
 import '../../shared/widgets/section_card.dart';
 
@@ -77,6 +78,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
   bool _loading = false;
   bool _submitting = false;
   String? _fetchError;
+  int? _savingPriceForProductId;
 
   bool get _isEdit => widget.id != null;
 
@@ -152,7 +154,6 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
       _items.add(_LineItemDraft(
         productId: product.id,
         productName: product.name,
-        sku: product.sku,
         quantity: 1,
         unitPrice: product.purchasePrice,
       ));
@@ -164,6 +165,24 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
       final draft = _items.removeAt(index);
       draft.dispose();
     });
+  }
+
+  Future<void> _savePurchasePrice(_LineItemDraft draft) async {
+    if (draft.unitPrice < 0) {
+      AppSnackbar.error(context, 'Enter a valid price before saving.');
+      return;
+    }
+    setState(() => _savingPriceForProductId = draft.productId);
+    try {
+      await ref.read(productsServiceProvider).update(draft.productId, {'purchase_price': draft.unitPrice});
+      if (mounted) AppSnackbar.success(context, "Updated ${draft.productName ?? 'product'}'s purchase price.");
+    } on ApiException catch (e) {
+      if (mounted) AppSnackbar.error(context, e.message);
+    } catch (_) {
+      if (mounted) AppSnackbar.error(context, 'Failed to update purchase price.');
+    } finally {
+      if (mounted) setState(() => _savingPriceForProductId = null);
+    }
   }
 
   double get _subtotal => _items.fold(0.0, (sum, d) => sum + d.lineTotal);
@@ -277,6 +296,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                   const SizedBox(height: 14),
                   AppDateField(
                     label: 'Purchase Date',
+                    required: true,
                     value: _purchaseDate,
                     onChanged: (d) => setState(() => _purchaseDate = d),
                   ),
@@ -379,19 +399,28 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
 
   Widget _buildProductResult(BuildContext context, ProductModel product) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(product.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 3),
-        Wrap(
-          spacing: 10,
-          runSpacing: 2,
-          children: [
-            if (product.brand != null) Text(product.brand!.name, style: TextStyle(fontSize: 12, color: muted)),
-            Text('Stock: ${product.currentStock}', style: TextStyle(fontSize: 12, color: muted)),
-            Text('Purchase: ${formatCurrency(product.purchasePrice)}', style: TextStyle(fontSize: 12, color: muted)),
-          ],
+        ProductThumbnail(url: product.imageUrl, size: 36, radius: 6),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(product.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 3),
+              Wrap(
+                spacing: 10,
+                runSpacing: 2,
+                children: [
+                  if (product.brand != null) Text(product.brand!.name, style: TextStyle(fontSize: 12, color: muted)),
+                  Text('Stock: ${product.currentStock}', style: TextStyle(fontSize: 12, color: muted)),
+                  Text('Purchase: ${formatCurrency(product.purchasePrice)}', style: TextStyle(fontSize: 12, color: muted)),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -448,6 +477,13 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                   decoration: const InputDecoration(labelText: 'Unit Price', isDense: true),
                   onChanged: (_) => setState(() {}),
                 ),
+              ),
+              IconButton(
+                icon: _savingPriceForProductId == draft.productId
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.check),
+                tooltip: "Save as this product's purchase price",
+                onPressed: _savingPriceForProductId == draft.productId ? null : () => _savePurchasePrice(draft),
               ),
             ],
           ),

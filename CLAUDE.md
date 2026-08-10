@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repo layout
 
-The actual application lives in `laravel-app/` — run all commands from there, not the repo root. `mobile-app/` is an empty placeholder for a future native client that will consume the same API. `laravel.local-run-process.md` at the repo root has full local setup steps (MySQL creds, demo logins, etc.).
+The web application lives in `laravel-app/` — run all commands from there, not the repo root. `mobile-app/` is a Flutter client (Riverpod + go_router + dio) consuming the same `/api` — see "Mobile app" below. `laravel.local-run-process.md` at the repo root has full local setup steps (MySQL creds, demo logins, etc.) — note it still uses old "Stock In/Stock Out" terminology in places; trust the code/this file over it for naming.
 
 This is a Laravel 12 + Vue 3 SPA **monolith**: Vue owns all client-side routing, Laravel serves one Blade shell (`resources/views/app.blade.php`) and a JSON API under `/api`. Vite is used only for asset compilation/HMR, never for page routing — this is deliberate, it avoids CORS entirely since everything is same-origin.
 
@@ -15,8 +15,8 @@ Run from `laravel-app/`:
 ```bash
 composer run dev          # php artisan serve + queue:listen + pail + vite, concurrently
 php artisan test          # full backend suite
-php artisan test --filter=StockOutTest          # single test class
-php artisan test --filter="stock out rejects insufficient stock"   # single test by name
+php artisan test --filter=SaleTest          # single test class
+php artisan test --filter=test_sale_rejects_insufficient_stock_and_does_not_change_stock   # single test by name
 npm run dev                # vite only (HMR)
 npm run build               # production frontend build — run after any resources/js or resources/css change
 ```
@@ -27,26 +27,28 @@ Tests run against an isolated **in-memory SQLite** DB (`phpunit.xml`), completel
 
 ## Architecture
 
-**Auth**: `tymon/jwt-auth` (NOT Sanctum) — stateless bearer tokens, `auth:api` guard on all routes except login. Chosen so a future mobile client can hit the exact same API. Token TTL is 7 days (`JWT_TTL` in `.env` / `config/jwt.php`).
+**Auth**: `tymon/jwt-auth` (NOT Sanctum) — stateless bearer tokens, `auth:api` guard on all routes except login. Chosen so the mobile client can hit the exact same API (see "Mobile app" below) without a separate auth scheme. Token TTL is 7 days (`JWT_TTL` in `.env` / `config/jwt.php`).
 
-**Roles**: admin / manager / staff, enforced in two independent places that must be kept in sync:
-- Backend: `app/Policies/*` (authoritative — e.g. `StockOutPolicy` lets staff create but not delete/update).
-- Frontend: `resources/js/utils/permissions.js`'s `CAPABILITIES` map + each route's `meta.roles` in `resources/js/router/index.js` (`router.beforeEach` redirects on violation). This only controls what the UI *shows*; it is not a security boundary.
+**Roles**: admin / manager / staff, enforced in three independent places that must be kept in sync:
+- Backend: `app/Policies/*` (authoritative — e.g. `SalePolicy` lets any role create a Sale but only admin/manager update/delete it; `PurchasePolicy` restricts create *and* view to admin/manager — staff have no Purchase access at all).
+- Web frontend: `resources/js/utils/permissions.js`'s `CAPABILITIES` map + each route's `meta.roles` in `resources/js/router/index.js` (`router.beforeEach` redirects on violation).
+- Mobile: `mobile-app/lib/core/permissions.dart`'s `kCapabilities` map, which the file's own doc-comment says "mirrors resources/js/utils/permissions.js exactly" — update both together.
 
-**Status model**: a single polymorphic-by-convention `statuses` table backs Product/Customer/Brand/User ("general": active/inactive), StockIn/StockOut/Invoice status (completed/cancelled/issued), scoped by `Status::TYPE_*` constants. Look up IDs via `Status::id($type, $slug)`, never hardcode a status ID.
+None of the frontend copies are a security boundary; they only control what each UI *shows*.
 
-**Stock In / Stock Out are the core modules** — everything else supports them. Both follow the same shape in `app/Http/Controllers/Api/{StockIn,StockOut}Controller.php`:
-- `store()`/`update()`/`destroy()` wrapped in `DB::transaction`.
-- Stock changes use `lockForUpdate()` + atomic conditional decrements (`->where('current_stock', '>=', qty)->decrement(...)`) with a post-check that throws (→ 422) if it would go negative. This is what makes concurrent Stock Out requests safe — verified historically with real parallel HTTP requests, not just unit assertions.
-- `update()`/`destroy()` use a reverse-then-reapply pattern (increment old effect, then apply new) so edits and cancellations can never leave stock in a wrong state.
-- Stock Out auto-creates a 1:1 `Invoice` with matching items/totals; editing or deleting a Stock Out keeps its Invoice in sync (Invoices have no independent create/update/delete — `InvoicePolicy` is view-only).
-- Reference numbers (`SI-YYYY-NNNNNN` / `SO-YYYY-NNNNNN`) come from `app/Services/ReferenceNumberGenerator.php`, which also uses `lockForUpdate()` to stay race-safe.
+**Status model**: a single polymorphic-by-convention `statuses` table backs Product/Customer/Brand/User ("general": active/inactive), Purchase/Sale/Invoice status (completed/cancelled/issued), scoped by `Status::TYPE_*` constants (`TYPE_GENERAL`/`TYPE_PURCHASE`/`TYPE_SALE`/`TYPE_INVOICE`). Look up IDs via `Status::id($type, $slug)`, never hardcode a status ID.
+
+**Purchase / Sale are the core modules** (formerly "Stock In / Stock Out" — that naming still lingers in `laravel.local-run-process.md` and some UI component paths like `components/stock/`, but the models/controllers/routes/tests are all Purchase/Sale now) — everything else supports them. Both live in `app/Http/Controllers/Api/{Purchase,Sale}Controller.php` and wrap `store()`/`update()`/`destroy()` in `DB::transaction`, but their stock-safety mechanics differ because one increases stock and the other decreases it:
+- **Sale** (decreases stock, the riskier direction): `store()`/`update()` first `lockForUpdate()` the `Product` row, check `current_stock` is sufficient, then apply an atomic conditional decrement (`->where('current_stock', '>=', qty)->decrement(...)`) and throw immediately (→ 422) if it affected zero rows. This is what makes concurrent Sale requests safe — verified historically with real parallel HTTP requests, not just unit assertions. `update()`/`destroy()` reverse the old effect (plain increment) before reapplying the new one, so edits and cancellations can never leave stock in a wrong state.
+- **Purchase** (increases stock on create; the risk is only on reversal): `store()` just increments. `update()`/`destroy()` reverse the old effect with a plain decrement, then check across all affected product IDs (`where('current_stock', '<', 0)->exists()`) and throw a `RuntimeException` (caught → 422) if the reversal would go negative — no row locking needed since only the reversal step can go negative and that's checked before commit.
+- Sale auto-creates a 1:1 `Invoice` (linked via `sale_id`) with matching items/totals; editing or deleting a Sale keeps its Invoice in sync (Invoices have no independent create/update/delete — `InvoicePolicy` is view-only). Purchase has no Invoice.
+- Reference numbers (`PUR-YYYY-NNNN` / `SAL-YYYY-NNNN` / `INV-YYYY-NNNN`) come from `app/Services/ReferenceNumberGenerator.php::generate($prefix, $table, $column)`, which also uses `lockForUpdate()` to stay race-safe.
 
 **List/index endpoints** share two small conventions worth reusing rather than reinventing per-controller:
 - Sorting: `app/Http/Controllers/Concerns/Sortable.php` — `applySort($query, $request, $sortMap, $defaultKey, $defaultDir)` where `$sortMap` whitelists `sort_by` keys to either a real column or a `Closure($query, $dir)` for relation columns (e.g. sort Products by `brand` via a correlated subquery on `brands.name`). Never interpolate `sort_by` into raw SQL.
-- Stock In/Out list responses include a `totals` key (items/qty/amount) computed over the *entire filtered result set* via a cloned pre-pagination query, not just the current page.
+- Purchase/Sale list responses include a `totals` key (items/qty/amount; Sale additionally reports cost/profit/due) computed over the *entire filtered result set* via a cloned pre-pagination query, not just the current page.
 
-**Soft deletes**: Product, Customer, Brand, User are soft-deleted. Every `belongsTo` that points at one of them (e.g. `StockOut::customer()`, `StockIn::creator()`) is declared `->withTrashed()` so historical transactions keep displaying correctly after the parent is deleted. If you add a new relation to one of these models, apply the same pattern or history will silently break.
+**Soft deletes**: Product, Customer, Brand, User are soft-deleted. Every `belongsTo` that points at one of them (e.g. `Sale::customer()`, `Purchase::creator()`) is declared `->withTrashed()` so historical transactions keep displaying correctly after the parent is deleted. If you add a new relation to one of these models, apply the same pattern or history will silently break.
 
 **Date columns are plain strings, not Eloquent date casts.** `purchase_date`/`sale_date`/`invoice_date` deliberately have no `'date'` cast. Eloquent's `date` cast only affects the *read* format — on write it always stores full `Y-m-d H:i:s` regardless of the cast's format modifier, which corrupted date-based grouping/filtering earlier in this project's history. Keep passing/storing these as plain `Y-m-d` strings; if seeding, call `->toDateString()` explicitly.
 
@@ -56,7 +58,15 @@ Tests run against an isolated **in-memory SQLite** DB (`phpunit.xml`), completel
 - `components/tables/DataTable.vue` is the shared list-table component: pass `columns` (`{ key, label, align, sortable }`) + `rows`, provide `#cell-<key>` slots for custom rendering, `#footer` slot for a totals row. It renders its own sortable column headers and emits `@sort(key)` — the parent view owns the actual `sort_by`/`sort_dir` state and refetch (see any `*List.vue` for the pattern: toggle asc/desc if the same key is clicked again, else reset to asc).
 - Every list view has both a desktop `<table>` (via DataTable, `hidden md:block`) and an independent mobile card list (`md:hidden`) — these are two separate template blocks that must be updated together; there is no shared row-rendering logic between them.
 - `components/common/SelectSearch.vue` is a searchable dropdown for **small fixed enumerable option lists** (Status, Role, payment method) with an optional inline "add new" (`allow-create` + `create-fn` prop — only wired up for Brand, since Role/Status/payment-method values are hardcoded elsewhere in both frontend permission logic and backend business logic, so letting users freely create new ones would silently break things). `components/common/{Product,Customer}Search.vue` are async debounced remote-search dropdowns for large/dynamic collections instead — don't use SelectSearch for those.
-- `components/common/DateRangePicker.vue` wraps the third-party `em-datetimepicker` widget (`resources/js/vendor/em-datetimepicker/`, `components/common/EmDateTimePicker.vue`). Default mode is two separate date inputs; pass `unified` + `:presets="[...]"` for the single-field range-with-presets variant (used on Stock In/Out/Invoice lists). This is the only date input in the app — never add a native `<input type="date">`.
+- `components/common/DateRangePicker.vue` wraps the third-party `em-datetimepicker` widget (`resources/js/vendor/em-datetimepicker/`, `components/common/EmDateTimePicker.vue`). Default mode is two separate date inputs; pass `unified` + `:presets="[...]"` for the single-field range-with-presets variant (used on Purchase/Sale/Invoice lists). This is the only date input in the app — never add a native `<input type="date">`.
+
+## Mobile app
+
+`mobile-app/` is a Flutter client (Riverpod for state, `go_router` for routing, `dio` for HTTP, `flutter_secure_storage` for the JWT) hitting the same `/api` as the web SPA — this is the payoff of the jwt-auth choice above. It structurally mirrors the Laravel/Vue side rather than following idiomatic Flutter conventions of its own:
+- `lib/services/*.dart` — one per resource, thin wrappers around a shared `dio` instance (`lib/core/api_client.dart`), same 1:1 split as `resources/js/services/*.js`.
+- `lib/features/{sales,purchases,products,...}/` — screens grouped by resource, paralleling `resources/js/views/*`.
+- `lib/core/permissions.dart` mirrors `resources/js/utils/permissions.js` exactly (see Roles above) — keep both in sync.
+- Run/build commands (Chrome dev, Android emulator/device, APK build) are documented in `mobile-app.md` at the repo root, not here — check there before assuming Flutter tooling.
 
 ## Theming
 

@@ -17,7 +17,9 @@ import '../../shared/widgets/app_date_field.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
+import '../../shared/widgets/product_thumbnail.dart';
 import '../../shared/widgets/remote_search_field.dart';
+import '../../shared/widgets/required_label.dart';
 import '../../shared/widgets/searchable_select.dart';
 import '../../shared/widgets/section_card.dart';
 
@@ -70,6 +72,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
   String? _loadError;
   bool _submitting = false;
   bool _showValidation = false;
+  int? _savingPriceForProductId;
 
   CustomerRef? _customer;
   DateTime? _saleDate;
@@ -174,7 +177,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
         _items.add(_CartItem(
           productId: product.id,
           productName: product.name,
-          sku: product.sku,
           currentStock: product.currentStock,
           quantity: 1,
           unitPrice: product.sellingPrice,
@@ -188,6 +190,24 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
       _items[index].dispose();
       _items.removeAt(index);
     });
+  }
+
+  Future<void> _saveSellingPrice(_CartItem item) async {
+    if (item.unitPrice < 0) {
+      AppSnackbar.error(context, 'Enter a valid price before saving.');
+      return;
+    }
+    setState(() => _savingPriceForProductId = item.productId);
+    try {
+      await ref.read(productsServiceProvider).update(item.productId, {'selling_price': item.unitPrice});
+      if (mounted) AppSnackbar.success(context, "Updated ${item.productName}'s selling price.");
+    } on ApiException catch (e) {
+      if (mounted) AppSnackbar.error(context, e.message);
+    } catch (_) {
+      if (mounted) AppSnackbar.error(context, 'Failed to update selling price.');
+    } finally {
+      if (mounted) setState(() => _savingPriceForProductId = null);
+    }
   }
 
   Future<int> _resolveActiveGeneralStatusId() async {
@@ -224,7 +244,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
               TextField(
                 controller: controller,
                 autofocus: true,
-                decoration: InputDecoration(labelText: 'Customer Name', errorText: error),
+                decoration: InputDecoration(label: requiredLabel('Customer Name'), errorText: error),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -440,6 +460,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
         children: [
           AppDateField(
             label: 'Sale Date',
+            required: true,
             value: _saleDate,
             onChanged: (d) => setState(() => _saleDate = d),
             errorText: _showValidation && _saleDate == null ? 'Sale date is required' : null,
@@ -474,6 +495,8 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
             search: (q) => ref.read(productsServiceProvider).search(q),
             itemBuilder: (ctx, p) => Row(
               children: [
+                ProductThumbnail(url: p.imageUrl, size: 36, radius: 6),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,6 +601,13 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
                   },
                 ),
               ),
+              IconButton(
+                icon: _savingPriceForProductId == item.productId
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.check),
+                tooltip: "Save as this product's selling price",
+                onPressed: _savingPriceForProductId == item.productId ? null : () => _saveSellingPrice(item),
+              ),
             ],
           ),
           if (overStock) ...[
@@ -632,6 +662,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
           const SizedBox(height: 14),
           SearchableSelect<String>(
             label: 'Payment Method',
+            required: true,
             value: _paymentMethod,
             options: kPaymentMethods.map((m) => SelectOption(m['value']!, m['label']!)).toList(),
             onChanged: (v) => setState(() => _paymentMethod = v),

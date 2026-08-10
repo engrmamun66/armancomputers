@@ -22,7 +22,7 @@ class HomeShell extends ConsumerWidget {
       const NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Dashboard'),
       const NavigationDestination(icon: Icon(Icons.inventory_2_outlined), selectedIcon: Icon(Icons.inventory_2), label: 'Products'),
       const NavigationDestination(icon: Icon(Icons.arrow_circle_down_outlined), selectedIcon: Icon(Icons.arrow_circle_down), label: 'Purchase'),
-      const NavigationDestination(icon: Icon(Icons.upload_outlined), selectedIcon: Icon(Icons.upload), label: 'Sales'),
+      const NavigationDestination(icon: Icon(Icons.arrow_circle_up_outlined), selectedIcon: Icon(Icons.arrow_circle_up), label: 'Sales'),
       const NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
     ];
 

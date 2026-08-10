@@ -12,6 +12,7 @@ import '../../services/products_service.dart';
 import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
+import '../../shared/widgets/product_thumbnail.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
 
@@ -153,6 +154,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Center(
+            child: Column(
+              children: [
+                ProductThumbnail(url: product.imageUrl, size: 120, radius: 12),
+                if (product.images.length > 1) ...[
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: product.images
+                        .map((img) => ProductThumbnail(url: img.url, size: 40, radius: 6))
+                        .toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           SectionCard(
             title: 'Product Details',
             trailing: StatusBadge(status: product.status?.slug ?? product.status?.name ?? 'unknown'),

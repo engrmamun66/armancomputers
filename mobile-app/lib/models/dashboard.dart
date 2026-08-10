@@ -8,6 +8,10 @@ class DashboardCards {
   final int totalCustomers;
   final int lowStockProducts;
   final int outOfStockProducts;
+  final double totalSalesAmount;
+  final double totalPurchaseCost;
+  final double totalProfit;
+  final double totalDue;
 
   DashboardCards({
     required this.totalProducts,
@@ -19,6 +23,10 @@ class DashboardCards {
     required this.totalCustomers,
     required this.lowStockProducts,
     required this.outOfStockProducts,
+    required this.totalSalesAmount,
+    required this.totalPurchaseCost,
+    required this.totalProfit,
+    required this.totalDue,
   });
 
   factory DashboardCards.fromJson(Map<String, dynamic> json) => DashboardCards(
@@ -31,6 +39,10 @@ class DashboardCards {
         totalCustomers: (json['total_customers'] as num).toInt(),
         lowStockProducts: (json['low_stock_products'] as num).toInt(),
         outOfStockProducts: (json['out_of_stock_products'] as num).toInt(),
+        totalSalesAmount: (json['total_sales_amount'] as num?)?.toDouble() ?? 0,
+        totalPurchaseCost: (json['total_purchase_cost'] as num?)?.toDouble() ?? 0,
+        totalProfit: (json['total_profit'] as num?)?.toDouble() ?? 0,
+        totalDue: (json['total_due'] as num?)?.toDouble() ?? 0,
       );
 }
 

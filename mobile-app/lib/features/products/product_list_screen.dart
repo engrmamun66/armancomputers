@@ -18,6 +18,7 @@ import '../../shared/widgets/app_snackbar.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/loading.dart';
 import '../../shared/widgets/pagination_controls.dart';
+import '../../shared/widgets/product_thumbnail.dart';
 import '../../shared/widgets/search_field.dart';
 import '../../shared/widgets/searchable_select.dart';
 import '../../shared/widgets/status_badge.dart';
@@ -406,26 +407,41 @@ class _ProductCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ProductThumbnail(url: product.imageUrl, size: 44),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      product.name,
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                product.name,
+                                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            StatusBadge(status: product.status?.slug ?? product.status?.name ?? 'unknown'),
+                          ],
+                        ),
+                        if (product.brand != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            product.brand!.name,
+                            style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  StatusBadge(status: product.status?.slug ?? product.status?.name ?? 'unknown'),
                 ],
               ),
-              const SizedBox(height: 4),
-              if (product.brand != null)
-                Text(
-                  product.brand!.name,
-                  style: theme.textTheme.bodySmall?.copyWith(color: muted),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
               const SizedBox(height: 10),
               Row(
                 children: [

@@ -12,6 +12,7 @@ class AppDateField extends StatelessWidget {
   final DateTime? lastDate;
   final String? errorText;
   final VoidCallback? onClear;
+  final bool required;
 
   const AppDateField({
     super.key,
@@ -22,6 +23,7 @@ class AppDateField extends StatelessWidget {
     this.lastDate,
     this.errorText,
     this.onClear,
+    this.required = false,
   });
 
   Future<void> _pick(BuildContext context) async {
@@ -40,7 +42,13 @@ class AppDateField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        Text.rich(
+          TextSpan(
+            text: label,
+            style: Theme.of(context).textTheme.labelLarge,
+            children: required ? const [TextSpan(text: ' *', style: TextStyle(color: Colors.red))] : null,
+          ),
+        ),
         const SizedBox(height: 6),
         InkWell(
           borderRadius: BorderRadius.circular(10),

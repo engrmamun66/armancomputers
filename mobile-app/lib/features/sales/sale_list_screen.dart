@@ -18,6 +18,7 @@ import '../../shared/widgets/search_field.dart';
 import '../../shared/widgets/searchable_select.dart';
 import '../../shared/widgets/section_card.dart';
 import '../../shared/widgets/status_badge.dart';
+import '../dashboard/widgets/stat_card.dart';
 
 /// Bottom-nav shell tab — the single most business-critical screen in the
 /// app, since every Sale here auto-creates a linked Invoice server-side.
@@ -284,15 +285,73 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
   }
 
   Widget _buildTotals(BuildContext context, Map<String, dynamic> totals) {
-    return SectionCard(
-      title: 'Summary (filtered)',
-      child: Row(
-        children: [
-          Expanded(child: _stat(context, 'Items', '${totals['items_count'] ?? 0}')),
-          Expanded(child: _stat(context, 'Total Qty', '${totals['total_qty'] ?? 0}')),
-          Expanded(child: _stat(context, 'Total Amount', formatCurrency(totals['total_amount'] as num?))),
-        ],
-      ),
+    final success = AppColors.success(context);
+    final danger = AppColors.danger(context);
+    final profit = (totals['total_profit'] as num?)?.toDouble() ?? 0;
+    final due = (totals['total_due'] as num?)?.toDouble() ?? 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionCard(
+          title: 'Summary (filtered)',
+          child: Row(
+            children: [
+              Expanded(child: _stat(context, 'Items', '${totals['items_count'] ?? 0}')),
+              Expanded(child: _stat(context, 'Total Qty', '${totals['total_qty'] ?? 0}')),
+              Expanded(child: _stat(context, 'Total Sale', formatCurrency(totals['total_amount'] as num?))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const spacing = 12.0;
+            final itemWidth = (constraints.maxWidth - spacing) / 2;
+            return Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              children: [
+                SizedBox(
+                  width: itemWidth,
+                  child: StatCard(
+                    data: StatCardData(
+                      label: 'Total Purchase Cost',
+                      value: formatCurrency(totals['total_cost'] as num?),
+                      icon: Icons.arrow_circle_down_outlined,
+                      emphasize: true,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: StatCard(
+                    data: StatCardData(
+                      label: 'Total Profit',
+                      value: formatCurrency(profit),
+                      icon: Icons.trending_up,
+                      tint: profit >= 0 ? success : danger,
+                      emphasize: true,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: itemWidth,
+                  child: StatCard(
+                    data: StatCardData(
+                      label: 'Total Due',
+                      value: formatCurrency(due),
+                      icon: Icons.receipt_long_outlined,
+                      tint: due > 0 ? danger : success,
+                      emphasize: true,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 

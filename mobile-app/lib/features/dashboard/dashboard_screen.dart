@@ -152,6 +152,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               onCustomToChanged: _onCustomToChanged,
             ),
             const SizedBox(height: 20),
+            _FinancialStatsGrid(cards: data.cards),
+            const SizedBox(height: 20),
             _StatsGrid(cards: data.cards),
             const SizedBox(height: 20),
             SectionCard(
@@ -186,6 +188,64 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Four prominent, full-width financial KPIs shown above the regular grid —
+/// mirrors the web Dashboard.vue's "emphasized" top row. Total Sales /
+/// Purchase Cost / Profit are period-scoped (same range selector as the rest
+/// of the page); Total Due is an all-time outstanding-receivables balance,
+/// intentionally not period-scoped, matching the web behavior.
+class _FinancialStatsGrid extends StatelessWidget {
+  final DashboardCards cards;
+
+  const _FinancialStatsGrid({required this.cards});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final success = AppColors.success(context);
+    final danger = AppColors.danger(context);
+
+    final items = <StatCardData>[
+      StatCardData(
+        label: 'Total Sales (period)',
+        value: formatCurrency(cards.totalSalesAmount),
+        icon: Icons.arrow_circle_up_outlined,
+        tint: scheme.primary,
+        emphasize: true,
+      ),
+      StatCardData(
+        label: 'Total Purchase Cost (period)',
+        value: formatCurrency(cards.totalPurchaseCost),
+        icon: Icons.arrow_circle_down_outlined,
+        tint: scheme.primary,
+        emphasize: true,
+      ),
+      StatCardData(
+        label: 'Total Profit (period)',
+        value: formatCurrency(cards.totalProfit),
+        icon: Icons.trending_up,
+        tint: cards.totalProfit >= 0 ? success : danger,
+        emphasize: true,
+      ),
+      StatCardData(
+        label: 'Total Due',
+        value: formatCurrency(cards.totalDue),
+        icon: Icons.receipt_long_outlined,
+        tint: cards.totalDue > 0 ? danger : success,
+        emphasize: true,
+      ),
+    ];
+
+    return Column(
+      children: [
+        for (final item in items) ...[
+          StatCard(data: item),
+          if (item != items.last) const SizedBox(height: 12),
+        ],
+      ],
     );
   }
 }

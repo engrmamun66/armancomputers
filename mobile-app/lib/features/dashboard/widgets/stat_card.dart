@@ -7,12 +7,14 @@ class StatCardData {
   final String value;
   final IconData icon;
   final Color? tint;
+  final bool emphasize;
 
   const StatCardData({
     required this.label,
     required this.value,
     required this.icon,
     this.tint,
+    this.emphasize = false,
   });
 }
 
@@ -29,21 +31,28 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final tint = data.tint ?? scheme.primary;
+    final chipSize = data.emphasize ? 46.0 : 40.0;
 
     return Card(
+      shape: data.emphasize
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: tint.withValues(alpha: 0.35), width: 1.5),
+            )
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: 40,
-              width: 40,
+              height: chipSize,
+              width: chipSize,
               decoration: BoxDecoration(
                 color: tint.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(data.icon, color: tint, size: 20),
+              child: Icon(data.icon, color: tint, size: data.emphasize ? 22 : 20),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -63,10 +72,8 @@ class StatCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     data.value,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: (data.emphasize ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium)
+                        ?.copyWith(fontWeight: FontWeight.bold, color: data.emphasize ? tint : null),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

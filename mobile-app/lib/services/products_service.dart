@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/api_client.dart';
@@ -34,6 +35,21 @@ class ProductsService {
   }
 
   Future<void> remove(int id) => ref.read(dioProvider).delete('/products/$id');
+
+  Future<ProductImageModel> uploadImage(int productId, String filePath, {bool isDefault = false}) async {
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(filePath),
+      if (isDefault) 'is_default': '1',
+    });
+    final res = await ref.read(dioProvider).post('/products/$productId/images', data: formData);
+    return ProductImageModel.fromJson(res.data['data'] as Map<String, dynamic>);
+  }
+
+  Future<void> deleteImage(int productId, int imageId) =>
+      ref.read(dioProvider).delete('/products/$productId/images/$imageId');
+
+  Future<void> setDefaultImage(int productId, int imageId) =>
+      ref.read(dioProvider).patch('/products/$productId/images/$imageId/default');
 
   Future<List<StockHistoryEntry>> stockHistory(int id) async {
     final res = await ref.read(dioProvider).get('/products/$id/stock-history');

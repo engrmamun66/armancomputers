@@ -17,10 +17,9 @@ class ApiConfig {
 
   /// The backend's APP_URL host differs from what the running app can
   /// reach (127.0.0.1 inside the emulator is the emulator itself, not the
-  /// host machine). Rewrite any absolute media URL the API returns so it
-  /// resolves correctly against the configured origin.
+  /// host machine). Rewrite any absolute media URL the API returns — whatever
+  /// scheme/host/port it was built with — to the configured origin instead.
   static String resolveUrl(String url) {
-    final host = origin.replaceFirst(RegExp(r'^https?://'), '');
-    return url.replaceFirst('127.0.0.1:8000', host).replaceFirst('localhost:8000', host);
+    return url.replaceFirst(RegExp(r'^https?://[^/]+'), origin);
   }
 }
