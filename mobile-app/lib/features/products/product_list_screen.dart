@@ -208,12 +208,9 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
             },
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
+          Row(
             children: [
-              SizedBox(
-                width: 170,
+              Expanded(
                 child: SearchableSelect<int>(
                   label: 'Brand',
                   value: _brandId,
@@ -228,8 +225,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                   },
                 ),
               ),
-              SizedBox(
-                width: 170,
+              const SizedBox(width: 12),
+              Expanded(
                 child: SearchableSelect<String>(
                   label: 'Stock Status',
                   value: _stockStatus,
@@ -246,8 +243,12 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                   },
                 ),
               ),
-              SizedBox(
-                width: 170,
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
                 child: SearchableSelect<int>(
                   label: 'Status',
                   value: _statusId,
@@ -262,7 +263,8 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                   },
                 ),
               ),
-              SizedBox(width: 170, child: _buildSortControl(context)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildSortControl(context)),
             ],
           ),
           if (_hasFilters)
@@ -391,8 +393,8 @@ class _ProductCard extends StatelessWidget {
         stockFg = AppColors.warning(context);
         break;
       default:
-        stockBg = AppColors.successBg(context);
-        stockFg = AppColors.success(context);
+        stockBg = AppColors.neutralBg(context);
+        stockFg = AppColors.muted(context);
     }
 
     return Card(

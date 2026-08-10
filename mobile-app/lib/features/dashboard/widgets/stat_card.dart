@@ -72,7 +72,9 @@ class StatCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     data.value,
-                    style: (data.emphasize ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium)
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold, color: data.emphasize ? tint : null),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

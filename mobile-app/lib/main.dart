@@ -45,7 +45,7 @@ class ArmanComputersApp extends ConsumerWidget {
     ));
 
     return MaterialApp.router(
-      title: 'Arman Computers',
+      title: 'A-C',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.light(),

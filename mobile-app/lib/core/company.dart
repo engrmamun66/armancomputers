@@ -1,7 +1,7 @@
 class Company {
   static const name = 'Arman Computers';
-  static const phone = '+880 1700-000000';
-  static const email = 'info@armancomputers.com';
-  static const address = 'Shop 12, Elephant Road, Dhaka 1205, Bangladesh';
-  static const hours = 'Sat–Thu, 10:00 AM – 8:00 PM';
+  static const phone = '+880 1960-034350';
+  static const email = 'armanfahad50@gmail.com';
+  static const address = '305, Shaid janani jahanara imam sarani, Newmarket Dhaka.';
+  static const hours = 'Sat-Thu, 10:00 AM - 9:00 PM';
 }

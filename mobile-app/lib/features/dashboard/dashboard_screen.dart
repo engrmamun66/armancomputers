@@ -272,7 +272,7 @@ class _StatsGrid extends StatelessWidget {
         icon: Icons.inventory_2_outlined,
       ),
       StatCardData(
-        label: 'Total Stock Quantity',
+        label: 'Total Stock',
         value: _intFmt.format(cards.totalStockQuantity),
         icon: Icons.layers_outlined,
       ),

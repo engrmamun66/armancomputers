@@ -1,7 +1,7 @@
 export const COMPANY = {
     name: 'Arman Computers',
-    phone: '+880 1700-000000',
-    email: 'info@armancomputers.com',
-    address: 'Shop 12, Elephant Road, Dhaka 1205, Bangladesh',
-    hours: 'Sat–Thu, 10:00 AM – 8:00 PM',
+    phone: '+880 1960-034350',
+    email: 'armanfahad50@gmail.com',
+    address: '305, Shaid janani jahanara imam sarani, Newmarket Dhaka.',
+    hours: 'Sat-Thu, 10:00 AM - 9:00 PM',
 };

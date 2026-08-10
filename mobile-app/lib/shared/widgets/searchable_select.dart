@@ -130,53 +130,60 @@ class _SelectSheetState<T> extends State<_SelectSheet<T>> {
   @override
   Widget build(BuildContext context) {
     final showCreate = widget.allowCreate && _query.trim().isNotEmpty && !_exactMatch;
+    final mq = MediaQuery.of(context);
+    // Cap total sheet height to the space above the keyboard (+ safe-area top),
+    // so the list below shrinks via Flexible instead of overflowing when the
+    // keyboard is open and shrinks the visible viewport.
+    final maxSheetHeight = mq.size.height - mq.viewInsets.bottom - mq.padding.top - 32;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
           left: 16,
           right: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          bottom: mq.viewInsets.bottom + 16,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
-            TextField(
-              autofocus: true,
-              decoration: const InputDecoration(hintText: 'Search…', prefixIcon: Icon(Icons.search, size: 20)),
-              onChanged: (v) => setState(() => _query = v),
-            ),
-            const SizedBox(height: 8),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.45),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  ..._filtered.map(
-                    (o) => ListTile(
-                      title: Text(o.label),
-                      onTap: () => Navigator.of(context).pop(o.value),
-                    ),
-                  ),
-                  if (_filtered.isEmpty && !showCreate)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Text('No results found.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                    ),
-                  if (showCreate)
-                    ListTile(
-                      leading: _creating
-                          ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                          : const Icon(Icons.add),
-                      title: Text('Add "${_query.trim()}"'),
-                      onTap: _creating ? null : _create,
-                    ),
-                ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxSheetHeight.clamp(200, mq.size.height)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 12),
+              TextField(
+                autofocus: true,
+                decoration: const InputDecoration(hintText: 'Search…', prefixIcon: Icon(Icons.search, size: 20)),
+                onChanged: (v) => setState(() => _query = v),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    ..._filtered.map(
+                      (o) => ListTile(
+                        title: Text(o.label),
+                        onTap: () => Navigator.of(context).pop(o.value),
+                      ),
+                    ),
+                    if (_filtered.isEmpty && !showCreate)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text('No results found.', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                      ),
+                    if (showCreate)
+                      ListTile(
+                        leading: _creating
+                            ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.add),
+                        title: Text('Add "${_query.trim()}"'),
+                        onTap: _creating ? null : _create,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -90,7 +90,7 @@ onMounted(load);
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard label="Total Products" :value="data.cards.total_products" icon="box" />
-                <StatCard label="Total Stock Quantity" :value="data.cards.total_stock_quantity" icon="box" />
+                <StatCard label="Total Stock" :value="data.cards.total_stock_quantity" icon="box" />
                 <StatCard label="Purchase (period)" :value="data.cards.total_purchases" icon="arrow-down-tray" />
                 <StatCard label="Sales (period)" :value="data.cards.total_sales" icon="arrow-up-tray" />
                 <StatCard label="Today's Sales" :value="formatCurrency(data.cards.todays_sales)" icon="document-text" />
