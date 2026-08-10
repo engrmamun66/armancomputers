@@ -70,7 +70,7 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
     });
     try {
       final params = <String, dynamic>{
-        'sort_by': 'sale_date',
+        'sort_by': 'id',
         'sort_dir': 'desc',
         'page': _page,
       };

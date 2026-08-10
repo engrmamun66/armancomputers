@@ -58,12 +58,28 @@ async function loadInvoices() {
     }
 }
 
+const DEFAULT_SORT_BY = 'invoice_date';
+const DEFAULT_SORT_DIR = 'desc';
+
 function hasActiveFilters() {
-    return !!(filters.search || filters.date_from || filters.date_to);
+    return !!(
+        filters.search ||
+        filters.date_from ||
+        filters.date_to ||
+        filters.sort_by !== DEFAULT_SORT_BY ||
+        filters.sort_dir !== DEFAULT_SORT_DIR
+    );
 }
 
 function clearFilters() {
-    Object.assign(filters, { search: '', date_from: '', date_to: '', page: 1 });
+    Object.assign(filters, {
+        search: '',
+        date_from: '',
+        date_to: '',
+        sort_by: DEFAULT_SORT_BY,
+        sort_dir: DEFAULT_SORT_DIR,
+        page: 1,
+    });
 }
 
 function onSort(key) {

@@ -48,6 +48,7 @@ class PurchaseController extends Controller
             ->withSum('items as total_qty', 'quantity');
 
         $this->applySort($filtered, $request, [
+            'id' => 'id',
             'reference_no' => 'reference_no',
             'purchase_date' => 'purchase_date',
             'supplier_name' => 'supplier_name',
@@ -57,7 +58,7 @@ class PurchaseController extends Controller
             'status' => 'status_id',
             'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'purchases.created_by'), $dir),
             'created_at' => 'created_at',
-        ], 'purchase_date', 'desc');
+        ], 'id', 'desc');
         $filtered->orderByDesc('id');
 
         $purchases = $filtered->paginate($request->integer('per_page', 15));

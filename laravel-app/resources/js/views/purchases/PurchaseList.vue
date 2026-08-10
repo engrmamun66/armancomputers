@@ -38,7 +38,7 @@ const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
 const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0 });
 const loading = ref(false);
 const statuses = ref([]);
-const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', sort_by: 'purchase_date', sort_dir: 'desc', page: 1 });
+const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', sort_by: 'id', sort_dir: 'desc', page: 1 });
 
 async function loadStatuses() {
     const { data } = await lookups.statuses('purchase');
@@ -78,12 +78,30 @@ function onSort(key) {
     loadPurchases();
 }
 
+const DEFAULT_SORT_BY = 'id';
+const DEFAULT_SORT_DIR = 'desc';
+
 function hasActiveFilters() {
-    return !!(filters.search || filters.date_from || filters.date_to || filters.status_id);
+    return !!(
+        filters.search ||
+        filters.date_from ||
+        filters.date_to ||
+        filters.status_id ||
+        filters.sort_by !== DEFAULT_SORT_BY ||
+        filters.sort_dir !== DEFAULT_SORT_DIR
+    );
 }
 
 function clearFilters() {
-    Object.assign(filters, { search: '', date_from: '', date_to: '', status_id: '', page: 1 });
+    Object.assign(filters, {
+        search: '',
+        date_from: '',
+        date_to: '',
+        status_id: '',
+        sort_by: DEFAULT_SORT_BY,
+        sort_dir: DEFAULT_SORT_DIR,
+        page: 1,
+    });
 }
 
 watch([() => filters.search, () => filters.date_from, () => filters.date_to, () => filters.status_id], () => {

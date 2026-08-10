@@ -69,6 +69,7 @@ class SaleController extends Controller
             ->withSum('items as total_qty', 'quantity');
 
         $this->applySort($filtered, $request, [
+            'id' => 'id',
             'reference_no' => 'reference_no',
             'sale_date' => 'sale_date',
             'customer' => fn ($q, $dir) => $q->orderBy(Customer::select('name')->whereColumn('customers.id', 'sales.customer_id'), $dir),
@@ -79,7 +80,7 @@ class SaleController extends Controller
             'due_amount' => 'due_amount',
             'status' => 'status_id',
             'created_by' => fn ($q, $dir) => $q->orderBy(User::select('name')->whereColumn('users.id', 'sales.created_by'), $dir),
-        ], 'sale_date', 'desc');
+        ], 'id', 'desc');
         $filtered->orderByDesc('id');
 
         $sales = $filtered->paginate($request->integer('per_page', 15));

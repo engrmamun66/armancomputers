@@ -71,7 +71,7 @@ class _PurchaseListScreenState extends ConsumerState<PurchaseListScreen> {
       _error = null;
     });
     final params = <String, dynamic>{
-      'sort_by': 'purchase_date',
+      'sort_by': 'id',
       'sort_dir': 'desc',
       'page': _page,
     };
@@ -255,14 +255,17 @@ class _PurchaseListScreenState extends ConsumerState<PurchaseListScreen> {
       child: Row(
         children: [
           Expanded(
+            flex: 1,
             child: _totalStat(context, 'Items', '${_asNum(totals['items_count'])?.toInt() ?? 0}'),
           ),
           Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outlineVariant),
           Expanded(
+            flex: 1,
             child: _totalStat(context, 'Total Qty', '${_asNum(totals['total_qty'])?.toInt() ?? 0}'),
           ),
           Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outlineVariant),
           Expanded(
+            flex: 2,
             child: _totalStat(context, 'Amount', formatCurrency(_asNum(totals['total_amount']))),
           ),
         ],
