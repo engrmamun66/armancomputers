@@ -66,6 +66,7 @@ onMounted(async () => {
             current_stock: null,
             quantity: item.quantity,
             unit_price: item.unit_price,
+            warranty_end_date: item.warranty_end_date?.slice(0, 10) || '',
         }));
     }
     loading.value = false;
@@ -83,6 +84,7 @@ function addProduct(product) {
         current_stock: product.current_stock,
         quantity: 1,
         unit_price: product.purchase_price,
+        warranty_end_date: '',
     });
 }
 
@@ -201,6 +203,7 @@ async function submit() {
                 product_id: item.product_id,
                 quantity: Number(item.quantity),
                 unit_price: Number(item.unit_price),
+                warranty_end_date: item.warranty_end_date || null,
             })),
         };
 
@@ -311,13 +314,14 @@ async function submit() {
                                 <th class="py-2 pr-3 text-center">Current Stock</th>
                                 <th class="py-2 pr-3 text-center w-28">Qty</th>
                                 <th class="py-2 pr-3 text-left w-32">Unit Price</th>
+                                <th class="py-2 pr-3 text-left w-36">Warranty</th>
                                 <th class="py-2 pr-3 text-right">Total</th>
                                 <th class="py-2"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="!items.length">
-                                <td colspan="6" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
+                                <td colspan="7" class="py-6 text-center text-slate-400">No products added yet. Search above to add one.</td>
                             </tr>
                             <tr v-for="(item, index) in items" :key="item.product_id" class="border-b border-slate-100">
                                 <td class="py-2 pr-3 font-medium text-slate-800">{{ item.name }}</td>
@@ -339,6 +343,14 @@ async function submit() {
                                             <svg v-else class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M12 3a9 9 0 100 18" /></svg>
                                         </button>
                                     </div>
+                                </td>
+                                <td class="py-2 pr-3">
+                                    <EmDateTimePicker
+                                        v-model="item.warranty_end_date"
+                                        model-value-type="date"
+                                        placeholder="Optional"
+                                        classes="w-full px-2 py-1 text-sm border border-slate-300 rounded-md"
+                                    />
                                 </td>
                                 <td class="py-2 pr-3 text-right font-medium">{{ formatCurrency((item.quantity || 0) * (item.unit_price || 0)) }}</td>
                                 <td class="py-2 text-right">

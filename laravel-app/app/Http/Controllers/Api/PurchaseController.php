@@ -100,6 +100,7 @@ class PurchaseController extends Controller
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'total_price' => $item['quantity'] * $item['unit_price'],
+                    'warranty_end_date' => $item['warranty_end_date'] ?? null,
                 ]);
 
                 Product::query()->whereKey($item['product_id'])->increment('current_stock', $item['quantity']);
@@ -149,6 +150,7 @@ class PurchaseController extends Controller
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'total_price' => $totalPrice,
+                        'warranty_end_date' => $item['warranty_end_date'] ?? null,
                     ]);
 
                     Product::query()->whereKey($item['product_id'])->increment('current_stock', $item['quantity']);
