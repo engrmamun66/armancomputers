@@ -121,12 +121,12 @@ async function submitPassword() {
                     <h2 class="text-sm font-semibold text-slate-700 mb-4">Account Information</h2>
                     <form class="space-y-4" @submit.prevent="submitProfile">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Name <span class="text-rose-600">*</span></label>
                             <input v-model="profileForm.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                             <p v-if="profileErrors.name" class="mt-1 text-xs text-rose-600">{{ profileErrors.name[0] }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Email <span class="text-rose-600">*</span></label>
                             <input v-model="profileForm.email" type="email" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                             <p v-if="profileErrors.email" class="mt-1 text-xs text-rose-600">{{ profileErrors.email[0] }}</p>
                         </div>
@@ -142,18 +142,18 @@ async function submitPassword() {
                     <h2 class="text-sm font-semibold text-slate-700 mb-4">Change Password</h2>
                     <form class="space-y-4" @submit.prevent="submitPassword">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Current Password</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Current Password <span class="text-rose-600">*</span></label>
                             <input v-model="passwordForm.current_password" type="password" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                             <p v-if="passwordErrors.current_password" class="mt-1 text-xs text-rose-600">{{ passwordErrors.current_password[0] }}</p>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">New Password <span class="text-rose-600">*</span></label>
                                 <input v-model="passwordForm.new_password" type="password" required minlength="8" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                                 <p v-if="passwordErrors.new_password" class="mt-1 text-xs text-rose-600">{{ passwordErrors.new_password[0] }}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Confirm New Password</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Confirm New Password <span class="text-rose-600">*</span></label>
                                 <input v-model="passwordForm.new_password_confirmation" type="password" required minlength="8" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                                 <p v-if="passwordErrors.new_password_confirmation" class="mt-1 text-xs text-rose-600">{{ passwordErrors.new_password_confirmation[0] }}</p>
                             </div>

@@ -48,19 +48,19 @@ function submit() {
                 <h2 class="text-sm font-semibold text-slate-700 mb-4">Send us a message</h2>
                 <form class="space-y-4" @submit.prevent="submit">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Name <span class="text-rose-600">*</span></label>
                         <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email <span class="text-rose-600">*</span></label>
                         <input v-model="form.email" type="email" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Subject <span class="text-rose-600">*</span></label>
                         <input v-model="form.subject" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Message</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Message <span class="text-rose-600">*</span></label>
                         <textarea v-model="form.message" rows="4" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"></textarea>
                     </div>
                     <div class="flex justify-end">

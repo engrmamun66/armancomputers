@@ -210,7 +210,7 @@ async function removeBrand(brand) {
         <Modal v-model="showFormModal" :title="editingBrand ? 'Edit Brand' : 'Add Brand'" size="sm">
             <form class="space-y-4" @submit.prevent="submitForm">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Brand Name</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Brand Name <span class="text-rose-600">*</span></label>
                     <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="formErrors.name" class="mt-1 text-xs text-rose-600">{{ formErrors.name[0] }}</p>
                 </div>
@@ -219,7 +219,7 @@ async function removeBrand(brand) {
                     <textarea v-model="form.description" rows="3" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
                     <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
                 </div>
             </form>

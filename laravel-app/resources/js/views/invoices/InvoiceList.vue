@@ -93,7 +93,7 @@ onMounted(loadInvoices);
             <div class="sm:w-64">
                 <SearchInput v-model="filters.search" placeholder="Search invoice number or customer…" />
             </div>
-            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="DATE_RANGE_PRESETS" />
+            <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="[] ?? DATE_RANGE_PRESETS" />
             <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="clearFilters">
                 Reset Filters
             </button>

@@ -148,10 +148,6 @@ async function handleLogout() {
         <footer class="no-print hidden md:block border-t border-slate-200 bg-white">
             <div class="px-6 py-4 flex items-center justify-between text-sm text-slate-500">
                 <p>&copy; {{ new Date().getFullYear() }} Arman Computers. All rights reserved.</p>
-                <div class="flex gap-4">
-                    <RouterLink v-if="route.name !== 'contact'" :to="{ name: 'contact' }" class="hover:text-slate-700">Contact</RouterLink>
-                    <RouterLink v-if="route.name !== 'privacy'" :to="{ name: 'privacy' }" class="hover:text-slate-700">Privacy Policy</RouterLink>
-                </div>
             </div>
         </footer>
 

@@ -283,9 +283,15 @@ async function submit() {
 
             <ImageCropModal v-model="showCropModal" :file="pickedFile" :output-size="600" @cropped="onImageCropped" />
 
+             <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Product Name <span class="text-rose-600">*</span></label>
+                <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
+                <p v-if="errors.name" class="mt-1 text-xs text-rose-600">{{ errors.name[0] }}</p>
+            </div>
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Brand</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Brand <span class="text-rose-600">*</span></label>
                     <SelectSearch
                         v-model="form.brand_id"
                         :options="brandOptions"
@@ -297,15 +303,9 @@ async function submit() {
                     <p v-if="errors.brand_id" class="mt-1 text-xs text-rose-600">{{ errors.brand_id[0] }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
                     <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
-                <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                <p v-if="errors.name" class="mt-1 text-xs text-rose-600">{{ errors.name[0] }}</p>
             </div>
 
             <div>
@@ -321,17 +321,17 @@ async function submit() {
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Price</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Price <span class="text-rose-600">*</span></label>
                     <input v-model="form.purchase_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="errors.purchase_price" class="mt-1 text-xs text-rose-600">{{ errors.purchase_price[0] }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Selling Price</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Selling Price <span class="text-rose-600">*</span></label>
                     <input v-model="form.selling_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="errors.selling_price" class="mt-1 text-xs text-rose-600">{{ errors.selling_price[0] }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stock</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stock <span class="text-rose-600">*</span></label>
                     <input v-model="form.minimum_stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="errors.minimum_stock" class="mt-1 text-xs text-rose-600">{{ errors.minimum_stock[0] }}</p>
                 </div>

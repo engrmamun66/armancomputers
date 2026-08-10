@@ -290,27 +290,27 @@ async function removeUser(user) {
         <Modal v-model="showFormModal" :title="editingUser ? 'Edit User' : 'Add User'">
             <form class="space-y-4" @submit.prevent="submitForm">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Name <span class="text-rose-600">*</span></label>
                     <input v-model="form.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="formErrors.name" class="mt-1 text-xs text-rose-600">{{ formErrors.name[0] }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email <span class="text-rose-600">*</span></label>
                     <input v-model="form.email" type="email" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="formErrors.email" class="mt-1 text-xs text-rose-600">{{ formErrors.email[0] }}</p>
                 </div>
                 <div v-if="!editingUser">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-rose-600">*</span></label>
                     <input v-model="form.password" type="password" required minlength="8" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="formErrors.password" class="mt-1 text-xs text-rose-600">{{ formErrors.password[0] }}</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Role <span class="text-rose-600">*</span></label>
                         <SelectSearch v-model="form.role_id" :options="roleOptions" placeholder="Select a role" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
                         <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
                     </div>
                 </div>
@@ -332,7 +332,7 @@ async function removeUser(user) {
             <form class="space-y-4" @submit.prevent="submitReset">
                 <p class="text-sm text-slate-500">Set a new password for {{ resetTarget?.name }}.</p>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">New Password <span class="text-rose-600">*</span></label>
                     <input v-model="resetPassword" type="password" required minlength="8" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="resetErrors.password" class="mt-1 text-xs text-rose-600">{{ resetErrors.password[0] }}</p>
                 </div>

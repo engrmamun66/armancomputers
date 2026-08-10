@@ -271,7 +271,7 @@ async function submit() {
                 <h2 class="text-sm font-semibold text-slate-700 mb-4">Customer Information</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Customer</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Customer <span class="text-rose-600">*</span></label>
                         <div v-if="selectedCustomer" class="flex items-center justify-between px-3 py-2 border border-slate-300 rounded-md bg-slate-50">
                             <span class="text-sm font-medium text-slate-800">{{ selectedCustomer.name }} <span class="text-slate-400 font-normal">· {{ selectedCustomer.phone || 'no phone' }}</span></span>
                             <button type="button" class="text-sm text-link" @click="selectedCustomer = null; form.customer_id = null">Change</button>
@@ -283,7 +283,7 @@ async function submit() {
                         <input :value="referenceNo || 'Auto-generated on save'" type="text" disabled class="w-full px-3 py-2 text-sm border border-slate-200 bg-slate-50 text-slate-400 rounded-md" />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Sale Date</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Sale Date <span class="text-rose-600">*</span></label>
                         <EmDateTimePicker
                             v-model="form.sale_date"
                             model-value-type="date"
@@ -382,7 +382,7 @@ async function submit() {
                     <span>{{ formatCurrency(grandTotal) }}</span>
                 </div>
                 <div class="flex justify-between items-center text-sm border-t border-slate-200 pt-3">
-                    <span class="text-slate-500">Payment Method</span>
+                    <span class="text-slate-500">Payment Method <span class="text-rose-600">*</span></span>
                     <div class="w-40">
                         <SelectSearch v-model="form.payment_method" :options="PAYMENT_METHODS" placeholder="Select method" />
                     </div>
@@ -408,7 +408,7 @@ async function submit() {
         <Modal v-model="showCustomerModal" title="Add New Customer" size="sm">
             <form class="space-y-4" @submit.prevent="submitCustomerModal">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Customer Name</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Customer Name <span class="text-rose-600">*</span></label>
                     <input v-model="customerForm.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="customerErrors.name" class="mt-1 text-xs text-rose-600">{{ customerErrors.name[0] }}</p>
                 </div>

@@ -257,7 +257,7 @@ async function submit() {
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Date</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Date <span class="text-rose-600">*</span></label>
                         <EmDateTimePicker
                             v-model="form.purchase_date"
                             model-value-type="date"
@@ -381,7 +381,7 @@ async function submit() {
             <form class="space-y-4" @submit.prevent="submitProductModal">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Brand</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Brand <span class="text-rose-600">*</span></label>
                         <SelectSearch
                             v-model="productForm.brand_id"
                             :options="brandOptions"
@@ -393,12 +393,12 @@ async function submit() {
                         <p v-if="productErrors.brand_id" class="mt-1 text-xs text-rose-600">{{ productErrors.brand_id[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
                         <SelectSearch v-model="productForm.status_id" :options="statusOptions" placeholder="Select a status" />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Product Name <span class="text-rose-600">*</span></label>
                     <input v-model="productForm.name" type="text" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                     <p v-if="productErrors.name" class="mt-1 text-xs text-rose-600">{{ productErrors.name[0] }}</p>
                 </div>
@@ -409,17 +409,17 @@ async function submit() {
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Price</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Purchase Price <span class="text-rose-600">*</span></label>
                         <input v-model="productForm.purchase_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                         <p v-if="productErrors.purchase_price" class="mt-1 text-xs text-rose-600">{{ productErrors.purchase_price[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Selling Price</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Selling Price <span class="text-rose-600">*</span></label>
                         <input v-model="productForm.selling_price" type="number" step="0.01" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                         <p v-if="productErrors.selling_price" class="mt-1 text-xs text-rose-600">{{ productErrors.selling_price[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stock</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Minimum Stock <span class="text-rose-600">*</span></label>
                         <input v-model="productForm.minimum_stock" type="number" min="0" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
                         <p v-if="productErrors.minimum_stock" class="mt-1 text-xs text-rose-600">{{ productErrors.minimum_stock[0] }}</p>
                     </div>

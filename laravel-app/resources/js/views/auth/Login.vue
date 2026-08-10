@@ -45,7 +45,7 @@ async function submit() {
 
         <form class="space-y-4" @submit.prevent="submit">
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email <span class="text-rose-600">*</span></label>
                 <input
                     v-model="form.email"
                     type="email"
@@ -57,7 +57,7 @@ async function submit() {
                 <p v-if="errors.email" class="mt-1 text-xs text-rose-600">{{ errors.email[0] }}</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-rose-600">*</span></label>
                 <input
                     v-model="form.password"
                     type="password"
