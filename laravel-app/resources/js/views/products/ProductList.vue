@@ -29,7 +29,6 @@ const columns = [
     { key: 'index', label: '#' },
     { key: 'image', label: 'Image', sortable: false },
     { key: 'name', label: 'Product' },
-    { key: 'barcode', label: 'Barcode' },
     { key: 'brand', label: 'Brand' },
     { key: 'purchase_price', label: 'Purchase Price', align: 'right' },
     { key: 'selling_price', label: 'Selling Price', align: 'right' },
@@ -174,7 +173,6 @@ async function removeProduct(product) {
                         {{ row.name }}
                     </RouterLink>
                 </template>
-                <template #cell-barcode="{ row }">{{ row.barcode || '—' }}</template>
                 <template #cell-brand="{ row }">{{ row.brand?.name }}</template>
                 <template #cell-purchase_price="{ row }">{{ formatCurrency(row.purchase_price) }}</template>
                 <template #cell-selling_price="{ row }">{{ formatCurrency(row.selling_price) }}</template>

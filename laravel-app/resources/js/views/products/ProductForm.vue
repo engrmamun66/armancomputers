@@ -38,7 +38,6 @@ const pendingImagePreviewUrl = ref(null);
 const form = reactive({
     brand_id: '',
     name: '',
-    barcode: '',
     description: '',
     purchase_price: '',
     selling_price: '',
@@ -57,7 +56,6 @@ onMounted(async () => {
         Object.assign(form, {
             brand_id: product.brand?.id,
             name: product.name,
-            barcode: product.barcode,
             description: product.description,
             purchase_price: product.purchase_price,
             selling_price: product.selling_price,
@@ -306,12 +304,6 @@ async function submit() {
                     <label class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-rose-600">*</span></label>
                     <SelectSearch v-model="form.status_id" :options="statusOptions" placeholder="Select a status" />
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Barcode <span class="text-slate-400 font-normal">(optional)</span></label>
-                <input v-model="form.barcode" type="text" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md" />
-                <p v-if="errors.barcode" class="mt-1 text-xs text-rose-600">{{ errors.barcode[0] }}</p>
             </div>
 
             <div>

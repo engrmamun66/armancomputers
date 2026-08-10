@@ -80,6 +80,7 @@ function clearFilters() {
         sort_dir: DEFAULT_SORT_DIR,
         page: 1,
     });
+    loadInvoices();
 }
 
 function onSort(key) {

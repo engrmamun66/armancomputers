@@ -102,6 +102,7 @@ function clearFilters() {
         sort_dir: DEFAULT_SORT_DIR,
         page: 1,
     });
+    loadPurchases();
 }
 
 watch([() => filters.search, () => filters.date_from, () => filters.date_to, () => filters.status_id], () => {
