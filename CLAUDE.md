@@ -29,8 +29,8 @@ Tests run against an isolated **in-memory SQLite** DB (`phpunit.xml`), completel
 
 **Auth**: `tymon/jwt-auth` (NOT Sanctum) — stateless bearer tokens, `auth:api` guard on all routes except login. Chosen so the mobile client can hit the exact same API (see "Mobile app" below) without a separate auth scheme. Token TTL is 7 days (`JWT_TTL` in `.env` / `config/jwt.php`).
 
-**Roles**: admin / manager / staff, enforced in three independent places that must be kept in sync:
-- Backend: `app/Policies/*` (authoritative — e.g. `SalePolicy` lets any role create a Sale but only admin/manager update/delete it; `PurchasePolicy` restricts create *and* view to admin/manager — staff have no Purchase access at all).
+**Roles**: admin / manager (a third "staff" role existed early on and was fully retired — if you see stray references to it, they're stale), enforced in three independent places that must be kept in sync:
+- Backend: `app/Policies/*` (authoritative — e.g. `SalePolicy` lets either role create a Sale but requires admin/manager to update/delete it; `PurchasePolicy` restricts create/view/update/delete to admin/manager too).
 - Web frontend: `resources/js/utils/permissions.js`'s `CAPABILITIES` map + each route's `meta.roles` in `resources/js/router/index.js` (`router.beforeEach` redirects on violation).
 - Mobile: `mobile-app/lib/core/permissions.dart`'s `kCapabilities` map, which the file's own doc-comment says "mirrors resources/js/utils/permissions.js exactly" — update both together.
 
