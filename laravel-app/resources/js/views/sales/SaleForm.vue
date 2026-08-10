@@ -398,7 +398,7 @@ async function submit() {
             </div>
 
             <div class="flex justify-end gap-3">
-                <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]">Cancel</RouterLink>
+                <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]">Cancel</RouterLink>
                 <button type="submit" :disabled="saving" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60">
                     {{ saving ? 'Saving…' : 'Save Sale' }}
                 </button>
@@ -423,7 +423,7 @@ async function submit() {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showCustomerModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="showCustomerModal = false">Cancel</button>
                 <button type="button" :disabled="savingCustomer" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover disabled:opacity-60" @click="submitCustomerModal">
                     {{ savingCustomer ? 'Saving…' : 'Save Customer' }}
                 </button>

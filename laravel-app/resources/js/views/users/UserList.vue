@@ -99,7 +99,7 @@ const formErrors = ref({});
 
 function openCreate() {
     editingUser.value = null;
-    Object.assign(form, { name: '', email: '', password: '', role_id: roles.value[2]?.id ?? '', status_id: statuses.value[0]?.id ?? '' });
+    Object.assign(form, { name: '', email: '', password: '', role_id: '', status_id: statuses.value[0]?.id ?? '' });
     formErrors.value = {};
     showFormModal.value = true;
 }
@@ -319,7 +319,7 @@ async function removeUser(user) {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showFormModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="showFormModal = false">Cancel</button>
                 <button
                     type="button"
                     :disabled="saving"
@@ -341,7 +341,7 @@ async function removeUser(user) {
                 </div>
             </form>
             <template #footer>
-                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="showResetModal = false">Cancel</button>
+                <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="showResetModal = false">Cancel</button>
                 <button
                     type="button"
                     :disabled="resetting"

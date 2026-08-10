@@ -71,7 +71,7 @@ function confirm() {
         </div>
         <p class="mt-3 text-xs text-slate-500">Drag to reposition, resize the box to adjust the crop. Output: {{ outputSize }}×{{ outputSize }}px.</p>
         <template #footer>
-            <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="close">Cancel</button>
+            <button type="button" class="px-4 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="close">Cancel</button>
             <button type="button" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover" @click="confirm">
                 Crop &amp; Use
             </button>

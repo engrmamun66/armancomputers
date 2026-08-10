@@ -35,7 +35,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
             <div role="dialog" aria-modal="true" :class="['relative bg-white rounded-lg shadow-xl w-full my-8 sm:my-0', sizes[size]]">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
                     <h3 class="text-base font-semibold text-slate-900">{{ title }}</h3>
-                    <button type="button" class="flex items-center justify-center h-7 w-7 rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f] text-lg leading-none" @click="close">&times;</button>
+                    <button type="button" class="flex items-center justify-center h-7 w-7 rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f] text-lg leading-none" @click="close">&times;</button>
                 </div>
                 <div class="px-5 py-4 max-h-[75vh] overflow-y-auto">
                     <slot />

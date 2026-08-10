@@ -168,7 +168,7 @@ async function removeSale(sale) {
                 <option value="partial">Partial</option>
                 <option value="due">Due</option>
             </select>
-            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]" @click="clearFilters">
+            <button v-if="hasActiveFilters()" type="button" class="px-3 py-2 text-sm rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]" @click="clearFilters">
                 Reset Filters
             </button>
         </div>

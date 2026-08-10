@@ -13,7 +13,7 @@ const { state, respond } = useConfirm();
                 <div class="mt-6 flex justify-end gap-3">
                     <button
                         type="button"
-                        class="px-4 py-2 text-sm font-medium rounded-md bg-[#f24c17] text-white hover:bg-[#d8430f]"
+                        class="px-4 py-2 text-sm font-medium rounded-md bg-[#f24c17] text-onbrand hover:bg-[#d8430f]"
                         @click="respond(false)"
                     >
                         {{ state.cancelText }}
