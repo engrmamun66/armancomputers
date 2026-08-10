@@ -60,6 +60,7 @@ class SaleController extends Controller
             'total_amount' => $totalAmount,
             'total_cost' => $totalCost,
             'total_profit' => $totalAmount - $totalCost,
+            'total_due' => (float) (clone $filtered)->sum('due_amount'),
         ];
 
         $filtered

@@ -125,7 +125,7 @@ async function removePurchase(purchase) {
 
         <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
             <div class="sm:w-64">
-                <SearchInput v-model="filters.search" placeholder="Search reference or supplier…" />
+                <SearchInput v-model="filters.search" placeholder="Reference or supplier…" />
             </div>
             <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="DATE_RANGE_PRESETS" />
             <select v-model="filters.status_id" class="px-3 py-2 text-sm border border-slate-300 rounded-md">

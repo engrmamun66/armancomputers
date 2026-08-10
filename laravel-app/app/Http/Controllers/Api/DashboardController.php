@@ -43,6 +43,7 @@ class DashboardController extends Controller
             'total_sales_amount' => $periodSalesAmount,
             'total_purchase_cost' => $periodSalesCost,
             'total_profit' => $periodSalesAmount - $periodSalesCost,
+            'total_due' => (float) Sale::sum('due_amount'),
         ];
 
         $purchaseByDate = DB::table('purchase_items')

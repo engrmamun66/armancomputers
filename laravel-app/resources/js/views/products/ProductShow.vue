@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import ProductThumbnail from '@/components/common/ProductThumbnail.vue';
+import Icon from '@/components/common/Icon.vue';
 import productsApi from '@/services/products';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
@@ -36,6 +37,13 @@ onMounted(async () => {
                     </RouterLink>
                     <RouterLink v-if="canManage" :to="{ name: 'products.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover">
                         Edit
+                    </RouterLink>
+                    <RouterLink
+                        :to="{ name: 'products.index' }"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover"
+                    >
+                        <Icon name="arrow-left" class="h-4 w-4" />
+                        Back
                     </RouterLink>
                 </div>
             </div>

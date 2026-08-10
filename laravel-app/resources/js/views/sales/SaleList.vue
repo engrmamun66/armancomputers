@@ -41,7 +41,7 @@ const columns = [
 
 const rows = ref([]);
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 15 });
-const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0, total_cost: 0, total_profit: 0 });
+const totals = ref({ items_count: 0, total_qty: 0, total_amount: 0, total_cost: 0, total_profit: 0, total_due: 0 });
 const loading = ref(false);
 const statuses = ref([]);
 const filters = reactive({ search: '', date_from: '', date_to: '', status_id: '', payment_status: '', sort_by: 'sale_date', sort_dir: 'desc', page: 1 });
@@ -135,7 +135,7 @@ async function removeSale(sale) {
 
         <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
             <div class="sm:w-64">
-                <SearchInput v-model="filters.search" placeholder="Search reference, customer, or product…" />
+                <SearchInput v-model="filters.search" placeholder="Reference, customer, or product…" />
             </div>
             <DateRangePicker v-model:from="filters.date_from" v-model:to="filters.date_to" unified :presets="DATE_RANGE_PRESETS" />
             <select v-model="filters.status_id" class="px-3 py-2 text-sm border border-slate-300 rounded-md">
@@ -153,14 +153,21 @@ async function removeSale(sale) {
             </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <StatCard label="Total Sale" :value="formatCurrency(totals.total_amount)" icon="arrow-up-tray" emphasize />
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <StatCard label="Total Purchase Cost" :value="formatCurrency(totals.total_cost)" icon="arrow-down-tray" emphasize />
+            <StatCard label="Total Sale" :value="formatCurrency(totals.total_amount)" icon="arrow-up-tray" emphasize />
             <StatCard
                 label="Total Profit"
                 :value="formatCurrency(totals.total_profit)"
                 icon="shield-check"
                 :tone="totals.total_profit >= 0 ? 'success' : 'danger'"
+                emphasize
+            />
+            <StatCard
+                label="Total Due"
+                :value="formatCurrency(totals.total_due)"
+                icon="document-text"
+                :tone="totals.total_due > 0 ? 'danger' : 'success'"
                 emphasize
             />
         </div>

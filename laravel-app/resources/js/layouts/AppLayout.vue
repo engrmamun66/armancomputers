@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
@@ -55,7 +55,17 @@ const mobileMoreItems = computed(() => visibleNavItems.value.filter((item) => !m
 const breadcrumb = computed(() => BREADCRUMBS[route.name] || '');
 
 const userMenuOpen = ref(false);
+const userMenuEl = ref(null);
 const moreSheetOpen = ref(false);
+
+function onClickOutsideUserMenu(event) {
+    if (userMenuEl.value && !userMenuEl.value.contains(event.target)) {
+        userMenuOpen.value = false;
+    }
+}
+
+onMounted(() => document.addEventListener('mousedown', onClickOutsideUserMenu));
+onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutsideUserMenu));
 
 async function handleLogout() {
     await auth.logout();
@@ -74,7 +84,7 @@ async function handleLogout() {
 
                 <div class="flex items-center gap-2">
                 <ThemeToggle />
-                <div class="relative">
+                <div ref="userMenuEl" class="relative">
                     <button
                         type="button"
                         class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
