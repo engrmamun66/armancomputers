@@ -21,7 +21,6 @@ const Map<String, List<String>> kCapabilities = {
     'invoices.view',
     'dashboard',
   ],
-  'staff': ['products.view', 'customers.view', 'sales.manage', 'invoices.view', 'dashboard'],
 };
 
 bool can(String roleSlug, String capability) => (kCapabilities[roleSlug] ?? const []).contains(capability);

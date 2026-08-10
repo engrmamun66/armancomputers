@@ -20,7 +20,7 @@ import { useConfirm } from '@/composables/useConfirm';
 import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
 
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage');
 const toast = useToast();
 const { confirm } = useConfirm();
 

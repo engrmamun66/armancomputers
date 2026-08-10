@@ -12,7 +12,7 @@ import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/ut
 
 const props = defineProps({ id: { type: [String, Number], required: true } });
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage');
 
 const sale = ref(null);
 const loading = ref(true);

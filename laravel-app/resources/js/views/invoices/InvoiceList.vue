@@ -17,7 +17,7 @@ import { formatCurrency, formatDate } from '@/utils/format';
 
 const toast = useToast();
 const auth = useAuthStore();
-const canManage = can(auth.roleSlug, 'sales.manage') && auth.roleSlug !== 'staff';
+const canManage = can(auth.roleSlug, 'sales.manage');
 
 const DATE_RANGE_PRESETS = ['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year', 'Last Year'];
 
