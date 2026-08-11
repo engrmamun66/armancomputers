@@ -7,7 +7,15 @@ const props = defineProps({
     excludeIds: { type: Array, default: () => [] },
     placeholder: { type: String, default: 'Search product by name or barcode…' },
     allowCreate: { type: Boolean, default: false },
+    // Sales can't sell an inactive product, but Purchases still need to
+    // restock/log inventory against one — so inactive selection is blocked
+    // by default and only Purchase opts in.
+    allowInactive: { type: Boolean, default: false },
 });
+
+function isSelectable(product) {
+    return props.allowInactive || product.status?.slug === 'active';
+}
 
 const emit = defineEmits(['select', 'create-new']);
 
@@ -77,8 +85,10 @@ function closeSoon() {
                     v-for="product in results"
                     :key="product.id"
                     type="button"
-                    class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
-                    @mousedown.prevent="select(product)"
+                    :disabled="!isSelectable(product)"
+                    class="w-full text-left px-3 py-2 flex items-center justify-between gap-2 text-sm border-b border-slate-100 last:border-0"
+                    :class="isSelectable(product) ? 'hover:bg-slate-50' : 'opacity-50 cursor-not-allowed'"
+                    @mousedown.prevent="isSelectable(product) && select(product)"
                 >
                     <span class="flex items-center gap-2 min-w-0">
                         <ProductThumbnail :src="product.image_url" :alt="product.name" size="h-8 w-8" />
@@ -87,8 +97,11 @@ function closeSoon() {
                             <span class="text-slate-400"> · {{ product.brand?.name }}</span>
                         </span>
                     </span>
-                    <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs whitespace-nowrap">
-                        {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}
+                    <span class="flex items-center gap-2 whitespace-nowrap">
+                        <span v-if="product.status?.slug !== 'active'" class="text-xs font-medium text-rose-600">Inactive</span>
+                        <span :class="product.current_stock <= 0 ? 'text-rose-600' : 'text-slate-500'" class="text-xs">
+                            {{ product.current_stock <= 0 ? 'Out of stock' : `Stock: ${product.current_stock}` }}
+                        </span>
                     </span>
                 </button>
                 <p v-if="!results.length" class="px-3 py-2 text-sm text-slate-400">No products found.</p>

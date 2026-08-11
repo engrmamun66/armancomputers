@@ -86,21 +86,31 @@ function pickImage() {
     imageInput.value?.click();
 }
 
-async function onImageSelected(event) {
+function onImageSelected(event) {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
 
+    pickedFile.value = file;
+    showCropModal.value = true;
+}
+
+async function onImageCropped(blob) {
+    pickedFile.value = null;
+
     if (!isEdit.value) {
-        pickedFile.value = file;
-        showCropModal.value = true;
+        if (pendingImagePreviewUrl.value) {
+            URL.revokeObjectURL(pendingImagePreviewUrl.value);
+        }
+        pendingImageBlob.value = blob;
+        pendingImagePreviewUrl.value = URL.createObjectURL(blob);
         return;
     }
 
     uploadingImage.value = true;
     try {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('image', blob, 'product.jpg');
         const { data } = await productsApi.uploadImage(props.id, formData);
         if (data.data.is_default) {
             images.value.forEach((img) => (img.is_default = false));
@@ -112,15 +122,6 @@ async function onImageSelected(event) {
     } finally {
         uploadingImage.value = false;
     }
-}
-
-function onImageCropped(blob) {
-    if (pendingImagePreviewUrl.value) {
-        URL.revokeObjectURL(pendingImagePreviewUrl.value);
-    }
-    pendingImageBlob.value = blob;
-    pendingImagePreviewUrl.value = URL.createObjectURL(blob);
-    pickedFile.value = null;
 }
 
 function removePendingImage() {
@@ -214,7 +215,20 @@ async function submit() {
                 <RouterLink :to="{ name: 'products.stock-history', params: { id } }" class="text-link hover:text-link-hover font-medium">View History</RouterLink>
             </div>
 
-            <div v-if="isEdit">
+            <div v-if="isEdit && !images.length">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Image <span class="text-slate-400 font-normal">(optional)</span></label>
+                <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
+                <button
+                    type="button"
+                    :disabled="uploadingImage"
+                    class="h-20 w-20 rounded-md border border-dashed border-slate-300 text-slate-400 hover:text-slate-600 hover:border-slate-400 flex items-center justify-center disabled:opacity-60"
+                    @click="pickImage"
+                >
+                    <Icon v-if="!uploadingImage" name="photo" class="h-6 w-6" />
+                    <span v-else class="text-xs">…</span>
+                </button>
+            </div>
+            <div v-else-if="isEdit">
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-medium text-slate-700">Images</label>
                     <button
@@ -227,8 +241,7 @@ async function submit() {
                     </button>
                     <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
                 </div>
-                <div v-if="!images.length" class="text-sm text-slate-400">No images yet.</div>
-                <div v-else class="flex flex-wrap gap-3">
+                <div class="flex flex-wrap gap-3">
                     <div v-for="image in images" :key="image.id" class="relative group">
                         <ProductThumbnail :src="image.url" size="h-20 w-20" />
                         <span v-if="image.is_default" class="absolute -top-1.5 -left-1.5 px-1.5 py-0.5 text-[10px] font-semibold rounded bg-accent-solid text-on-accent-solid">Default</span>
