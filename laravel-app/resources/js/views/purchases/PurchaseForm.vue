@@ -303,7 +303,7 @@ async function submit() {
                         + Add new product
                     </button>
                 </div>
-                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to add…" allow-create allow-inactive @select="addProduct" @create-new="openProductModal" />
+                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to add…" allow-create @select="addProduct" @create-new="openProductModal" />
 
                 <div class="mt-4 overflow-x-auto">
                     <table class="min-w-full text-sm">

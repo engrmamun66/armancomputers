@@ -7,10 +7,10 @@ const props = defineProps({
     excludeIds: { type: Array, default: () => [] },
     placeholder: { type: String, default: 'Search product by name or barcode…' },
     allowCreate: { type: Boolean, default: false },
-    // Sales can't sell an inactive product, but Purchases still need to
-    // restock/log inventory against one — so inactive selection is blocked
-    // by default and only Purchase opts in.
-    allowInactive: { type: Boolean, default: false },
+    // Purchases still need to restock/log inventory against an inactive
+    // product, so this defaults to allowed — Sales can't sell one, so it
+    // opts out explicitly.
+    allowInactive: { type: Boolean, default: true },
 });
 
 function isSelectable(product) {

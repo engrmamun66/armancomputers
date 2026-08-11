@@ -305,7 +305,7 @@ async function submit() {
 
             <div class="bg-white border border-slate-200 rounded-lg p-6">
                 <h2 class="text-sm font-semibold text-slate-700 mb-4">Products</h2>
-                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to sell…" @select="addProduct" />
+                <ProductSearch :exclude-ids="excludeIds" placeholder="Search product to sell…" :allow-inactive="false" @select="addProduct" />
 
                 <div class="mt-4 overflow-x-auto">
                     <table class="min-w-full text-sm">
