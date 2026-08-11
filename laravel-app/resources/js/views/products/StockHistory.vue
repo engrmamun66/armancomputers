@@ -1,10 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import DataTable from '@/components/tables/DataTable.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
+import Icon from '@/components/common/Icon.vue';
 import productsApi from '@/services/products';
 import { formatDate } from '@/utils/format';
 
@@ -36,6 +38,17 @@ onMounted(async () => {
     <AppLayout>
         <LoadingSpinner v-if="loading" />
         <template v-else-if="product">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-lg font-semibold text-slate-900">Stock History</h1>
+                <RouterLink
+                    :to="{ name: 'products.show', params: { id } }"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover"
+                >
+                    <Icon name="arrow-left" class="h-4 w-4" />
+                    Back
+                </RouterLink>
+            </div>
+
             <div class="bg-white border border-slate-200 rounded-lg p-4 mb-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
                 <div><span class="text-slate-400">Product:</span> <span class="font-medium text-slate-800">{{ product.name }}</span></div>
                 <div><span class="text-slate-400">Current Stock:</span> <span class="font-medium text-slate-800">{{ product.current_stock }}</span></div>
