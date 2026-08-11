@@ -506,17 +506,21 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(formatCurrency(p.sellingPrice), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text(
-                      'Stock: ${p.currentStock}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: p.currentStock > 0 ? AppColors.success(ctx) : AppColors.danger(ctx),
+                    if (p.status?.slug != 'active')
+                      Text('Inactive', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.danger(ctx)))
+                    else
+                      Text(
+                        'Stock: ${p.currentStock}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: p.currentStock > 0 ? AppColors.success(ctx) : AppColors.danger(ctx),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],
             ),
+            isDisabled: (p) => p.status?.slug != 'active',
             onSelected: _addProduct,
           ),
           if (_showValidation && _items.isEmpty)

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/api_exception.dart';
 import '../../core/format.dart';
+import '../../core/theme.dart';
 import '../../models/line_item.dart';
 import '../../models/product.dart';
 import '../../services/products_service.dart';
@@ -423,6 +424,8 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
                   if (product.brand != null) Text(product.brand!.name, style: TextStyle(fontSize: 12, color: muted)),
                   Text('Stock: ${product.currentStock}', style: TextStyle(fontSize: 12, color: muted)),
                   Text('Purchase: ${formatCurrency(product.purchasePrice)}', style: TextStyle(fontSize: 12, color: muted)),
+                  if (product.status?.slug != 'active')
+                    Text('Inactive', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.danger(context))),
                 ],
               ),
             ],

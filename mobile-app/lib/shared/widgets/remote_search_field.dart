@@ -11,6 +11,9 @@ class RemoteSearchField<T> extends StatefulWidget {
   final Widget Function(BuildContext context, T item) itemBuilder;
   final ValueChanged<T> onSelected;
   final Widget? trailing; // e.g. "+ Add new" affordance shown under results
+  // Result still shows (dimmed) but can't be tapped — e.g. an inactive product
+  // in a Sale's search, which mustn't be sellable even though it's findable.
+  final bool Function(T item)? isDisabled;
 
   const RemoteSearchField({
     super.key,
@@ -19,6 +22,7 @@ class RemoteSearchField<T> extends StatefulWidget {
     required this.itemBuilder,
     required this.onSelected,
     this.trailing,
+    this.isDisabled,
   });
 
   @override
@@ -103,13 +107,20 @@ class _RemoteSearchFieldState<T> extends State<RemoteSearchField<T>> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     itemCount: _results.length,
                     separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, index) => InkWell(
-                      onTap: () => _select(_results[index]),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        child: widget.itemBuilder(context, _results[index]),
-                      ),
-                    ),
+                    itemBuilder: (context, index) {
+                      final item = _results[index];
+                      final disabled = widget.isDisabled?.call(item) ?? false;
+                      return InkWell(
+                        onTap: disabled ? null : () => _select(item),
+                        child: Opacity(
+                          opacity: disabled ? 0.5 : 1,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            child: widget.itemBuilder(context, item),
+                          ),
+                        ),
+                      );
+                    },
                   ),
           ),
       ],
