@@ -22,8 +22,6 @@ class InvoiceResource extends JsonResource
                 'address' => $this->customer->address,
             ] : null,
             'invoice_date' => $this->invoice_date,
-            'sale_date' => $this->sale?->sale_date,
-            'warranty_end_date' => $this->sale?->warranty_end_date,
             'subtotal' => (float) $this->subtotal,
             'discount' => (float) $this->discount,
             'additional_cost' => (float) $this->additional_cost,

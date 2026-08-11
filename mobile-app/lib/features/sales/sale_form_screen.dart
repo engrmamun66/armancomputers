@@ -36,6 +36,9 @@ class _CartItem {
   final int? currentStock;
   int quantity;
   double unitPrice;
+  // Carried through from the existing item on edit — no picker to change it
+  // yet, but editing a Sale must not silently wipe a warranty set elsewhere.
+  final String? warrantyEndDate;
   final TextEditingController qtyController;
   final TextEditingController priceController;
 
@@ -46,12 +49,14 @@ class _CartItem {
     required this.currentStock,
     required this.quantity,
     required this.unitPrice,
+    this.warrantyEndDate,
   })  : qtyController = TextEditingController(text: quantity.toString()),
         priceController = TextEditingController(text: unitPrice.toStringAsFixed(2));
 
   double get lineTotal => quantity * unitPrice;
 
-  LineItem toLineItem() => LineItem(productId: productId, quantity: quantity, unitPrice: unitPrice);
+  LineItem toLineItem() =>
+      LineItem(productId: productId, quantity: quantity, unitPrice: unitPrice, warrantyEndDate: warrantyEndDate);
 
   void dispose() {
     qtyController.dispose();
@@ -76,7 +81,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
 
   CustomerRef? _customer;
   DateTime? _saleDate;
-  DateTime? _warrantyEndDate;
   late final TextEditingController _notesController;
   late final TextEditingController _discountController;
   late final TextEditingController _additionalCostController;
@@ -126,7 +130,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
       setState(() {
         _customer = sale.customer;
         _saleDate = DateTime.tryParse(sale.saleDate) ?? DateTime.now();
-        _warrantyEndDate = sale.warrantyEndDate != null ? DateTime.tryParse(sale.warrantyEndDate!) : null;
         _notesController.text = sale.notes ?? '';
         _discount = sale.discount;
         _discountController.text = sale.discount.toStringAsFixed(2);
@@ -142,6 +145,7 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
               currentStock: null,
               quantity: li.quantity,
               unitPrice: li.unitPrice,
+              warrantyEndDate: li.warrantyEndDate,
             )));
         _loading = false;
       });
@@ -310,7 +314,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
     final payload = <String, dynamic>{
       'customer_id': _customer!.id,
       'sale_date': apiDate(_saleDate!),
-      'warranty_end_date': _warrantyEndDate != null ? apiDate(_warrantyEndDate!) : null,
       'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       'discount': _discount,
       'additional_cost': _additionalCost,
@@ -464,13 +467,6 @@ class _SaleFormScreenState extends ConsumerState<SaleFormScreen> {
             value: _saleDate,
             onChanged: (d) => setState(() => _saleDate = d),
             errorText: _showValidation && _saleDate == null ? 'Sale date is required' : null,
-          ),
-          const SizedBox(height: 12),
-          AppDateField(
-            label: 'Warranty End Date (optional)',
-            value: _warrantyEndDate,
-            onChanged: (d) => setState(() => _warrantyEndDate = d),
-            onClear: () => setState(() => _warrantyEndDate = null),
           ),
           const SizedBox(height: 12),
           TextField(

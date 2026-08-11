@@ -269,7 +269,7 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
           : Column(
               children: [
                 for (var i = 0; i < items.length; i++) ...[
-                  _ItemRow(item: items[i]),
+                  _ItemRow(item: items[i], startDate: invoice.invoiceDate),
                   if (i != items.length - 1)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
@@ -356,7 +356,8 @@ class _InvoiceDetailScreenState extends ConsumerState<InvoiceDetailScreen> {
 
 class _ItemRow extends StatelessWidget {
   final LineItem item;
-  const _ItemRow({required this.item});
+  final String startDate;
+  const _ItemRow({required this.item, required this.startDate});
 
   @override
   Widget build(BuildContext context) {
@@ -378,6 +379,11 @@ class _ItemRow extends StatelessWidget {
             Text(formatCurrency(item.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
           ],
         ),
+        if (item.warrantyEndDate != null) ...[
+          const SizedBox(height: 4),
+          Text('Warranty: ${formatWarranty(startDate, item.warrantyEndDate) ?? '—'}',
+              style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+        ],
       ],
     );
   }

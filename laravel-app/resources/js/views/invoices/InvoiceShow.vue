@@ -66,9 +66,6 @@ function print() {
                         <p class="text-lg font-semibold text-slate-900">INVOICE</p>
                         <p class="text-sm text-slate-500 mt-1">{{ invoice.invoice_number }}</p>
                         <p class="text-sm text-slate-500">{{ formatDate(invoice.invoice_date) }}</p>
-                        <p v-if="invoice.warranty_end_date" class="text-sm text-slate-500">
-                            Warranty: {{ formatWarranty(invoice.sale_date, invoice.warranty_end_date) }} (until {{ formatDate(invoice.warranty_end_date) }})
-                        </p>
                         <div class="mt-2"><StatusBadge :status="invoice.payment_status" /></div>
                     </div>
                 </div>
@@ -89,6 +86,7 @@ function print() {
                                 <th class="py-2 pr-2">Product</th>
                                 <th class="py-2 pr-2 text-right">Qty</th>
                                 <th class="py-2 pr-2 text-right">Unit Price</th>
+                                <th class="py-2 pr-2 text-center">Warranty</th>
                                 <th class="py-2 text-right">Total</th>
                             </tr>
                         </thead>
@@ -98,6 +96,7 @@ function print() {
                                 <td class="py-2 pr-2 font-medium text-slate-800">{{ item.product_name }}</td>
                                 <td class="py-2 pr-2 text-right">{{ item.quantity }}</td>
                                 <td class="py-2 pr-2 text-right">{{ formatCurrency(item.unit_price) }}</td>
+                                <td class="py-2 pr-2 text-center text-slate-500">{{ formatWarranty(invoice.invoice_date, item.warranty_end_date) || '—' }}</td>
                                 <td class="py-2 text-right">{{ formatCurrency(item.total_price) }}</td>
                             </tr>
                         </tbody>

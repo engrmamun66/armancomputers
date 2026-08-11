@@ -123,7 +123,6 @@ class SaleController extends Controller
                     'reference_no' => ReferenceNumberGenerator::generate('SAL', 'sales'),
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
-                    'warranty_end_date' => $validated['warranty_end_date'] ?? null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,
@@ -142,6 +141,7 @@ class SaleController extends Controller
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'total_price' => $item['quantity'] * $item['unit_price'],
+                        'warranty_end_date' => $item['warranty_end_date'] ?? null,
                     ]);
 
                     $affected = Product::query()
@@ -176,6 +176,7 @@ class SaleController extends Controller
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'total_price' => $item['quantity'] * $item['unit_price'],
+                        'warranty_end_date' => $item['warranty_end_date'] ?? null,
                     ]);
                 }
 
@@ -243,6 +244,7 @@ class SaleController extends Controller
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'total_price' => $totalPrice,
+                        'warranty_end_date' => $item['warranty_end_date'] ?? null,
                     ]);
 
                     $affected = Product::query()
@@ -265,7 +267,6 @@ class SaleController extends Controller
                 $sale->update([
                     'customer_id' => $validated['customer_id'],
                     'sale_date' => $validated['sale_date'],
-                    'warranty_end_date' => $validated['warranty_end_date'] ?? null,
                     'subtotal' => $subtotal,
                     'discount' => $discount,
                     'additional_cost' => $additionalCost,
@@ -285,6 +286,7 @@ class SaleController extends Controller
                             'quantity' => $item['quantity'],
                             'unit_price' => $item['unit_price'],
                             'total_price' => $item['quantity'] * $item['unit_price'],
+                            'warranty_end_date' => $item['warranty_end_date'] ?? null,
                         ]);
                     }
                     $invoice->update([

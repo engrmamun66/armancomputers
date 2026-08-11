@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import StatusBadge from '@/components/common/StatusBadge.vue';
 import DataTable from '@/components/tables/DataTable.vue';
+import Icon from '@/components/common/Icon.vue';
 import salesApi from '@/services/sales';
 import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
@@ -43,7 +44,13 @@ onMounted(async () => {
                         View Invoice
                     </RouterLink>
                     <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id } }" class="px-4 py-2 text-sm rounded-md border border-slate-300">Edit</RouterLink>
-                    <RouterLink :to="{ name: 'sales.index' }" class="px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover">Back</RouterLink>
+                    <RouterLink
+                        :to="{ name: 'sales.index' }"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-accent-solid text-on-accent-solid hover:bg-accent-solid-hover"
+                    >
+                        <Icon name="arrow-left" class="h-4 w-4" />
+                        Back
+                    </RouterLink>
                 </div>
             </div>
 
@@ -52,13 +59,6 @@ onMounted(async () => {
                     <div><dt class="text-slate-400">Customer</dt><dd class="text-slate-800 font-medium">{{ sale.customer?.name }}</dd></div>
                     <div><dt class="text-slate-400">Customer Phone</dt><dd class="text-slate-800 font-medium">{{ sale.customer?.phone || '—' }}</dd></div>
                     <div><dt class="text-slate-400">Sale Date</dt><dd class="text-slate-800 font-medium">{{ formatDate(sale.sale_date) }}</dd></div>
-                    <div>
-                        <dt class="text-slate-400">Warranty</dt>
-                        <dd class="text-slate-800 font-medium">
-                            {{ formatWarranty(sale.sale_date, sale.warranty_end_date) || '—' }}
-                            <span v-if="sale.warranty_end_date" class="text-slate-400 font-normal">(until {{ formatDate(sale.warranty_end_date) }})</span>
-                        </dd>
-                    </div>
                     <div><dt class="text-slate-400">Status</dt><dd><StatusBadge :status="sale.status?.slug" /></dd></div>
                     <div><dt class="text-slate-400">Payment</dt><dd><StatusBadge :status="sale.payment_status" /> <span class="text-slate-500">({{ sale.payment_method }})</span></dd></div>
                     <div><dt class="text-slate-400">Created By</dt><dd class="text-slate-800 font-medium">{{ sale.created_by }}</dd></div>
@@ -69,7 +69,7 @@ onMounted(async () => {
 
             <DataTable :columns="columns" :rows="sale.items" row-key="id">
                 <template #cell-unit_price="{ row }">{{ formatCurrency(row.unit_price) }}</template>
-                <template #cell-warranty>{{ formatWarranty(sale.sale_date, sale.warranty_end_date) || '—' }}</template>
+                <template #cell-warranty="{ row }">{{ formatWarranty(sale.sale_date, row.warranty_end_date) || '—' }}</template>
                 <template #cell-total_price="{ row }">{{ formatCurrency(row.total_price) }}</template>
             </DataTable>
 

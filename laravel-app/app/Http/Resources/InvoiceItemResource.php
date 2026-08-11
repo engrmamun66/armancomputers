@@ -18,6 +18,7 @@ class InvoiceItemResource extends JsonResource
             'quantity' => $this->quantity,
             'unit_price' => (float) $this->unit_price,
             'total_price' => (float) $this->total_price,
+            'warranty_end_date' => $this->warranty_end_date,
         ];
     }
 }

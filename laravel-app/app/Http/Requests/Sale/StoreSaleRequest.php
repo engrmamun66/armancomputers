@@ -16,7 +16,6 @@ class StoreSaleRequest extends FormRequest
         return [
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'sale_date' => ['required', 'date'],
-            'warranty_end_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'additional_cost' => ['nullable', 'numeric', 'min:0'],
@@ -26,6 +25,7 @@ class StoreSaleRequest extends FormRequest
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.warranty_end_date' => ['nullable', 'date'],
         ];
     }
 }

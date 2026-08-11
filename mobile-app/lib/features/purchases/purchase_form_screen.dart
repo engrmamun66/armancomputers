@@ -24,6 +24,9 @@ class _LineItemDraft {
   final int productId;
   final String? productName;
   final String? sku;
+  // Carried through from the existing item on edit — no picker to change it
+  // yet, but editing a Purchase must not silently wipe a warranty set elsewhere.
+  final String? warrantyEndDate;
   final TextEditingController quantityController;
   final TextEditingController unitPriceController;
 
@@ -34,6 +37,7 @@ class _LineItemDraft {
     this.sku,
     required int quantity,
     required double unitPrice,
+    this.warrantyEndDate,
   })  : quantityController = TextEditingController(text: quantity.toString()),
         unitPriceController = TextEditingController(text: unitPrice.toStringAsFixed(2));
 
@@ -48,6 +52,7 @@ class _LineItemDraft {
         sku: sku,
         quantity: quantity,
         unitPrice: unitPrice,
+        warrantyEndDate: warrantyEndDate,
       );
 
   void dispose() {
@@ -132,6 +137,7 @@ class _PurchaseFormScreenState extends ConsumerState<PurchaseFormScreen> {
               sku: li.sku,
               quantity: li.quantity,
               unitPrice: li.unitPrice,
+              warrantyEndDate: li.warrantyEndDate,
             )));
       setState(() => _loading = false);
     } on ApiException catch (e) {

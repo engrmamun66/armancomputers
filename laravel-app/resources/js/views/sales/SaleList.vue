@@ -17,7 +17,7 @@ import { useAuthStore } from '@/stores/auth';
 import { can } from '@/utils/permissions';
 import { useToast } from '@/composables/useToast';
 import { useConfirm } from '@/composables/useConfirm';
-import { formatCurrency, formatDate, formatDateTime, formatWarranty } from '@/utils/format';
+import { formatCurrency, formatDate, formatDateTime } from '@/utils/format';
 
 const auth = useAuthStore();
 const canManage = can(auth.roleSlug, 'sales.manage');
@@ -34,7 +34,6 @@ const columns = [
     { key: 'total_qty', label: 'Items / Qty', align: 'right' },
     { key: 'grand_total', label: 'Total Amount', align: 'right' },
     { key: 'payment', label: 'Payment', align: 'right', sortable: false },
-    { key: 'warranty', label: 'Warranty', sortable: false },
     { key: 'status', label: 'Status' },
     { key: 'actions', label: 'Actions', align: 'right' },
 ];
@@ -225,7 +224,6 @@ async function removeSale(sale) {
                     <div>Paid: {{ formatCurrency(row.paid_amount) }}</div>
                     <div :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : 'text-slate-400'">Due: {{ formatCurrency(row.due_amount) }}</div>
                 </template>
-                <template #cell-warranty="{ row }">{{ formatWarranty(row.sale_date, row.warranty_end_date) || '—' }}</template>
                 <template #cell-status="{ row }">
                     <div class="flex flex-col gap-1 items-start">
                         <StatusBadge :status="row.status?.slug" />
@@ -263,7 +261,6 @@ async function removeSale(sale) {
                         Paid: {{ formatCurrency(row.paid_amount) }} · Due:
                         <span :class="row.due_amount > 0 ? 'text-rose-600 font-medium' : ''">{{ formatCurrency(row.due_amount) }}</span>
                     </p>
-                    <p class="text-sm text-slate-500">Warranty: {{ formatWarranty(row.sale_date, row.warranty_end_date) || '—' }}</p>
                     <div class="flex gap-2 mt-3 text-sm">
                         <RouterLink v-if="row.invoice_id" :to="{ name: 'invoices.show', params: { id: row.invoice_id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-slate-600 bg-slate-200">Invoice</RouterLink>
                         <RouterLink v-if="canManage" :to="{ name: 'sales.edit', params: { id: row.id } }" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-primary-700 bg-primary-50">Edit</RouterLink>

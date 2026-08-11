@@ -8,6 +8,7 @@ class LineItem {
   final int quantity;
   final double unitPrice;
   final double? totalPrice;
+  final String? warrantyEndDate;
 
   LineItem({
     this.id,
@@ -17,6 +18,7 @@ class LineItem {
     required this.quantity,
     required this.unitPrice,
     this.totalPrice,
+    this.warrantyEndDate,
   });
 
   factory LineItem.fromJson(Map<String, dynamic> json) => LineItem(
@@ -27,12 +29,14 @@ class LineItem {
         quantity: (json['quantity'] as num).toInt(),
         unitPrice: (json['unit_price'] as num).toDouble(),
         totalPrice: (json['total_price'] as num?)?.toDouble(),
+        warrantyEndDate: json['warranty_end_date'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
         'product_id': productId,
         'quantity': quantity,
         'unit_price': unitPrice,
+        'warranty_end_date': warrantyEndDate,
       };
 
   double get lineTotal => totalPrice ?? (quantity * unitPrice);

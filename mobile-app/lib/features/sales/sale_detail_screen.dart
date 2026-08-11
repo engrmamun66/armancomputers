@@ -187,19 +187,6 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
               Text(formatDate(sale.saleDate), style: TextStyle(color: scheme.onSurfaceVariant)),
             ],
           ),
-          if (sale.warrantyEndDate != null) ...[
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.shield_outlined, size: 16, color: scheme.onSurfaceVariant),
-                const SizedBox(width: 6),
-                Text(
-                  'Warranty: ${formatWarranty(sale.saleDate, sale.warrantyEndDate) ?? '—'} (until ${formatDate(sale.warrantyEndDate)})',
-                  style: TextStyle(color: scheme.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ],
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -264,14 +251,14 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
               children: [
                 for (int i = 0; i < sale.items.length; i++) ...[
                   if (i > 0) const Divider(height: 20),
-                  _buildItemRow(context, sale.items[i]),
+                  _buildItemRow(context, sale.items[i], sale.saleDate),
                 ],
               ],
             ),
     );
   }
 
-  Widget _buildItemRow(BuildContext context, LineItem item) {
+  Widget _buildItemRow(BuildContext context, LineItem item, String startDate) {
     final scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,6 +273,11 @@ class _SaleDetailScreenState extends ConsumerState<SaleDetailScreen> {
             Text(formatCurrency(item.lineTotal), style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
+        if (item.warrantyEndDate != null) ...[
+          const SizedBox(height: 4),
+          Text('Warranty: ${formatWarranty(startDate, item.warrantyEndDate) ?? '—'}',
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
+        ],
       ],
     );
   }

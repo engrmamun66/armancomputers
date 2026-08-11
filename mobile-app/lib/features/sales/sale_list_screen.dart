@@ -409,8 +409,7 @@ class _SaleListScreenState extends ConsumerState<SaleListScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                '${sale.itemsCount ?? sale.items.length} item(s) · Qty ${sale.totalQty ?? 0}'
-                '${formatWarranty(sale.saleDate, sale.warrantyEndDate) != null ? ' · Warranty: ${formatWarranty(sale.saleDate, sale.warrantyEndDate)}' : ''}',
+                '${sale.itemsCount ?? sale.items.length} item(s) · Qty ${sale.totalQty ?? 0}',
                 style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12),
               ),
               const SizedBox(height: 10),

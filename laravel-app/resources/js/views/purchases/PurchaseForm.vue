@@ -270,11 +270,10 @@ async function submit() {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Warranty End Date</label>
-                        <EmDateTimePicker
+                        <input
                             v-model="form.warranty_end_date"
-                            model-value-type="date"
-                            placeholder="Optional"
-                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
+                            type="date"
+                            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
                         />
                         <p v-if="errors.warranty_end_date" class="mt-1 text-xs text-rose-600">{{ errors.warranty_end_date[0] }}</p>
                     </div>
@@ -345,11 +344,10 @@ async function submit() {
                                     </div>
                                 </td>
                                 <td class="py-2 pr-3">
-                                    <EmDateTimePicker
+                                    <input
                                         v-model="item.warranty_end_date"
-                                        model-value-type="date"
-                                        placeholder="Optional"
-                                        classes="w-full px-2 py-1 text-sm border border-slate-300 rounded-md"
+                                        type="date"
+                                        class="w-full px-2 py-1 text-sm border border-slate-300 rounded-md"
                                     />
                                 </td>
                                 <td class="py-2 pr-3 text-right font-medium">{{ formatCurrency((item.quantity || 0) * (item.unit_price || 0)) }}</td>

@@ -14,7 +14,7 @@ import productsApi from '@/services/products';
 import lookups from '@/services/lookups';
 import { useToast } from '@/composables/useToast';
 import Icon from '@/components/common/Icon.vue';
-import { formatCurrency, formatWarranty } from '@/utils/format';
+import { formatCurrency } from '@/utils/format';
 
 const props = defineProps({ id: { type: [String, Number], default: null } });
 const router = useRouter();
@@ -26,6 +26,7 @@ const saving = ref(false);
 const errors = ref({});
 const generalError = ref('');
 const referenceNo = ref(null);
+const invoiceId = ref(null);
 
 const PAYMENT_METHODS = [
     { value: 'cash', label: 'Cash' },
@@ -38,7 +39,6 @@ const PAYMENT_METHODS = [
 const form = reactive({
     customer_id: null,
     sale_date: new Date().toISOString().slice(0, 10),
-    warranty_end_date: '',
     notes: '',
     discount: 0,
     additional_cost: 0,
@@ -54,11 +54,11 @@ onMounted(async () => {
         const { data } = await salesApi.get(props.id);
         const sale = data.data;
         referenceNo.value = sale.reference_no;
+        invoiceId.value = sale.invoice_id;
         selectedCustomer.value = sale.customer;
         Object.assign(form, {
             customer_id: sale.customer?.id,
             sale_date: sale.sale_date?.slice(0, 10),
-            warranty_end_date: sale.warranty_end_date?.slice(0, 10) || '',
             notes: sale.notes || '',
             discount: sale.discount,
             additional_cost: sale.additional_cost,
@@ -72,6 +72,7 @@ onMounted(async () => {
             available_stock: null,
             quantity: item.quantity,
             unit_price: item.unit_price,
+            warranty_end_date: item.warranty_end_date?.slice(0, 10) || '',
         }));
     }
     loading.value = false;
@@ -133,6 +134,7 @@ function addProduct(product) {
         available_stock: product.current_stock,
         quantity: 1,
         unit_price: product.selling_price,
+        warranty_end_date: '',
     });
 }
 
@@ -205,7 +207,6 @@ async function submit() {
         const payload = {
             customer_id: form.customer_id,
             sale_date: form.sale_date,
-            warranty_end_date: form.warranty_end_date || null,
             notes: form.notes,
             discount: Number(form.discount) || 0,
             additional_cost: Number(form.additional_cost) || 0,
@@ -215,6 +216,7 @@ async function submit() {
                 product_id: item.product_id,
                 quantity: Number(item.quantity),
                 unit_price: Number(item.unit_price),
+                warranty_end_date: item.warranty_end_date || null,
             })),
         };
 
@@ -224,8 +226,8 @@ async function submit() {
         } else {
             await salesApi.create(payload);
             toast.success('Sale created successfully.');
+            router.push({ name: 'sales.index' });
         }
-        router.push({ name: 'sales.index' });
     } catch (error) {
         if (error.response?.status === 422) {
             errors.value = error.response.data.errors || {};
@@ -244,6 +246,13 @@ async function submit() {
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-lg font-semibold text-slate-900">{{ isEdit ? 'Edit Sale' : 'New Sale' }}</h1>
             <div class="flex gap-3">
+                <RouterLink
+                    v-if="invoiceId"
+                    :to="{ name: 'invoices.show', params: { id: invoiceId } }"
+                    class="px-3 py-2 text-sm rounded-md border border-slate-300 hover:bg-slate-50"
+                >
+                    View Invoice
+                </RouterLink>
                 <RouterLink
                     v-if="isEdit"
                     :to="{ name: 'sales.show', params: { id: props.id } }"
@@ -290,16 +299,6 @@ async function submit() {
                             classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
                         />
                         <p v-if="errors.sale_date" class="mt-1 text-xs text-rose-600">{{ errors.sale_date[0] }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Warranty End Date</label>
-                        <EmDateTimePicker
-                            v-model="form.warranty_end_date"
-                            model-value-type="date"
-                            placeholder="Optional"
-                            classes="w-full px-3 py-2 text-sm border border-slate-300 rounded-md"
-                        />
-                        <p v-if="errors.warranty_end_date" class="mt-1 text-xs text-rose-600">{{ errors.warranty_end_date[0] }}</p>
                     </div>
                 </div>
             </div>
@@ -350,7 +349,13 @@ async function submit() {
                                         </div>
                                     </td>
                                     <td class="py-2 pr-3 text-right font-medium">{{ formatCurrency((item.quantity || 0) * (item.unit_price || 0)) }}</td>
-                                    <td class="py-2 pr-3 text-slate-500">{{ formatWarranty(form.sale_date, form.warranty_end_date) || '—' }}</td>
+                                    <td class="py-2 pr-3">
+                                        <input
+                                            v-model="item.warranty_end_date"
+                                            type="date"
+                                            class="w-full px-2 py-1 text-sm border border-slate-300 rounded-md"
+                                        />
+                                    </td>
                                     <td class="py-2 text-right">
                                         <button type="button" class="text-rose-600 hover:text-rose-700" @click="removeItem(index)">Remove</button>
                                     </td>

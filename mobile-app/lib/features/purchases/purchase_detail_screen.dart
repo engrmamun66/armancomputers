@@ -204,7 +204,7 @@ class _PurchaseDetailScreenState extends ConsumerState<PurchaseDetailScreen> {
                       children: purchase.items
                           .map((item) => Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
-                                child: _buildItemRow(context, item),
+                                child: _buildItemRow(context, item, purchase.purchaseDate),
                               ))
                           .toList(),
                     ),
@@ -253,7 +253,7 @@ class _PurchaseDetailScreenState extends ConsumerState<PurchaseDetailScreen> {
     );
   }
 
-  Widget _buildItemRow(BuildContext context, LineItem item) {
+  Widget _buildItemRow(BuildContext context, LineItem item, String startDate) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(12),
@@ -272,6 +272,9 @@ class _PurchaseDetailScreenState extends ConsumerState<PurchaseDetailScreen> {
             children: [
               Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
               Text('Unit Price: ${formatCurrency(item.unitPrice)}', style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
+              if (item.warrantyEndDate != null)
+                Text('Warranty: ${formatWarranty(startDate, item.warrantyEndDate) ?? '—'}',
+                    style: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant)),
             ],
           ),
           const SizedBox(height: 6),
