@@ -2,6 +2,8 @@
 
 ## 1. Build assets locally
 
+Server doesn't need Node — build on your machine, upload the output (`public/build/`) in step 2.
+
 ```bash
 cd laravel-app
 npm ci
