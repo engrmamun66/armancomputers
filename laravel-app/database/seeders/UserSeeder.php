@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
                 'name' => 'Arman',
                 'email' => 'admin@armancomputers.com',
                 'role' => Role::MANAGER,
-                'password' => 'ManagerAC!2026#Qz4'
+                'password' => 'Arman1997#'
             ],
         ];
 
