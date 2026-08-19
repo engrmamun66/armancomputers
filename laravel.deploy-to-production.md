@@ -18,6 +18,14 @@ Zip `laravel-app/`'s contents (include `vendor/` and `public/build/`), upload + 
 composer install --no-dev --optimize-autoloader   # run this locally before zipping if vendor/ isn't already included
 ```
 
+If server's `composer` command errors with `Could not open input file: .../composer.phar` (broken alias pointing at some other domain's path — seen on this host), bypass it:
+
+```bash
+cd ~/armancomputers.net
+curl -sS https://getcomposer.org/installer | php
+php composer.phar install --no-dev --optimize-autoloader
+```
+
 ## 3. Set document root
 
 cPanel → Domains → set Document Root to `armancomputers.net/public`
