@@ -12,18 +12,17 @@ npm run build
 
 ## 2. Upload code
 
-- Git: `git clone <repo-url> laravel-app` on server, or
-- Manual: zip `laravel-app/` (include `vendor/`, `public/build/`), upload + extract via File Manager
-
-If code is already cloned on server: just upload local `laravel-app/public/build/` into the same path on server (`public/build` is gitignored, won't exist from a clone).
+Zip `laravel-app/`'s contents (include `vendor/` and `public/build/`), upload + extract directly into `armancomputers.net/` via File Manager (no nested `laravel-app` folder on server — its contents go straight into `armancomputers.net/`).
 
 ```bash
-composer install --no-dev --optimize-autoloader
+composer install --no-dev --optimize-autoloader   # run this locally before zipping if vendor/ isn't already included
 ```
 
 ## 3. Set document root
 
-cPanel → Domains → set Document Root to `laravel-app/public`
+cPanel → Domains → set Document Root to `armancomputers.net/public`
+
+(Since `laravel-app/`'s contents were uploaded directly into `armancomputers.net/`, `public/` sits right under it — no extra `laravel-app` segment in the path.)
 
 ## 4. `.env`
 
@@ -59,11 +58,12 @@ chmod -R 775 storage bootstrap/cache
 
 ## Redeploy (updates)
 
+Re-upload changed files (or full zip re-extract) into `armancomputers.net/`, then:
+
 ```bash
-git pull
-composer install --no-dev --optimize-autoloader
-npm run build   # locally, then re-upload public/build/
-php artisan migrate --force
+composer install --no-dev --optimize-autoloader   # only if composer.json/lock changed
+# rebuild locally + re-upload public/build/ if resources/js or resources/css changed
+php artisan migrate --force                       # only if new migrations
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
