@@ -15,6 +15,8 @@ npm run build
 - Git: `git clone <repo-url> laravel-app` on server, or
 - Manual: zip `laravel-app/` (include `vendor/`, `public/build/`), upload + extract via File Manager
 
+If code is already cloned on server: just upload local `laravel-app/public/build/` into the same path on server (`public/build` is gitignored, won't exist from a clone).
+
 ```bash
 composer install --no-dev --optimize-autoloader
 ```
